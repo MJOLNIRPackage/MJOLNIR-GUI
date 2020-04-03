@@ -54,7 +54,7 @@ class mywindow(QtWidgets.QMainWindow):
         
         
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
-        
+        self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_plot_button_function)
         
         # self.ui.DataSet_binning_comboBox.
         
@@ -76,12 +76,21 @@ class mywindow(QtWidgets.QMainWindow):
         if not hasattr(self, 'fileList'):
             self.DataSet_convertData_button_function()
         
-        # Should take options from the window
-        V = self.ds.View3D(0.02,0.02,0.1)
+        QXBin=float(self.ui.View3D_QXBin_lineEdit.text())
+        QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
+        EBin =float(self.ui.View3D_EBin_lineEdit.text())
+        self.V = self.ds.View3D(QXBin,QYBin,EBin)
         
-        # This should be replaced with a call to the future set c axis function
-        V.caxis = (0,1e-6)
-        self.V=V
+        self.View3D_setCAxis_button_function()
+        
+    def View3D_setCAxis_button_function(self):
+        #For some reason this creates a new window when it is clicked. It shouldn't.
+        if not hasattr(self, 'V'):
+            self.View3D_plot_button_function()
+            
+        CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
+        self.V.caxis = (CAxisMin,CAxisMax)
         
 
 
