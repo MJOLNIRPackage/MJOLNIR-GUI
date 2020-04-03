@@ -65,6 +65,9 @@
     <property name="currentText">
      <string>8</string>
     </property>
+    <property name="currentIndex">
+     <number>2</number>
+    </property>
     <item>
      <property name="text">
       <string>1</string>

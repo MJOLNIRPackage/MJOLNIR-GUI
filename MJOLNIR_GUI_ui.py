@@ -461,6 +461,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuMask.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.DataSet_binning_comboBox.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

@@ -52,14 +52,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
         
         
-        self.ui.pushButton_12.clicked.connect(self.testTitle)
         
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         
         
-    def testTitle(self):
-        
-        print("It's working!")
+        # self.ui.DataSet_binning_comboBox.
         
         
     def DataSet_convertData_button_function(self):
@@ -67,16 +64,19 @@ class mywindow(QtWidgets.QMainWindow):
         fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
         self.fileList=fileList
 
+
+        binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = GuiDataSet(self.fileList)
-        ds.convertDataFile(binning=8,saveFile=False)
+        ds.convertDataFile(binning=binning,saveFile=False)
         self.ds=ds
         
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
         if not hasattr(self, 'fileList'):
-            self.DataSet_convertData_button_function(self)
+            self.DataSet_convertData_button_function()
         
+        # Should take options from the window
         V = self.ds.View3D(0.02,0.02,0.1)
         
         # This should be replaced with a call to the future set c axis function
