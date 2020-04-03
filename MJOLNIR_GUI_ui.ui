@@ -14,29 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListWidget" name="DataSet_filenames_listWidget">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>110</y>
-      <width>161</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectItems</enum>
-    </property>
-    <item>
-     <property name="text">
-      <string>filename1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>filename2</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="DataSet_convertData_button">
     <property name="geometry">
      <rect>
@@ -1134,11 +1111,20 @@
      <string>Path/To/Current/Directory/</string>
     </property>
    </widget>
+   <widget class="QListView" name="DataSet_filenames_listView">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>110</y>
+      <width>161</width>
+      <height>151</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_2</zorder>
    <zorder>groupBox</zorder>
-   <zorder>DataSet_filenames_listWidget</zorder>
    <zorder>DataSet_convertData_button</zorder>
    <zorder>DataSet_binning_comboBox</zorder>
    <zorder>label</zorder>
@@ -1159,6 +1145,7 @@
    <zorder>label_13</zorder>
    <zorder>label_14</zorder>
    <zorder>DataSet_path_lineEdit</zorder>
+   <zorder>DataSet_filenames_listView</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
