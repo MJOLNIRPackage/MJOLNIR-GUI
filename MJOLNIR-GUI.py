@@ -1,10 +1,13 @@
 
 
-import IPython
-shell = IPython.get_ipython()
-shell.enable_matplotlib(gui='qt')
+try:
+    import IPython
+    shell = IPython.get_ipython()
+    shell.enable_matplotlib(gui='qt')
+except:
+    pass
 
-from MJOLNIR.Data import DataSet
+from MJOLNIR.Data import DataSet,DataFile
 from MJOLNIR import _tools # Usefull tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,9 +17,15 @@ plt.ion()
 
 from PyQt5 import QtWidgets
 
-from MJOLNIRGui_ui2 import Ui_MainWindow  
+from MJOLNIR_GUI_ui import Ui_MainWindow  
 
 import sys
+
+class GuiDataSet(DataSet.DataSet):
+    def __init__(self,dataFiles=None, **kwargs):
+        print('Got datafiles:\n',dataFiles)
+        super(GuiDataSet,self).__init__(dataFiles=dataFiles,**kwargs)
+
 
 class mywindow(QtWidgets.QMainWindow):
 
@@ -39,13 +48,9 @@ class mywindow(QtWidgets.QMainWindow):
         print("It's working!")
     def View3D_plot_button_function(self):
         
+        fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
         
-
-        numbers = '493-500' # String of data numbers
-
-
-        fileList = _tools.fileListGenerator(numbers,'C:/Users/jacobsen_h/Dropbox/MJOLINRfun/rawdata/',2018) # Create file list from 2018 in specified folder
-        ds = DataSet.DataSet(fileList)
+        ds = GuiDataSet(fileList)
         ds.convertDataFile(binning=8,saveFile=False)
         V = ds.View3D(0.02,0.02,0.1)
         V.caxis = (0,1e-6)
