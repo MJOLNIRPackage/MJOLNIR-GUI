@@ -37,9 +37,6 @@ class mywindow(QtWidgets.QMainWindow):
     def testTitle(self):
         
         print("It's working!")
-        print("It's working more!")
-        
-        #So how does this work?
     def View3D_plot_button_function(self):
         
         
