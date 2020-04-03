@@ -14,14 +14,17 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="DataSet_filenames_listWidget">
     <property name="geometry">
      <rect>
       <x>130</x>
       <y>110</y>
-      <width>321</width>
+      <width>161</width>
       <height>151</height>
      </rect>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectItems</enum>
     </property>
     <item>
      <property name="text">
@@ -34,11 +37,11 @@
      </property>
     </item>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="DataSet_convertData_button">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>160</y>
+      <x>300</x>
+      <y>240</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -47,11 +50,11 @@
      <string>Convert Data</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="DataSet_binning_comboBox">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>130</y>
+      <x>300</x>
+      <y>210</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -81,8 +84,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>110</y>
+      <x>310</x>
+      <y>180</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -326,8 +329,8 @@
    <widget class="QPushButton" name="pushButton_10">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>50</y>
+      <x>130</x>
+      <y>20</y>
       <width>111</width>
       <height>23</height>
      </rect>
@@ -339,8 +342,8 @@
    <widget class="QPushButton" name="pushButton_11">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>80</y>
+      <x>130</x>
+      <y>50</y>
       <width>131</width>
       <height>23</height>
      </rect>
@@ -411,6 +414,19 @@
      </property>
      <property name="text">
       <string>Set c axis</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="View3D_plot_button">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>80</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot View3D</string>
      </property>
     </widget>
    </widget>
@@ -710,7 +726,7 @@
        <x>50</x>
        <y>140</y>
        <width>216</width>
-       <height>21</height>
+       <height>22</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_9">
@@ -859,7 +875,7 @@
       <rect>
        <x>100</x>
        <y>20</y>
-       <width>141</width>
+       <width>156</width>
        <height>41</height>
       </rect>
      </property>
@@ -1037,26 +1053,91 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="View3D_plot_button">
+   <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>20</y>
-      <width>75</width>
-      <height>23</height>
+      <x>410</x>
+      <y>80</y>
+      <width>71</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Plot View3D</string>
+     <string>Temperature</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>100</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Magnetic field</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>120</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sample name</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>140</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scan command</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>160</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Type of scan</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="DataSet_path_lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>80</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Path/To/Current/Directory/</string>
     </property>
    </widget>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_2</zorder>
    <zorder>groupBox</zorder>
-   <zorder>listWidget</zorder>
-   <zorder>pushButton</zorder>
-   <zorder>comboBox</zorder>
+   <zorder>DataSet_filenames_listWidget</zorder>
+   <zorder>DataSet_convertData_button</zorder>
+   <zorder>DataSet_binning_comboBox</zorder>
    <zorder>label</zorder>
    <zorder>gridLayoutWidget</zorder>
    <zorder>gridLayoutWidget_2</zorder>
@@ -1069,7 +1150,12 @@
    <zorder>pushButton_10</zorder>
    <zorder>pushButton_11</zorder>
    <zorder>lineEdit_6</zorder>
-   <zorder>View3D_plot_button</zorder>
+   <zorder>label_10</zorder>
+   <zorder>label_11</zorder>
+   <zorder>label_12</zorder>
+   <zorder>label_13</zorder>
+   <zorder>label_14</zorder>
+   <zorder>DataSet_path_lineEdit</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

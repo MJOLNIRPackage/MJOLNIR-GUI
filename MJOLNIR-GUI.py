@@ -21,6 +21,16 @@ from MJOLNIR_GUI_ui import Ui_MainWindow
 
 import sys
 
+
+
+
+# Naming convention: WhereInGui_description_type
+# Append _function if it is a function
+# E.g.: View3D_plot_button and View3D_plot_button_function
+
+#Headlines so far are:
+#DataSet, View3D, QELine, QPlane, Cut1D,
+
 class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None, **kwargs):
         print('Got datafiles:\n',dataFiles)
