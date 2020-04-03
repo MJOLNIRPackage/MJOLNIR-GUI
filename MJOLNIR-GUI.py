@@ -12,6 +12,8 @@ from MJOLNIR import _tools # Usefull tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 plt.ion()
 
 
@@ -90,7 +92,7 @@ class mywindow(QtWidgets.QMainWindow):
             
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
-        self.V.caxis = (CAxisMin,CAxisMax)
+        self.V.set_clim(CAxisMin,CAxisMax)
         
 
 
