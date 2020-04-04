@@ -82,7 +82,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_plot_button_function)
         
-        # self.ui.DataSet_binning_comboBox.
+        
+        
+        self.V=None
         
         
     def DataSet_convertData_button_function(self):
@@ -114,13 +116,17 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.View3D_setCAxis_button_function()
         
+        
+        
     def View3D_setCAxis_button_function(self):
         #For some reason this creates a new window when it is clicked. It shouldn't.
-        if not hasattr(self, 'V'):
+        # if not hasattr(self, 'V'):
+        if self.V is None:
             self.View3D_plot_button_function()
             
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
+        
         self.V.set_clim(CAxisMin,CAxisMax)
         
     def setupDebugDataSet(self):
