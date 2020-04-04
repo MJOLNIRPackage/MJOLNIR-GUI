@@ -92,21 +92,20 @@ class mywindow(QtWidgets.QMainWindow):
         #fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
 
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
-        ds = self.dataSets[self.DataFileModel.currentDataFileIndex]#GuiDataSet(files)
+        self.dataSets[self.currentDataSetIndex].convertDataFile(binning=binning,saveFile=False)
         
-        ds.convertDataFile(binning=binning,saveFile=False)
-        self.ds=ds
         
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
-        if not hasattr(self, 'fileList'):
+        if len(self.dataSets[self.currentDataSetIndex].convertedFiles)==0:
             self.DataSet_convertData_button_function()
         
         QXBin=float(self.ui.View3D_QXBin_lineEdit.text())
         QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
         EBin =float(self.ui.View3D_EBin_lineEdit.text())
-        self.V = self.ds.View3D(QXBin,QYBin,EBin)
+        
+        self.V = self.dataSets[self.currentDataSetIndex].View3D(QXBin,QYBin,EBin)
         
         self.View3D_setCAxis_button_function()
         
