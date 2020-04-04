@@ -75,8 +75,8 @@ class mywindow(QtWidgets.QMainWindow):
         
         
 
-        self.ui.DataSet_filenames_listWidget.setModel(self.DataFileModel)
-        self.ui.DataSet_filenames_listWidget.clicked.connect(self.selectedDataFileChanged)
+        self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
+        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
         self.DataFileModel.currentDataFileIndex = 0
         
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
@@ -90,15 +90,9 @@ class mywindow(QtWidgets.QMainWindow):
     def DataSet_convertData_button_function(self):
         #The loading should be moved to a different button        
         #fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
-        self.fileList=self.dataSets[self.DataFileModel.currentDataFileIndex]
-
 
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
-        files = []
-        for f in self.fileList:
-            df = GuiDataFile(f)
-            files.append(df)
-        ds = GuiDataSet(files)
+        ds = self.dataSets[self.DataFileModel.currentDataFileIndex]#GuiDataSet(files)
         
         ds.convertDataFile(binning=binning,saveFile=False)
         self.ds=ds
@@ -179,7 +173,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataFileModel.layoutChanged.emit()
 
     def selectedDataFileChanged(self,*args,**kwargs):
-        self.currentDataFileIndex = self.ui.DataSet_filenames_listWidget.selectedIndexes()[0].row()
+        self.currentDataFileIndex = self.ui.DataSet_filenames_listView.selectedIndexes()[0].row()
         self.DataFileModel.updateCurrentDataFileIndex(self.currentDataFileIndex)
         self.DataFileModel.layoutChanged.emit()
         print('Set {} and file {}'.format(self.currentDataSetIndex,self.currentDataFileIndex))
