@@ -40,7 +40,6 @@ class GuiDataSet(DataSet.DataSet):
         
     
     def setData(self,column,value):
-        print('Setting data on dataset {}',self.name)
         if column == 0: self.name = value
         
 
@@ -53,7 +52,6 @@ class GuiDataFile(DataFile.DataFile):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
         
     def setData(self,column,value):
-        print('Setting value!')
         if column == 0: self.name = value
 
     def flags(self):
@@ -191,6 +189,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
         self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
         self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
+        self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
 
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
         
@@ -243,39 +242,29 @@ class mywindow(QtWidgets.QMainWindow):
         self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
-        #self.currentDataSetIndex = self.ui.DataSet_DataSets_listView.selectedIndexes()[0].row()
         self.DataFileModel.updateCurrentDataSetIndex()
-        
-        #self.DataFileModel.layoutChanged.emit()
 
     def selectedDataFileChanged(self,*args,**kwargs):
-        self.currentDataFileIndex = self.ui.DataSet_filenames_listView.selectedIndexes()[0].row()
-        
         self.DataFileModel.layoutChanged.emit()
-        print(self.DataFileModel.flags(self.ui.DataSet_filenames_listView.selectedIndexes()[0]))
-        #print('Set {} and file {}'.format(self.currentDataSetIndex,self.currentDataFileIndex))
 
 
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
-#        self.dataSets.append(ds)
         self.DataSetModel.append(ds)
-        #self.DataSetModel.layoutChanged.emit()
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
         
 
+
+    def DataSet_DeleteFiles_button_function(self):
+        self.DataFileModel.delete()
+
+
     def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
-        print('DOUBLE!! WoopWoop. Entering edit mode....')
-        print(index.row(),index.column())
-        self.ui.DataSet_DataSets_listView.setCurrentIndex(index)
-        self.ui.DataSet_DataSets_listView.edit(index)
+        self.ui.DataSet_DataSets_listView.edit(index,'Hej')
 
     def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
-        print('DataFile DOUBLE!! WoopWoop. Entering edit mode....')
-        print(index.row(),index.column())
-        self.ui.DataSet_filenames_listView.setCurrentIndex(index)
         self.ui.DataSet_filenames_listView.edit(index)
 
 def run():
