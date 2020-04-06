@@ -1,13 +1,15 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+from MJOLNIR_Data import GuiDataFile
 
 
 
 class DataSetModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, dataSets=None, **kwargs):
+    def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
         super(DataSetModel, self).__init__(*args, **kwargs)
         self.dataSets = dataSets or []
+        self.DataSet_DataSets_listView = DataSet_DataSets_listView
         
     def data(self, index, role):
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
@@ -52,6 +54,26 @@ class DataSetModel(QtCore.QAbstractListModel):
 
     def flags(self,index):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+
+    def getCurrentDatasetIndex(self):
+        indices = self.DataSet_DataSets_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            return self.DataSet_DataSets_listView.selectedIndexes()[0]
+
+    def getCurrentDatasetIndexRow(self):
+        currentIndex = self.getCurrentDatafileIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return currentIndex.row()
+
+    def getCurrentDataSet(self):
+        index = self.getCurrentDatasetIndex()
+        return self.item(index)
 
 
 
@@ -156,4 +178,14 @@ class DataFileModel(QtCore.QAbstractListModel):
     def delete(self):
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         del ds[self.getCurrentDatafileIndexRow()]
+        self.layoutChanged.emit()
+
+
+    def add(self,files):
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        dfs = []
+        for f in files:
+            dfs.append(GuiDataFile(f))
+
+        ds.append(dfs)
         self.layoutChanged.emit()
