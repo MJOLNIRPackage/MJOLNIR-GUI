@@ -30,6 +30,8 @@ import sys
 # Append _function if it is a function
 # E.g.: View3D_plot_button and View3D_plot_button_function
 
+#Naming not quite sticking to convention, I will do some cleanup at some point..
+
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D,
 
@@ -79,12 +81,30 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
         self.DataFileModel.currentDataFileIndex = 0
         
+        
+        
+        
+        ##############################################################################
+        # View3D
+        ##############################################################################       
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_setCAxis_button_function)
+        self.ui.View3D_SetTitle_button.clicked.connect(self.View3D_SetTitle_button_function)
         
+        ##############################################################################
+        # QELine
+        ##############################################################################
+        self.ui.QELine_plot_button.clicked.connect(self.QELine_plot_button_function)
+        self.ui.QELine_setCAxis_button.clicked.connect(self.QELine_setCAxis_button_function)
+        self.ui.QELine_SetTitle_button.clicked.connect(self.QELine_SetTitle_button_function)
         
-        
-        # self.V=None
+        ##############################################################################
+        # QPlane
+        ##############################################################################
+        self.ui.QPlane_plot_button.clicked.connect(self.QPlane_plot_button_function)
+        self.ui.QPlane_setCAxis_button.clicked.connect(self.QPlane_setCAxis_button_function)
+        self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
+
         
         
     def DataSet_convertData_button_function(self):
@@ -94,6 +114,9 @@ class mywindow(QtWidgets.QMainWindow):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         self.dataSets[self.currentDataSetIndex].convertDataFile(binning=binning,saveFile=False)
         
+        ##############################################################################
+        # View3D
+        ##############################################################################
         
     def View3D_plot_button_function(self):
 
@@ -110,14 +133,52 @@ class mywindow(QtWidgets.QMainWindow):
         self.View3D_setCAxis_button_function()
         
     def View3D_setCAxis_button_function(self):
-        #For some reason this creates a new window when it is clicked. It shouldn't.
-        # if not hasattr(self, 'V'):
-        #     self.View3D_plot_button_function()
+        if not hasattr(self, 'V'):
+            self.View3D_plot_button_function()
             
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
         
         self.V.set_clim(CAxisMin,CAxisMax)
+        
+    def View3D_SetTitle_button_function(self):        
+        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
+        self.V.set_title(TitleText)
+        
+        ##############################################################################
+        # QELine
+        ##############################################################################
+    def QELine_plot_button_function(self):
+        print('This button has not been implemented yet')
+
+    def QELine_setCAxis_button_function(self):
+        
+        CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
+        
+        # self.V.set_clim(CAxisMin,CAxisMax)
+        
+        print('This button has not been implemented yet')
+
+    def QELine_SetTitle_button_function(self):
+        TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
+        print('This button has not been implemented yet')
+
+
+        ##############################################################################
+        # QPlane
+        ##############################################################################        
+    def QPlane_plot_button_function(self):
+        print('This button has not been implemented yet')
+
+    def QPlane_setCAxis_button_function(self):
+        print('This button has not been implemented yet')        
+        CAxisMin=float(self.ui.QPlane_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.QPlane_CAxisMax_lineEdit.text())
+
+    def QPlane_SetTitle_button_function(self):
+        TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
+        print('This button has not been implemented yet')
         
     def setupDebugDataSet(self):
 
