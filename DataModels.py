@@ -10,7 +10,7 @@ class DataSetModel(QtCore.QAbstractListModel):
         self.dataSets = dataSets or []
         
     def data(self, index, role):
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
             text = self.dataSets[index.row()].name
             return text
         
@@ -19,9 +19,39 @@ class DataSetModel(QtCore.QAbstractListModel):
         #    if status:
         #        return tick
 
+    def getData(self,*args,**kwargs):
+        return self.data(*args,**kwargs)
+
     def rowCount(self, index):
         return len(self.dataSets)
 
+    def append(self,ds):
+        self.dataSets.append(ds)
+        print("DataSet '{}' was added.".format(ds.name))
+        self.layoutChanged.emit()
+
+    def delete(self,index):
+        try:
+            print("DataSet '{}' was deleted.".format(self.dataSets[index.row()].name))
+            del self.dataSets[index.row()]
+            self.layoutChanged.emit()
+        except:
+            pass
+
+    def item(self,index):
+        return self.dataSets[index.row()]
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        ds = self.dataSets[index.row()]
+        if role == QtCore.Qt.EditRole:
+            ds.name = value
+            self.dataChanged.emit(index, index)
+            return True
+            
+        return False
+
+    def flags(self,index):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
 
 
@@ -43,17 +73,17 @@ conversionList = defaultList(['name',
 
 
 class DataFileModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, dataSets=None, currentDataSetIndex=None,currentDataFileIndex=None, **kwargs):
+    def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None, **kwargs):
         super(DataFileModel, self).__init__(*args, **kwargs)
-        self.dataSets = dataSets or []
-        self.currentDataSetIndex = currentDataSetIndex
-        self.currentDataFileIndex = currentDataFileIndex
+        self.dataSetModel = dataSetModel
+        self.DataSet_DataSets_listView = DataSet_DataSets_listView
+        self.DataSet_filenames_listView = DataSet_filenames_listView
         
     def data(self, index, role):
 
         if role == Qt.DisplayRole:
             
-            text = self.dataSets[self.currentDataSetIndex][index.row()].name
+            text = self.dataSetModel.item(self.getCurrentIndex())[index.row()].name
             return text
         
         #if role == Qt.DecorationRole:
@@ -61,14 +91,45 @@ class DataFileModel(QtCore.QAbstractListModel):
         #    if status:
         #        return tick
 
-    def rowCount(self, index):
-        if self.currentDataSetIndex is None:
-            return 0
-        return len(self.dataSets[self.currentDataSetIndex])
+    def getCurrentIndex(self):
+        
+        indices = self.DataSet_DataSets_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            return self.DataSet_DataSets_listView.selectedIndexes()[0]
 
-    def updateCurrentDataSetIndex(self,index):
-        self.currentDataSetIndex = index
+    def getCurrentIndexRow(self):
+        currentIndex = self.getCurrentIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return self.getCurrentIndex().row()
+
+    def rowCount(self, index):
         
-    def updateCurrentDataFileIndex(self,index):
-        self.currentDataFileIndex = index
+        if self.getCurrentIndexRow() is None:
+            return 0
+        try:
+            length = len(self.dataSetModel.item(self.getCurrentIndex()))
+            return length
+        except IndexError:
+            return 0
+
+    def updateCurrentDataSetIndex(self):
+        self.layoutChanged.emit()
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        df = self.dataSets[self.getCurrentIndexRow()][index.row()]
         
+        if role == QtCore.Qt.EditRole:
+            df.name = value
+            
+            return True
+            
+        return False
+
+
+    def flags(self,index):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
