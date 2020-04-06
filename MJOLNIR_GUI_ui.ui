@@ -260,27 +260,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QListWidget" name="listWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>110</y>
-      <width>111</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Data set 1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Data set 2</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="DataSet_NewDataSet_button">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -293,7 +273,7 @@
      <string>New data set</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
+   <widget class="QPushButton" name="DataSet_DeleteDataSet_button">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1121,6 +1101,16 @@
      </rect>
     </property>
    </widget>
+   <widget class="QListView" name="DataSet_DataSets_listView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>111</width>
+      <height>151</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_2</zorder>
@@ -1133,9 +1123,8 @@
    <zorder>verticalLayoutWidget</zorder>
    <zorder>label_8</zorder>
    <zorder>verticalLayoutWidget_2</zorder>
-   <zorder>listWidget_2</zorder>
-   <zorder>pushButton_6</zorder>
-   <zorder>pushButton_7</zorder>
+   <zorder>DataSet_NewDataSet_button</zorder>
+   <zorder>DataSet_DeleteDataSet_button</zorder>
    <zorder>pushButton_10</zorder>
    <zorder>pushButton_11</zorder>
    <zorder>lineEdit_6</zorder>
@@ -1146,6 +1135,7 @@
    <zorder>label_14</zorder>
    <zorder>DataSet_path_lineEdit</zorder>
    <zorder>DataSet_filenames_listView</zorder>
+   <zorder>DataSet_DataSets_listView</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
