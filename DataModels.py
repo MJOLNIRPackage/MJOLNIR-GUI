@@ -83,7 +83,7 @@ class DataFileModel(QtCore.QAbstractListModel):
 
         if role == Qt.DisplayRole:
             
-            text = self.dataSetModel.item(self.getCurrentIndex())[index.row()].name
+            text = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].name
             return text
         
         #if role == Qt.DecorationRole:
@@ -91,7 +91,7 @@ class DataFileModel(QtCore.QAbstractListModel):
         #    if status:
         #        return tick
 
-    def getCurrentIndex(self):
+    def getCurrentDatasetIndex(self):
         
         indices = self.DataSet_DataSets_listView.selectedIndexes()
         
@@ -100,19 +100,36 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return self.DataSet_DataSets_listView.selectedIndexes()[0]
 
-    def getCurrentIndexRow(self):
-        currentIndex = self.getCurrentIndex()
+    def getCurrentDatasetIndexRow(self):
+        currentIndex = self.getCurrentDatasetIndex()
         if currentIndex is None:
             return None
         else:
-            return self.getCurrentIndex().row()
+            return currentIndex.row()
+
+    def getCurrentDatafileIndex(self):
+        indices = self.DataSet_filenames_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            return self.DataSet_filenames_listView.selectedIndexes()[0]
+
+    def getCurrentDatafileIndexRow(self):
+        currentIndex = self.getCurrentDatafileIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return currentIndex.row()
+
+
 
     def rowCount(self, index):
         
-        if self.getCurrentIndexRow() is None:
+        if self.getCurrentDatasetIndexRow() is None:
             return 0
         try:
-            length = len(self.dataSetModel.item(self.getCurrentIndex()))
+            length = len(self.dataSetModel.item(self.getCurrentDatasetIndex()))
             return length
         except IndexError:
             return 0
@@ -121,7 +138,8 @@ class DataFileModel(QtCore.QAbstractListModel):
         self.layoutChanged.emit()
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        df = self.dataSets[self.getCurrentIndexRow()][index.row()]
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        df = ds[index.row()]
         
         if role == QtCore.Qt.EditRole:
             df.name = value
@@ -133,3 +151,9 @@ class DataFileModel(QtCore.QAbstractListModel):
 
     def flags(self,index):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+
+    def delete(self):
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        del ds[self.getCurrentDatafileIndexRow()]
+        self.layoutChanged.emit()
