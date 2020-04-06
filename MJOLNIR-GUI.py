@@ -54,7 +54,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles
-        self.setupDebugDataSet()
+        
         
         ##############################################################################
         # View3D
@@ -174,28 +174,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
 
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
-        
-
-    def setupDebugDataSet(self):
-
-        files = ['camea2018n000494.hdf', 'camea2018n000495.hdf', 'camea2018n000496.hdf', 'camea2018n000497.hdf', 'camea2018n000498.hdf', 'camea2018n000499.hdf', 'camea2018n000500.hdf']
-        dfs = []
-        for f in files:
-            dfs.append(GuiDataFile(f))
-
-        ds = GuiDataSet(dfs,name='set1')
-        self.DataSetModel.append(ds)
-
-        files = ['camea2018n000494.hdf', 'camea2018n000495.hdf', 'camea2018n000496.hdf', 'camea2018n000497.hdf', 'camea2018n000498.hdf', 'camea2018n000499.hdf', 'camea2018n000500.hdf']
-        dfs = []
-        for f in files:
-            dfs.append(GuiDataFile(f))
-
-        ds2 = GuiDataSet(dfs,name='set2')
-        self.DataSetModel.append(ds2)
-        #for index in range(len(self.dataSets)):
-        #    item = self.ui.DataSet_filenames_listView.item(index)
-        #    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
 
 
     @property
@@ -239,7 +217,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataFileModel.delete()
 
     def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
-        self.ui.DataSet_DataSets_listView.edit(index,'Hej')
+        self.ui.DataSet_DataSets_listView.edit(index)
 
     def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
         self.ui.DataSet_filenames_listView.edit(index)

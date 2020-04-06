@@ -1,3 +1,4 @@
+from PyQt5 import QtCore
 from MJOLNIR.Data import DataSet,DataFile
 
 class GuiDataSet(DataSet.DataSet):
