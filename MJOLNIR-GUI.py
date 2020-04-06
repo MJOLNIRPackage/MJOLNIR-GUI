@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 from MJOLNIR_GUI_ui import Ui_MainWindow  
 from DataModels import DataSetModel,DataFileModel
@@ -30,8 +30,6 @@ import sys
 # Append _function if it is a function
 # E.g.: View3D_plot_button and View3D_plot_button_function
 
-#Naming not quite sticking to convention, I will do some cleanup at some point..
-
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D,
 
@@ -39,10 +37,25 @@ class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None,name='No Name', **kwargs):
         super(GuiDataSet,self).__init__(dataFiles=dataFiles,**kwargs)
         self.name = name
+        
+    
+    def setData(self,column,value):
+        if column == 0: self.name = value
+        
+
+
+    def flags(self):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
 
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
+        
+    def setData(self,column,value):
+        if column == 0: self.name = value
+
+    def flags(self):
+        return QtCore.Qt.ItemIsEditable
 
 
 class mywindow(QtWidgets.QMainWindow):
@@ -58,31 +71,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.currentDataSetIndex = 0
 
         self.dataSets = []
+        
+
+        self.setupDataSet() # Setup datasets with buttons and call functions
+        self.setupDataFile() # Setup datafiles
         self.setupDebugDataSet()
-        
-        self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
-
-        self.ui.DataSet_NewDataSet_button.clicked.connect(self.pushButton_6_function)
-        self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.pushButton_7_function)
-
-        
-        self.DataSetModel = DataSetModel(dataSets=self.dataSets)
-        self.DataFileModel = DataFileModel(dataSets=self.dataSets,currentDataSetIndex=self.currentDataSetIndex)
-
-        self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
-        
-
-         
-        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)# = self.selectionChanged
-        
-        
-
-        self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
-        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
-        self.DataFileModel.currentDataFileIndex = 0
-        
-        
-        
         
         ##############################################################################
         # View3D
@@ -90,21 +83,24 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_setCAxis_button_function)
         self.ui.View3D_SetTitle_button.clicked.connect(self.View3D_SetTitle_button_function)
-        
+
         ##############################################################################
         # QELine
         ##############################################################################
         self.ui.QELine_plot_button.clicked.connect(self.QELine_plot_button_function)
         self.ui.QELine_setCAxis_button.clicked.connect(self.QELine_setCAxis_button_function)
         self.ui.QELine_SetTitle_button.clicked.connect(self.QELine_SetTitle_button_function)
-        
+
         ##############################################################################
         # QPlane
         ##############################################################################
         self.ui.QPlane_plot_button.clicked.connect(self.QPlane_plot_button_function)
         self.ui.QPlane_setCAxis_button.clicked.connect(self.QPlane_setCAxis_button_function)
         self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
-
+        
+        
+        
+        # self.V=None
         
         
     def DataSet_convertData_button_function(self):
@@ -114,9 +110,6 @@ class mywindow(QtWidgets.QMainWindow):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         self.dataSets[self.currentDataSetIndex].convertDataFile(binning=binning,saveFile=False)
         
-        ##############################################################################
-        # View3D
-        ##############################################################################
         
     def View3D_plot_button_function(self):
 
@@ -180,6 +173,27 @@ class mywindow(QtWidgets.QMainWindow):
         TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
         print('This button has not been implemented yet')
         
+
+    def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
+        self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
+        self.ui.DataSet_NewDataSet_button.clicked.connect(self.DataSet_NewDataSet_button_function)
+        self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.DataSet_DeleteDataSet_button_function)
+
+        self.DataSetModel = DataSetModel(dataSets=self.dataSets)
+        self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
+
+        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)
+        self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
+
+    def setupDataFile(self): # Set up main features for Gui regarding the datafile widgets
+        self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
+        self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
+        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
+        self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
+
+        self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
+        
+
     def setupDebugDataSet(self):
 
         files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000496.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000497.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000498.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000499.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000500.hdf']
@@ -188,7 +202,7 @@ class mywindow(QtWidgets.QMainWindow):
             dfs.append(GuiDataFile(f))
 
         ds = GuiDataSet(dfs,name='set1')
-        self.dataSets.append(ds)
+        self.DataSetModel.append(ds)
 
         files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf']
         dfs = []
@@ -196,7 +210,10 @@ class mywindow(QtWidgets.QMainWindow):
             dfs.append(GuiDataFile(f))
 
         ds2 = GuiDataSet(dfs,name='set2')
-        self.dataSets.append(ds2)
+        self.DataSetModel.append(ds2)
+        #for index in range(len(self.dataSets)):
+        #    item = self.ui.DataSet_filenames_listView.item(index)
+        #    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
 
 
     @property
@@ -225,25 +242,30 @@ class mywindow(QtWidgets.QMainWindow):
         self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
-        self.currentDataSetIndex = self.ui.DataSet_DataSets_listView.selectedIndexes()[0].row()
-        self.DataFileModel.updateCurrentDataSetIndex(self.currentDataSetIndex)
-        self.DataFileModel.layoutChanged.emit()
+        self.DataFileModel.updateCurrentDataSetIndex()
 
     def selectedDataFileChanged(self,*args,**kwargs):
-        self.currentDataFileIndex = self.ui.DataSet_filenames_listView.selectedIndexes()[0].row()
-        self.DataFileModel.updateCurrentDataFileIndex(self.currentDataFileIndex)
         self.DataFileModel.layoutChanged.emit()
-        print('Set {} and file {}'.format(self.currentDataSetIndex,self.currentDataFileIndex))
 
 
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
-        self.dataSets.append(ds)
-        self.DataSetModel.layoutChanged.emit()
+        self.DataSetModel.append(ds)
 
     def DataSet_DeleteDataSet_button_function(self):
-        del self.dataSets[self.currentDataSetIndex]
-        self.DataSetModel.layoutChanged.emit()
+        self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
+        
+
+
+    def DataSet_DeleteFiles_button_function(self):
+        self.DataFileModel.delete()
+
+
+    def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
+        self.ui.DataSet_DataSets_listView.edit(index,'Hej')
+
+    def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
+        self.ui.DataSet_filenames_listView.edit(index)
 
 def run():
     app = QtWidgets.QApplication(sys.argv)
