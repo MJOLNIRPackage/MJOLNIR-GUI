@@ -101,24 +101,33 @@ class mywindow(QtWidgets.QMainWindow):
         
         
     def DataSet_convertData_button_function(self):
-        #The loading should be moved to a different button        
-        #fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
-
+        #  Should add a check if a data set is selected
+            
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
-        self.dataSets[self.currentDataSetIndex].convertDataFile(binning=binning,saveFile=False)
+        index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+        # ds = self.DataSetModel.item(index)        
+        self.DataSetModel.item(index).convertDataFile(binning=binning,saveFile=False)
+        print('I have converted some data...') #this text can be improved
         
         
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
-        if len(self.dataSets[self.currentDataSetIndex].convertedFiles)==0:
-            self.DataSet_convertData_button_function()
+        # if len(self.dataSets[self.currentDataSetIndex].convertedFiles)==0:
+        #     self.DataSet_convertData_button_function()
         
         QXBin=float(self.ui.View3D_QXBin_lineEdit.text())
         QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
         EBin =float(self.ui.View3D_EBin_lineEdit.text())
         
-        self.V = self.dataSets[self.currentDataSetIndex].View3D(QXBin,QYBin,EBin)
+        
+        
+        index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+        # ds = self.DataSetModel.item(index)        
+        self.V=self.DataSetModel.item(index).View3D(QXBin,QYBin,EBin)
+
+        
+        # self.V = self.dataSets[self.currentDataSetIndex].View3D(QXBin,QYBin,EBin)
         
         self.View3D_setCAxis_button_function()
         
@@ -129,7 +138,11 @@ class mywindow(QtWidgets.QMainWindow):
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
         
-        self.V.set_clim(CAxisMin,CAxisMax)
+        index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+        # ds = self.DataSetModel.item(index)        
+        self.V.caxis(CAxisMin,CAxisMax)
+        
+
         
     def View3D_SetTitle_button_function(self):        
         TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
