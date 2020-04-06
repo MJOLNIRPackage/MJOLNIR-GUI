@@ -57,27 +57,11 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.dataSets = []
         self.setupDebugDataSet()
-        
-        self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
 
-        self.ui.DataSet_NewDataSet_button.clicked.connect(self.pushButton_6_function)
-        self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.pushButton_7_function)
+        self.setupDataSet() # Setup datasets with buttons and call functions
+        self.setupDataFile() # Setup datafiles
 
         
-        self.DataSetModel = DataSetModel(dataSets=self.dataSets)
-        self.DataFileModel = DataFileModel(dataSets=self.dataSets,currentDataSetIndex=self.currentDataSetIndex)
-
-        self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
-        
-
-         
-        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)# = self.selectionChanged
-        
-        
-
-        self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
-        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
-        self.DataFileModel.currentDataFileIndex = 0
         
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_setCAxis_button_function)
@@ -119,6 +103,24 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.V.set_clim(CAxisMin,CAxisMax)
         
+
+    def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
+        self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
+        self.ui.DataSet_NewDataSet_button.clicked.connect(self.DataSet_NewDataSet_button_function)
+        self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.DataSet_DeleteDataSet_button_function)
+
+        self.DataSetModel = DataSetModel(dataSets=self.dataSets)
+        self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
+
+        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)
+
+    def setupDataFile(self): # Set up main features for Gui regarding the datafile widgets
+        self.DataFileModel = DataFileModel(dataSets=self.dataSets,currentDataSetIndex=self.currentDataSetIndex)
+        self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
+        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
+        self.DataFileModel.currentDataFileIndex = 0
+
+
     def setupDebugDataSet(self):
 
         files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000496.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000497.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000498.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000499.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000500.hdf']
