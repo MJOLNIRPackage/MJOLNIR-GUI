@@ -87,20 +87,22 @@ class mywindow(QtWidgets.QMainWindow):
         #fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
 
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
-        self.dataSets[self.currentDataSetIndex].convertDataFile(binning=binning,saveFile=False)
+        ds = self.DataSetModel.getCurrentDataSet()
+        ds.convertDataFile(binning=binning,saveFile=False)
         
         
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
-        if len(self.dataSets[self.currentDataSetIndex].convertedFiles)==0:
+        ds = self.DataSetModel.getCurrentDataSet()
+        if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()
         
         QXBin=float(self.ui.View3D_QXBin_lineEdit.text())
         QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
         EBin =float(self.ui.View3D_EBin_lineEdit.text())
         
-        self.V = self.dataSets[self.currentDataSetIndex].View3D(QXBin,QYBin,EBin)
+        self.V = ds.View3D(QXBin,QYBin,EBin)
         
         self.View3D_setCAxis_button_function()
         
@@ -159,7 +161,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.DataSet_DeleteDataSet_button_function)
         self.ui.DataSet_AddFiles_button.clicked.connect(self.DataSet_AddFiles_button_function)
 
-        self.DataSetModel = DataSetModel(dataSets=self.dataSets)
+        self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
         self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
 
         self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)
