@@ -37,12 +37,9 @@ class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None,name='No Name', **kwargs):
         super(GuiDataSet,self).__init__(dataFiles=dataFiles,**kwargs)
         self.name = name
-        
-    
+            
     def setData(self,column,value):
         if column == 0: self.name = value
-        
-
 
     def flags(self):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
@@ -196,7 +193,7 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setupDebugDataSet(self):
 
-        files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000496.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000497.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000498.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000499.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000500.hdf']
+        files = ['camea2018n000494.hdf', 'camea2018n000495.hdf', 'camea2018n000496.hdf', 'camea2018n000497.hdf', 'camea2018n000498.hdf', 'camea2018n000499.hdf', 'camea2018n000500.hdf']
         dfs = []
         for f in files:
             dfs.append(GuiDataFile(f))
@@ -204,7 +201,7 @@ class mywindow(QtWidgets.QMainWindow):
         ds = GuiDataSet(dfs,name='set1')
         self.DataSetModel.append(ds)
 
-        files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf']
+        files = ['camea2018n000494.hdf', 'camea2018n000495.hdf', 'camea2018n000496.hdf', 'camea2018n000497.hdf', 'camea2018n000498.hdf', 'camea2018n000499.hdf', 'camea2018n000500.hdf']
         dfs = []
         for f in files:
             dfs.append(GuiDataFile(f))
@@ -228,7 +225,6 @@ class mywindow(QtWidgets.QMainWindow):
     def currentDataFileIndex(self,index):
         self._currentDataFileIndex = index
 
-
     @property
     def currentDataSetIndex(self):
         return self._currentDataSetIndex
@@ -247,7 +243,6 @@ class mywindow(QtWidgets.QMainWindow):
     def selectedDataFileChanged(self,*args,**kwargs):
         self.DataFileModel.layoutChanged.emit()
 
-
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
         self.DataSetModel.append(ds)
@@ -255,11 +250,8 @@ class mywindow(QtWidgets.QMainWindow):
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
         
-
-
     def DataSet_DeleteFiles_button_function(self):
         self.DataFileModel.delete()
-
 
     def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
         self.ui.DataSet_DataSets_listView.edit(index,'Hej')
