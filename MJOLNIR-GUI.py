@@ -7,11 +7,12 @@ try:
 except:
     pass
 
-from MJOLNIR.Data import DataSet,DataFile
+
 from MJOLNIR import _tools # Usefull tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
 
+from os import path
 
 
 plt.ion()
@@ -20,6 +21,7 @@ plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from MJOLNIR_GUI_ui import Ui_MainWindow  
+from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from DataModels import DataSetModel,DataFileModel
 import sys
 
@@ -33,29 +35,6 @@ import sys
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D,
 
-class GuiDataSet(DataSet.DataSet):
-    def __init__(self,dataFiles=None,name='No Name', **kwargs):
-        super(GuiDataSet,self).__init__(dataFiles=dataFiles,**kwargs)
-        self.name = name
-        
-    
-    def setData(self,column,value):
-        if column == 0: self.name = value
-        
-
-
-    def flags(self):
-        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
-
-class GuiDataFile(DataFile.DataFile):
-    def __init__(self,fileLocation, **kwargs):
-        super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
-        
-    def setData(self,column,value):
-        if column == 0: self.name = value
-
-    def flags(self):
-        return QtCore.Qt.ItemIsEditable
 
 
 class mywindow(QtWidgets.QMainWindow):
@@ -178,6 +157,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
         self.ui.DataSet_NewDataSet_button.clicked.connect(self.DataSet_NewDataSet_button_function)
         self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.DataSet_DeleteDataSet_button_function)
+        self.ui.DataSet_AddFiles_button.clicked.connect(self.DataSet_AddFiles_button_function)
 
         self.DataSetModel = DataSetModel(dataSets=self.dataSets)
         self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
@@ -266,6 +246,16 @@ class mywindow(QtWidgets.QMainWindow):
 
     def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
         self.ui.DataSet_filenames_listView.edit(index)
+
+    def DataSet_AddFiles_button_function(self):
+        currentFolder = self.ui.DataSet_path_lineEdit.text()
+        if path.exists(currentFolder):
+            folder=currentFolder
+        else:
+            folder = ""
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", folder,"HDF (*.hdf);;All Files (*)")
+        self.DataFileModel.add(files)
+        
 
 def run():
     app = QtWidgets.QApplication(sys.argv)

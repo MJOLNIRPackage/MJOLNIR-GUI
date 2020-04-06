@@ -1,6 +1,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+from MJOLNIR_Data import GuiDataFile
 
 
 
@@ -156,4 +157,14 @@ class DataFileModel(QtCore.QAbstractListModel):
     def delete(self):
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         del ds[self.getCurrentDatafileIndexRow()]
+        self.layoutChanged.emit()
+
+
+    def add(self,files):
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        dfs = []
+        for f in files:
+            dfs.append(GuiDataFile(f))
+
+        ds.append(dfs)
         self.layoutChanged.emit()
