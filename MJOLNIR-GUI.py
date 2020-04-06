@@ -60,18 +60,18 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
 
-        self.ui.pushButton_6.clicked.connect(self.pushButton_6_function)
-        self.ui.pushButton_7.clicked.connect(self.pushButton_7_function)
+        self.ui.DataSet_NewDataSet_button.clicked.connect(self.pushButton_6_function)
+        self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.pushButton_7_function)
 
         
         self.DataSetModel = DataSetModel(dataSets=self.dataSets)
         self.DataFileModel = DataFileModel(dataSets=self.dataSets,currentDataSetIndex=self.currentDataSetIndex)
 
-        self.ui.listWidget_2.setModel(self.DataSetModel)
+        self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
         
 
          
-        self.ui.listWidget_2.clicked.connect(self.selectedDataSetChanged)# = self.selectionChanged
+        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)# = self.selectionChanged
         
         
 
@@ -164,7 +164,7 @@ class mywindow(QtWidgets.QMainWindow):
         self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
-        self.currentDataSetIndex = self.ui.listWidget_2.selectedIndexes()[0].row()
+        self.currentDataSetIndex = self.ui.DataSet_DataSets_listView.selectedIndexes()[0].row()
         self.DataFileModel.updateCurrentDataSetIndex(self.currentDataSetIndex)
         self.DataFileModel.layoutChanged.emit()
 
@@ -175,19 +175,22 @@ class mywindow(QtWidgets.QMainWindow):
         print('Set {} and file {}'.format(self.currentDataSetIndex,self.currentDataFileIndex))
 
 
-    def pushButton_6_function(self):
+    def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
         self.dataSets.append(ds)
         self.DataSetModel.layoutChanged.emit()
 
-    def pushButton_7_function(self):
+    def DataSet_DeleteDataSet_button_function(self):
         del self.dataSets[self.currentDataSetIndex]
         self.DataSetModel.layoutChanged.emit()
 
-app = QtWidgets.QApplication([])
+def run():
+    app = QtWidgets.QApplication(sys.argv)
 
-application = mywindow()
+    application = mywindow()
 
-application.show()
+    application.show()
 
-sys.exit(app.exec_())
+    sys.exit(app.exec_())
+
+run()
