@@ -33,14 +33,31 @@ import sys
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D,
 
-class GuiDataSet(DataSet.DataSet,QtWidgets.QAbstractItemView):
+class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None,name='No Name', **kwargs):
         super(GuiDataSet,self).__init__(dataFiles=dataFiles,**kwargs)
         self.name = name
         
+    
+    def setData(self,column,value):
+        print('Setting data on dataset {}',self.name)
+        if column == 0: self.name = value
+        
+
+
+    def flags(self):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
+
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
+        
+    def setData(self,column,value):
+        print('Setting value!')
+        if column == 0: self.name = value
+
+    def flags(self):
+        return QtCore.Qt.ItemIsEditable
 
 
 class mywindow(QtWidgets.QMainWindow):
@@ -57,14 +74,31 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.dataSets = []
         
+
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles
         self.setupDebugDataSet()
-
         
-        
+        ##############################################################################
+        # View3D
+        ##############################################################################       
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_setCAxis_button_function)
+        self.ui.View3D_SetTitle_button.clicked.connect(self.View3D_SetTitle_button_function)
+
+        ##############################################################################
+        # QELine
+        ##############################################################################
+        self.ui.QELine_plot_button.clicked.connect(self.QELine_plot_button_function)
+        self.ui.QELine_setCAxis_button.clicked.connect(self.QELine_setCAxis_button_function)
+        self.ui.QELine_SetTitle_button.clicked.connect(self.QELine_SetTitle_button_function)
+
+        ##############################################################################
+        # QPlane
+        ##############################################################################
+        self.ui.QPlane_plot_button.clicked.connect(self.QPlane_plot_button_function)
+        self.ui.QPlane_setCAxis_button.clicked.connect(self.QPlane_setCAxis_button_function)
+        self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
         
         
         
@@ -94,14 +128,52 @@ class mywindow(QtWidgets.QMainWindow):
         self.View3D_setCAxis_button_function()
         
     def View3D_setCAxis_button_function(self):
-        #For some reason this creates a new window when it is clicked. It shouldn't.
-        # if not hasattr(self, 'V'):
-        #     self.View3D_plot_button_function()
+        if not hasattr(self, 'V'):
+            self.View3D_plot_button_function()
             
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
         
         self.V.set_clim(CAxisMin,CAxisMax)
+        
+    def View3D_SetTitle_button_function(self):        
+        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
+        self.V.set_title(TitleText)
+        
+        ##############################################################################
+        # QELine
+        ##############################################################################
+    def QELine_plot_button_function(self):
+        print('This button has not been implemented yet')
+
+    def QELine_setCAxis_button_function(self):
+        
+        CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
+        
+        # self.V.set_clim(CAxisMin,CAxisMax)
+        
+        print('This button has not been implemented yet')
+
+    def QELine_SetTitle_button_function(self):
+        TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
+        print('This button has not been implemented yet')
+
+
+        ##############################################################################
+        # QPlane
+        ##############################################################################        
+    def QPlane_plot_button_function(self):
+        print('This button has not been implemented yet')
+
+    def QPlane_setCAxis_button_function(self):
+        print('This button has not been implemented yet')        
+        CAxisMin=float(self.ui.QPlane_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.QPlane_CAxisMax_lineEdit.text())
+
+    def QPlane_SetTitle_button_function(self):
+        TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
+        print('This button has not been implemented yet')
         
 
     def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
@@ -120,8 +192,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
         self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
 
-        self.ui.DataSet_filenames_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
+        self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
         
+
     def setupDebugDataSet(self):
 
         files = ['/home/lass/Dropbox/PhD/CAMEAData/camea2018n000494.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000495.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000496.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000497.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000498.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000499.hdf', '/home/lass/Dropbox/PhD/CAMEAData/camea2018n000500.hdf']
@@ -139,6 +212,9 @@ class mywindow(QtWidgets.QMainWindow):
 
         ds2 = GuiDataSet(dfs,name='set2')
         self.DataSetModel.append(ds2)
+        #for index in range(len(self.dataSets)):
+        #    item = self.ui.DataSet_filenames_listView.item(index)
+        #    item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
 
 
     @property
@@ -167,24 +243,39 @@ class mywindow(QtWidgets.QMainWindow):
         self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
+        #self.currentDataSetIndex = self.ui.DataSet_DataSets_listView.selectedIndexes()[0].row()
         self.DataFileModel.updateCurrentDataSetIndex()
+        
+        #self.DataFileModel.layoutChanged.emit()
 
     def selectedDataFileChanged(self,*args,**kwargs):
+        self.currentDataFileIndex = self.ui.DataSet_filenames_listView.selectedIndexes()[0].row()
+        
         self.DataFileModel.layoutChanged.emit()
+        print(self.DataFileModel.flags(self.ui.DataSet_filenames_listView.selectedIndexes()[0]))
+        #print('Set {} and file {}'.format(self.currentDataSetIndex,self.currentDataFileIndex))
 
 
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
+#        self.dataSets.append(ds)
         self.DataSetModel.append(ds)
+        #self.DataSetModel.layoutChanged.emit()
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
         
 
     def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
+        print('DOUBLE!! WoopWoop. Entering edit mode....')
+        print(index.row(),index.column())
+        self.ui.DataSet_DataSets_listView.setCurrentIndex(index)
         self.ui.DataSet_DataSets_listView.edit(index)
 
     def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
+        print('DataFile DOUBLE!! WoopWoop. Entering edit mode....')
+        print(index.row(),index.column())
+        self.ui.DataSet_filenames_listView.setCurrentIndex(index)
         self.ui.DataSet_filenames_listView.edit(index)
 
 def run():
