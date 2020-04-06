@@ -83,9 +83,8 @@ class mywindow(QtWidgets.QMainWindow):
         
         
     def DataSet_convertData_button_function(self):
-        #The loading should be moved to a different button        
-        #fileList,_ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","hdf Files (*.hdf);;All Files (*)")
-
+        #  Should add a check if a data set is selected
+            
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
         ds.convertDataFile(binning=binning,saveFile=False)
@@ -113,7 +112,11 @@ class mywindow(QtWidgets.QMainWindow):
         CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
         
-        self.V.set_clim(CAxisMin,CAxisMax)
+        index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+        # ds = self.DataSetModel.item(index)        
+        self.V.caxis(CAxisMin,CAxisMax)
+        
+
         
     def View3D_SetTitle_button_function(self):        
         TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
