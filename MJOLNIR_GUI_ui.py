@@ -467,7 +467,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MJOLNIR GUI"))
         self.DataSet_convertData_button.setText(_translate("MainWindow", "Convert Data"))
         self.DataSet_binning_comboBox.setToolTip(_translate("MainWindow", "Binning"))
         self.DataSet_binning_comboBox.setCurrentText(_translate("MainWindow", "8"))

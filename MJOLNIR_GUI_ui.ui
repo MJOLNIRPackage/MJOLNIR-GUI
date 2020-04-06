@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MJOLNIR GUI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="DataSet_convertData_button">
