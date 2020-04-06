@@ -428,7 +428,7 @@
       <string>Constant bins</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="View3D_setCAxis_button_2">
+    <widget class="QPushButton" name="QELine_setCAxis_button">
      <property name="geometry">
       <rect>
        <x>370</x>
