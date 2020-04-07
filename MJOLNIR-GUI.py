@@ -108,20 +108,38 @@ class mywindow(QtWidgets.QMainWindow):
     def View3D_SelectView_QxE_radioButton_function(self):
         if hasattr(self, 'V'):
             self.V.setAxis(1)
+            # Redraw the title, then change the viewing plane to render properly
+            self.View3D_SetTitle_button_function()
+            self.V.setPlane(1)
+            self.V.setPlane(0)
                 
     def View3D_SelectView_QyE_radioButton_function(self):
         if hasattr(self, 'V'):
             self.V.setAxis(0)
+            # Redraw the title, then change the viewing plane to render properly
+            self.View3D_SetTitle_button_function()
+            self.V.setPlane(1)
+            self.V.setPlane(0)
         
     def View3D_SelectView_QxQy_radioButton_function(self):
         if hasattr(self, 'V'):
-            self.V.setAxis(2)    
-
+            self.V.setAxis(2)
+            # Redraw the title, then change the viewing plane to render properly
+            self.View3D_SetTitle_button_function()
+            self.V.setPlane(1)
+            self.V.setPlane(0)
         
     def View3D_SetTitle_button_function(self):        
-        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
-        self.V.set_title(TitleText)
-        
+        if hasattr(self, 'V'):
+            TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
+            self.V.ax.set_title(TitleText)
+            
+            # Get the value of the slider right now, then change it around a bit and put it back to where it was, to render properly
+            currentSliderValue=self.V.Energy_slider.val
+            self.V.Energy_slider.set_val(0)
+            self.V.Energy_slider.set_val(1)
+            self.V.Energy_slider.set_val(currentSliderValue)
+                    
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
@@ -145,6 +163,9 @@ class mywindow(QtWidgets.QMainWindow):
             
         
         self.View3D_setCAxis_button_function()        
+        self.View3D_SetTitle_button_function()
+        self.V.setPlane(1)
+        self.V.setPlane(0)
         
         ##############################################################################
         # QELine
