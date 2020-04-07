@@ -79,8 +79,7 @@ class mywindow(QtWidgets.QMainWindow):
         
         
         
-        # self.V=None
-        
+ 
         
     def DataSet_convertData_button_function(self):
         #  Should add a check if a data set is selected
@@ -114,7 +113,7 @@ class mywindow(QtWidgets.QMainWindow):
         
         index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
         # ds = self.DataSetModel.item(index)        
-        self.V.caxis(CAxisMin,CAxisMax)
+        self.V.caxis=(CAxisMin,CAxisMax)
         
 
         
@@ -239,13 +238,15 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataFileModel.add(files)
         
 
-def run():
+# def run():
+    
+if __name__=='__main__':
     app = QtWidgets.QApplication(sys.argv)
-
+    
     application = mywindow()
-
+    
     application.show()
-
+    
     sys.exit(app.exec_())
 
-run()
+# run()

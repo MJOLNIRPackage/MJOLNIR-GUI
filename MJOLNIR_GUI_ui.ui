@@ -457,7 +457,7 @@
     <widget class="QPushButton" name="QELine_SetTitle_button">
      <property name="geometry">
       <rect>
-       <x>490</x>
+       <x>510</x>
        <y>40</y>
        <width>75</width>
        <height>23</height>
@@ -789,6 +789,32 @@
       <string>Make fit</string>
      </property>
     </widget>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>10</y>
+       <width>461</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>24</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="progressBar_label">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>100</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ready</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
@@ -1034,7 +1060,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QLabel" name="label_10">
+   <widget class="QLabel" name="DataSet_Temperature_label">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1047,7 +1073,7 @@
      <string>Temperature</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_11">
+   <widget class="QLabel" name="DataSet_MagneticField_label">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1060,7 +1086,7 @@
      <string>Magnetic field</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_12">
+   <widget class="QLabel" name="DataSet_SampleName_label">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1073,7 +1099,7 @@
      <string>Sample name</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_13">
+   <widget class="QLabel" name="DataSet_ScanCommand_label">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1086,7 +1112,7 @@
      <string>Scan command</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_14">
+   <widget class="QLabel" name="DataSet_ScanType_label">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1149,11 +1175,11 @@
    <zorder>DataSet_AddFiles_button</zorder>
    <zorder>DataSet_DeleteFiles_button</zorder>
    <zorder>View3D_SetTitle_lineEdit</zorder>
-   <zorder>label_10</zorder>
-   <zorder>label_11</zorder>
-   <zorder>label_12</zorder>
-   <zorder>label_13</zorder>
-   <zorder>label_14</zorder>
+   <zorder>DataSet_Temperature_label</zorder>
+   <zorder>DataSet_MagneticField_label</zorder>
+   <zorder>DataSet_SampleName_label</zorder>
+   <zorder>DataSet_ScanCommand_label</zorder>
+   <zorder>DataSet_ScanType_label</zorder>
    <zorder>DataSet_path_lineEdit</zorder>
    <zorder>DataSet_filenames_listView</zorder>
    <zorder>DataSet_DataSets_listView</zorder>
@@ -1171,8 +1197,15 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="actionSave_GUI_state"/>
+    <addaction name="actionLoad_GUI_state"/>
+    <addaction name="separator"/>
     <addaction name="actionGenerate_View3d_script"/>
+    <addaction name="actionGenerate_QELine_script"/>
+    <addaction name="actionGenerate_QPlane_script"/>
+    <addaction name="actionGenerate_1d_script"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuMask">
     <property name="title">
@@ -1181,8 +1214,15 @@
     <addaction name="actionOpen_mask_gui"/>
     <addaction name="actionLoad_mask"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
@@ -1202,7 +1242,47 @@
   </action>
   <action name="actionGenerate_View3d_script">
    <property name="text">
-    <string>Generate View3d script</string>
+    <string>Generate View3D script</string>
+   </property>
+  </action>
+  <action name="actionSave_GUI_state">
+   <property name="text">
+    <string>Save GUI state</string>
+   </property>
+  </action>
+  <action name="actionLoad_GUI_state">
+   <property name="text">
+    <string>Load GUI state</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionPlease">
+   <property name="text">
+    <string>Please</string>
+   </property>
+  </action>
+  <action name="actionGenerate_QELine_script">
+   <property name="text">
+    <string>Generate QELine script</string>
+   </property>
+  </action>
+  <action name="actionGenerate_QPlane_script">
+   <property name="text">
+    <string>Generate QPlane script</string>
+   </property>
+  </action>
+  <action name="actionGenerate_1d_script">
+   <property name="text">
+    <string>Generate 1d script</string>
    </property>
   </action>
  </widget>
