@@ -17,7 +17,7 @@ class DataSetModel(QtCore.QAbstractListModel):
             return text
         
         #if role == Qt.DecorationRole:
-        #    status, _ = self.dataSets[index.row()]
+        #    status = self.dataSets[index.row()].checked
         #    if status:
         #        return tick
 
@@ -44,7 +44,7 @@ class DataSetModel(QtCore.QAbstractListModel):
         return self.dataSets[index.row()]
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        ds = self.dataSets[index.row()]
+        ds = self.item(index)
         if role == QtCore.Qt.EditRole:
             ds.name = value
             self.dataChanged.emit(index, index)
