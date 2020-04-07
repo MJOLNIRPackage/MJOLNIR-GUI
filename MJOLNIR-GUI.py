@@ -62,6 +62,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.View3D_plot_button.clicked.connect(self.View3D_plot_button_function)
         self.ui.View3D_setCAxis_button.clicked.connect(self.View3D_setCAxis_button_function)
         self.ui.View3D_SetTitle_button.clicked.connect(self.View3D_SetTitle_button_function)
+        
+        # Radiobutton to select viewing type
+        self.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.View3D_SelectView_QxE_radioButton_function)
+        self.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.View3D_SelectView_QyE_radioButton_function)
+        self.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.View3D_SelectView_QxQy_radioButton_function)
 
         ##############################################################################
         # QELine
@@ -78,9 +83,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
         
         
-        
- 
-        
+
     def DataSet_convertData_button_function(self):
         #  Should add a check if a data set is selected
             
@@ -88,6 +91,36 @@ class mywindow(QtWidgets.QMainWindow):
         ds = self.DataSetModel.getCurrentDataSet()
         ds.convertDataFile(binning=binning,saveFile=False)
         
+        
+        ##############################################################################
+        # View3D
+        ##############################################################################
+        
+    def View3D_setCAxis_button_function(self):
+        if not hasattr(self, 'V'):
+            self.View3D_plot_button_function()
+            
+        CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
+        CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
+              
+        self.V.caxis=(CAxisMin,CAxisMax)
+    
+    def View3D_SelectView_QxE_radioButton_function(self):
+        if hasattr(self, 'V'):
+            self.V.setAxis(1)
+                
+    def View3D_SelectView_QyE_radioButton_function(self):
+        if hasattr(self, 'V'):
+            self.V.setAxis(0)
+        
+    def View3D_SelectView_QxQy_radioButton_function(self):
+        if hasattr(self, 'V'):
+            self.V.setAxis(2)    
+
+        
+    def View3D_SetTitle_button_function(self):        
+        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
+        self.V.set_title(TitleText)
         
     def View3D_plot_button_function(self):
 
@@ -102,24 +135,16 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.V = ds.View3D(QXBin,QYBin,EBin)
         
-        self.View3D_setCAxis_button_function()
-        
-    def View3D_setCAxis_button_function(self):
-        if not hasattr(self, 'V'):
-            self.View3D_plot_button_function()
+        # Select the correct view
+        if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
+            self.View3D_SelectView_QyE_radioButton_function()
+        if self.ui.View3D_SelectView_QyE_radioButton.isChecked():
+            self.View3D_SelectView_QxE_radioButton_function()
+        if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
+            self.View3D_SelectView_QxQy_radioButton_function()
             
-        CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
-        CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
         
-        index = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
-        # ds = self.DataSetModel.item(index)        
-        self.V.caxis=(CAxisMin,CAxisMax)
-        
-
-        
-    def View3D_SetTitle_button_function(self):        
-        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
-        self.V.set_title(TitleText)
+        self.View3D_setCAxis_button_function()        
         
         ##############################################################################
         # QELine
