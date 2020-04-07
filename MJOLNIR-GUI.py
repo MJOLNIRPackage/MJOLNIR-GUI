@@ -151,7 +151,29 @@ class mywindow(QtWidgets.QMainWindow):
         QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
         EBin =float(self.ui.View3D_EBin_lineEdit.text())
         
-        self.V = ds.View3D(QXBin,QYBin,EBin)
+        if self.ui.View3D_SelectUnits_RLU_radioButton.isChecked():
+            rlu=True
+            
+        if self.ui.View3D_SelectUnits_AA_radioButton.isChecked():
+            rlu=False
+
+        if self.ui.View3D_Grid_checkBox.isChecked():
+            grid=9
+        else:
+            grid=False
+        
+        if self.ui.View3D_LogScale_checkBox.isChecked():
+            log=True
+        else:
+            log=False
+        
+        
+        self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
+        
+        # grid=9,rlu=True
+        
+        
+        
         
         # Select the correct view
         if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
