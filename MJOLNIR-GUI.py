@@ -51,10 +51,8 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.dataSets = []
         
-
         self.setupDataSet() # Setup datasets with buttons and call functions
-        self.setupDataFile() # Setup datafiles
-        
+        self.setupDataFile() # Setup datafiles        
         
         ##############################################################################
         # View3D
@@ -90,11 +88,10 @@ class mywindow(QtWidgets.QMainWindow):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
         ds.convertDataFile(binning=binning,saveFile=False)
-        
-        
-        ##############################################################################
-        # View3D
-        ##############################################################################
+                
+    ##############################################################################
+    # View3D
+    ##############################################################################
         
     def View3D_setCAxis_button_function(self):
         if not hasattr(self, 'V'):
@@ -165,15 +162,9 @@ class mywindow(QtWidgets.QMainWindow):
         if self.ui.View3D_LogScale_checkBox.isChecked():
             log=True
         else:
-            log=False
-        
+            log=False        
         
         self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
-        
-        # grid=9,rlu=True
-        
-        
-        
         
         # Select the correct view
         if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
@@ -182,27 +173,80 @@ class mywindow(QtWidgets.QMainWindow):
             self.View3D_SelectView_QxE_radioButton_function()
         if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
             self.View3D_SelectView_QxQy_radioButton_function()
-            
-        
+                    
         self.View3D_setCAxis_button_function()        
         self.View3D_SetTitle_button_function()
         self.V.setPlane(1)
         self.V.setPlane(0)
         
-        ##############################################################################
+    ##############################################################################
         # QELine
-        ##############################################################################
+    ##############################################################################
     def QELine_plot_button_function(self):
         print('This button has not been implemented yet')
+        
+        HStart=float(self.ui.QELine_HStart_lineEdit.text())
+        KStart=float(self.ui.QELine_KStart_lineEdit.text())
+        LStart=float(self.ui.QELine_LStart_lineEdit.text())
+        
+        HEnd=float(self.ui.QELine_HEnd_lineEdit.text())
+        KEnd=float(self.ui.QELine_KEnd_lineEdit.text())
+        LEnd=float(self.ui.QELine_LEnd_lineEdit.text())
+        
+        
+        Q1 = np.array([HStart,KStart,LStart])
+        Q2 = np.array([HEnd,KEnd,LEnd])
+        # Collect them into one array
+        QPoints = np.array([Q1,Q2])
+        
+        # Define orthogonal width and minimum pixel size along Q-cut
+        width = float(self.ui.QELine_Width_lineEdit.text())   # 1/AA
+        minPixel = float(self.ui.QELine_MinPixel_lineEdit.text()) # 1/AA
+        
+        EMin=float(self.ui.QELine_EMin_lineEdit.text())
+        EMax=float(self.ui.QELine_EMax_lineEdit.text())
+        NPoints=int(self.ui.QELine_NPoints_lineEdit.text())
+        
+        # Define energy bins
+        EnergyBins=np.linspace(EMin,EMax,NPoints)
+
+        
+        # fig = plt.figure(figsize=(8,6))
+        # ax = fig.gca()
+        # ax,DataLists,Bins,BinCenters,Offsets = \
+        # ds.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \
+        #       ax=ax, EnergyBins=EnergyBins)
+        # ax.set_clim(0,10e-8)       
+        
+        
+        if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
+            rlu=True
+            
+        if self.ui.QELine_SelectUnits_AA_radioButton.isChecked():
+            rlu=False        
+    
+        ds = self.DataSetModel.getCurrentDataSet()
+        if len(ds.convertedFiles)==0:
+            self.DataSet_convertData_button_function()
+            
+        self.QELine=ds.plotCutQELine(QPoints=QPoints, width=width, \
+                                     minPixel=minPixel, EnergyBins=EnergyBins,\
+                                         rlu=rlu)
+    
+        
+        self.QELine_setCAxis_button_function()
+        
+        
 
     def QELine_setCAxis_button_function(self):
         
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
         
-        # self.V.set_clim(CAxisMin,CAxisMax)
-        
-        print('This button has not been implemented yet')
+        self.QELine.caxis=(CAxisMin,CAxisMax)
+
+
+
 
     def QELine_SetTitle_button_function(self):
         TitleText=self.ui.QELine_SetTitle_lineEdit.text()        

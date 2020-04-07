@@ -587,13 +587,25 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="QELine_EMin_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_EMin_lineEdit">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QLineEdit" name="QELine_NPoints_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_NPoints_lineEdit">
+        <property name="text">
+         <string>101</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="QELine_Emax_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_EMax_lineEdit">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_32">
