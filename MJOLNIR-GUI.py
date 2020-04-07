@@ -178,29 +178,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
 
 
-    @property
-    def currentDataFileIndex(self):
-        return self._currentDataFileIndex
-
-    @currentDataFileIndex.getter
-    def currentDataFileIndex(self):
-        return self._currentDataFileIndex
-
-    @currentDataFileIndex.setter
-    def currentDataFileIndex(self,index):
-        self._currentDataFileIndex = index
-
-    @property
-    def currentDataSetIndex(self):
-        return self._currentDataSetIndex
-
-    @currentDataSetIndex.getter
-    def currentDataSetIndex(self):
-        return self._currentDataSetIndex
-
-    @currentDataSetIndex.setter
-    def currentDataSetIndex(self,index):
-        self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
         self.DataFileModel.updateCurrentDataSetIndex()
