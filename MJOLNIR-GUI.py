@@ -25,7 +25,31 @@ from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from DataModels import DataSetModel,DataFileModel
 import sys
 
+import functools
 
+
+
+def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',delayInSeconds=3):
+
+    def ProgressBarDecorator(func):
+        @functools.wraps(func)
+        def newFunc(self,*args,**kwargs):
+            self.setProgressBarValue(0)
+            self.setProgressBarLabelText(runningText)
+            if len(args) == 1:
+                args = ()
+            else:
+                args = args[1:]
+            print('Args: ',*args)
+            print('Kwargs: ',*kwargs)
+            returnval = func(self,*args,**kwargs)
+            self.setProgressBarMaximum(100)
+            self.setProgressBarValue(100)
+            self.setProgressBarLabelText(completedText)
+            QtCore.QTimer.singleShot(int(delayInSeconds*1000), self.resetProgressBar)
+            return returnval
+        return newFunc
+    return ProgressBarDecorator
 
 
 # Naming convention: WhereInGui_description_type
@@ -86,14 +110,14 @@ class mywindow(QtWidgets.QMainWindow):
         self.setupMenu()
 
  
-        
+    @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
     def DataSet_convertData_button_function(self):
         #  Should add a check if a data set is selected
             
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
         try:
-            ds.convertDataFile(binning=binning,saveFile=False)
+            ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
             msg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,title='Error')
             msg.setText("Error")
@@ -102,7 +126,7 @@ class mywindow(QtWidgets.QMainWindow):
             msg.exec_()
 
         self.DataFileModel.layoutChanged.emit()
-        ds.convertDataFile(binning=binning,saveFile=False)
+        #ds.convertDataFile(binning=binning,saveFile=False)
                 
     ##############################################################################
     # View3D
@@ -353,6 +377,7 @@ class mywindow(QtWidgets.QMainWindow):
     def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
         self.ui.DataSet_filenames_listView.edit(index)
 
+    @ProgressBarDecoratorArguments(runningText='Adding Data Files',completedText='Data Files Added')
     def DataSet_AddFiles_button_function(self):
         currentFolder = self.ui.DataSet_path_lineEdit.text()
         if path.exists(currentFolder):
@@ -362,7 +387,7 @@ class mywindow(QtWidgets.QMainWindow):
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
-        self.DataFileModel.add(files)
+        self.DataFileModel.add(files,guiWindow=self)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon('Icons/icons/cross-button.png'))
@@ -407,6 +432,18 @@ class mywindow(QtWidgets.QMainWindow):
             for label,entry in zip(self.DataFileLabels,entries):
                 label.setText(label.defaultText+': '+entry)
             
+    def setProgressBarValue(self,value):
+        self.ui.progressBar.setValue(value)
+
+    def setProgressBarLabelText(self,text):
+        self.ui.progressBar_label.setText(text)
+
+    def setProgressBarMaximum(self,value):
+        self.ui.progressBar.setMaximum(value)
+
+    def resetProgressBar(self):
+        self.setProgressBarValue(0)
+        self.setProgressBarLabelText('Ready')
 
 
 # def run():
