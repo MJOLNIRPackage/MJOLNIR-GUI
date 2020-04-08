@@ -31,6 +31,7 @@ class DataSetModel(QtCore.QAbstractListModel):
     def append(self,ds):
         self.dataSets.append(ds)
         print("DataSet '{}' was added.".format(ds.name))
+        self.selectLastDataSet()
         self.layoutChanged.emit()
 
     def delete(self,index):
@@ -40,6 +41,14 @@ class DataSetModel(QtCore.QAbstractListModel):
             self.layoutChanged.emit()
         except:
             pass
+        QtWidgets.QApplication.processEvents()
+        index = self.getCurrentDatasetIndex()
+        
+        if index is None:
+            self.selectLastDataSet()
+        else:
+            if index.row()==self.rowCount(None):
+                self.selectLastDataSet()
 
     def item(self,index):
         if not index is None:
@@ -76,6 +85,12 @@ class DataSetModel(QtCore.QAbstractListModel):
     def getCurrentDataSet(self):
         index = self.getCurrentDatasetIndex()
         return self.item(index)
+
+    def selectLastDataSet(self):
+        DataSets = self.rowCount(None)
+        if DataSets!=0:
+            index = self.index(self.rowCount(None)-1,0)
+            self.DataSet_DataSets_listView.setCurrentIndex(index)
 
 
 

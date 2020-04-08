@@ -427,8 +427,6 @@ class mywindow(QtWidgets.QMainWindow):
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
         self.DataSetModel.append(ds)
-        index = self.DataSetModel.index(self.DataSetModel.rowCount(None)-1,0)
-        self.DataSetModel.DataSet_DataSets_listView.setCurrentIndex(index)
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
