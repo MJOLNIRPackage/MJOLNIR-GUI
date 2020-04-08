@@ -119,7 +119,7 @@ class mywindow(QtWidgets.QMainWindow):
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
-    def DataSet_convertData_button_function(self):
+    def DataSet_convertData_button_function(self):    
         #  Should add a check if a data set is selected
             
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
@@ -234,6 +234,7 @@ class mywindow(QtWidgets.QMainWindow):
     @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
     def QELine_plot_button_function(self):    
         # First check if we have data, otherwise convert data
+        
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()
@@ -255,8 +256,7 @@ class mywindow(QtWidgets.QMainWindow):
         # Define orthogonal width and minimum pixel size along Q-cut
         width = float(self.ui.QELine_Width_lineEdit.text())   
         minPixel = float(self.ui.QELine_MinPixel_lineEdit.text()) 
-
-        
+ 
         # Define energy bins
         EMin=float(self.ui.QELine_EMin_lineEdit.text())
         EMax=float(self.ui.QELine_EMax_lineEdit.text())
@@ -280,8 +280,6 @@ class mywindow(QtWidgets.QMainWindow):
             constantBins=False              
     
         # Make plot
-
-        
         ax,DataLists,Bins,BinCenters,Offsets = \
         ds.plotCutQELine(QPoints=QPoints, width=width, \
                                      minPixel=minPixel, EnergyBins=EnergyBins,\
@@ -301,7 +299,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.windows.append(self.QELine.get_figure())
         self.QELine_SetTitle_button_function()
-        
+
 
     def QELine_setCAxis_button_function(self):       
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
@@ -318,17 +316,15 @@ class mywindow(QtWidgets.QMainWindow):
             fig = self.QELine.get_figure()
             fig.canvas.draw()
 
-
-        ##############################################################################
-        # QPlane
-        ##############################################################################        
+    ##############################################################################
+    # QPlane
+    ##############################################################################        
     def QPlane_plot_button_function(self):
         # Make plot
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()        
         
-
         # Check various plot settings
         if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
             rlu=True
@@ -344,7 +340,6 @@ class mywindow(QtWidgets.QMainWindow):
         EMax=float(self.ui.QPlane_EMax_lineEdit.text())
         QxWidth = float(self.ui.QPlane_QxWidth_lineEdit.text())           
         QyWidth = float(self.ui.QPlane_QyWidth_lineEdit.text())           
-
 
         Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=QxWidth,yBinTolerance=QyWidth,log=log,rlu=rlu)
         
@@ -380,7 +375,9 @@ class mywindow(QtWidgets.QMainWindow):
             fig = self.QPlane.get_figure()
             fig.canvas.draw()
         
-
+    ##############################################################################
+    # DataSet
+    ##############################################################################   
     def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
         self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
         self.ui.DataSet_convertData_button.setToolTip('Convert selected Dataset')
@@ -403,7 +400,6 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.DataSetSelectionModel = self.ui.DataSet_DataSets_listView.selectionModel()
         self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
-
         
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
 
@@ -411,7 +407,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
         self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
 
-        
         self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
         self.DataFileSelectionModel.selectionChanged.connect(self.selectedDataFileChanged)
         
@@ -420,8 +415,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_DeleteFiles_button.setStatusTip(self.ui.DataSet_DeleteFiles_button.toolTip())
 
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
-
-
 
     def selectedDataSetChanged(self,*args,**kwargs):
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -542,6 +535,7 @@ class mywindow(QtWidgets.QMainWindow):
         dialog.exec_()
 
 # def run():
+
     
 if __name__=='__main__':
     app = QtWidgets.QApplication(sys.argv)
@@ -551,5 +545,3 @@ if __name__=='__main__':
     application.show()
     
     sys.exit(app.exec_())
-
-# run()
