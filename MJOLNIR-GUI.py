@@ -23,6 +23,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 from MJOLNIR_GUI_ui import Ui_MainWindow  
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from DataModels import DataSetModel,DataFileModel
+from AboutDialog import AboutDialog
 import sys
 
 import functools
@@ -34,18 +35,23 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
     def ProgressBarDecorator(func):
         @functools.wraps(func)
         def newFunc(self,*args,**kwargs):
+            blockItemsState = []
+            for button in self.blockItems:
+                blockItemsState.append(button.isEnabled())
+                button.setEnabled(False)
             self.setProgressBarValue(0)
             self.setProgressBarLabelText(runningText)
             if len(args) == 1:
                 args = ()
             else:
                 args = args[1:]
-            print('Args: ',*args)
-            print('Kwargs: ',*kwargs)
+            QtWidgets.QApplication.processEvents()
             returnval = func(self,*args,**kwargs)
             self.setProgressBarMaximum(100)
             self.setProgressBarValue(100)
             self.setProgressBarLabelText(completedText)
+            for button,state in zip(self.blockItems,blockItemsState):
+                button.setEnabled(state)
             QtCore.QTimer.singleShot(int(delayInSeconds*1000), self.resetProgressBar)
             return returnval
         return newFunc
@@ -71,12 +77,14 @@ class mywindow(QtWidgets.QMainWindow):
     
         self.ui.setupUi(self)
         
+        self.windows = []
 
         self.dataSets = []
         
+        self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
+        self.blockItems.append(self.ui.DataSet_binning_comboBox)
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles        
-        
 
         self.setupDataSet_DataFile_labels()
 
@@ -176,6 +184,7 @@ class mywindow(QtWidgets.QMainWindow):
             self.V.Energy_slider.set_val(1)
             self.V.Energy_slider.set_val(currentSliderValue)
                     
+    @ProgressBarDecoratorArguments(runningText='Generating View3D',completedText='View3D Generated')                    
     def View3D_plot_button_function(self):
 
         # Check if we already have data, otherwise convert current data.
@@ -204,6 +213,7 @@ class mywindow(QtWidgets.QMainWindow):
             log=False        
         
         self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
+        self.windows.append(self.V.ax.get_figure())
         
         # Select the correct view
         if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
@@ -221,6 +231,7 @@ class mywindow(QtWidgets.QMainWindow):
     ##############################################################################
         # QELine
     ##############################################################################
+    @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
     def QELine_plot_button_function(self):
         
         HStart=float(self.ui.QELine_HStart_lineEdit.text())
@@ -277,7 +288,8 @@ class mywindow(QtWidgets.QMainWindow):
         fig.set_size_inches(8,6)
         
         self.QELine_setCAxis_button_function()
-        
+
+        self.windows.append(self.QELine.getFigure())
         
 
     def QELine_setCAxis_button_function(self):
@@ -397,6 +409,10 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionExit.setToolTip('Exit the application') 
         self.ui.actionExit.triggered.connect(self.close)
 
+        self.ui.actionAbout.setIcon(QtGui.QIcon('Icons/icons/question.png'))
+        self.ui.actionAbout.setToolTip('Show About') 
+        self.ui.actionAbout.triggered.connect(self.about)
+
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
         self.DataFileLabels = [self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
@@ -448,6 +464,24 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarValue(0)
         self.setProgressBarLabelText('Ready')
 
+
+    def closeEvent(self, event):
+        print("closing PyQtTest")
+        if hasattr(self,'windows'):
+            for window in self.windows:
+                try:
+                    plt.close(window)
+                except:
+                    pass
+
+        self.SaveSettings()
+
+    def SaveSettings(self):
+        print("I really want to save the current settings but can't as this feature is not yet created... sorry :-( ")
+
+    def about(self):
+        dialog = AboutDialog('About.txt')
+        dialog.exec_()
 
 # def run():
     
