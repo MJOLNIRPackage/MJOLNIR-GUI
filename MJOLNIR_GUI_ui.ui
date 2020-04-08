@@ -830,14 +830,17 @@
     <widget class="QLabel" name="progressBar_label">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>169</x>
        <y>100</y>
-       <width>47</width>
-       <height>13</height>
+       <width>431</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Ready</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </widget>
