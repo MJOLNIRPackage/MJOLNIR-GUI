@@ -177,7 +177,7 @@
       <height>84</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="View3D_SelectView_layout">
      <item>
       <widget class="QRadioButton" name="View3D_SelectView_QxE_radioButton">
        <property name="text">
@@ -223,42 +223,6 @@
     <property name="text">
      <string>View3d bins</string>
     </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>280</y>
-      <width>51</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectUnits_RLU_radioButton">
-       <property name="text">
-        <string>RLU</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectUnits_AA_radioButton">
-       <property name="text">
-        <string>AA-1</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>Units</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
    <widget class="QPushButton" name="DataSet_NewDataSet_button">
     <property name="geometry">
@@ -388,6 +352,55 @@
      <property name="text">
       <string>Plot View3D</string>
      </property>
+    </widget>
+    <widget class="QCheckBox" name="View3D_Grid_checkBox">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>70</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Grid</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>10</y>
+       <width>51</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="View3D_SelectUnits_layout">
+      <item>
+       <widget class="QRadioButton" name="View3D_SelectUnits_RLU_radioButton">
+        <property name="text">
+         <string>RLU</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="View3D_SelectUnits_AA_radioButton">
+        <property name="text">
+         <string>AA-1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Units</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
@@ -574,13 +587,25 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="QELine_EMin_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_EMin_lineEdit">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QLineEdit" name="QELine_NPoints_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_NPoints_lineEdit">
+        <property name="text">
+         <string>101</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="QELine_Emax_lineEdit"/>
+       <widget class="QLineEdit" name="QELine_EMax_lineEdit">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_32">
@@ -799,7 +824,7 @@
       </rect>
      </property>
      <property name="value">
-      <number>24</number>
+      <number>0</number>
      </property>
     </widget>
     <widget class="QLabel" name="progressBar_label">
@@ -1169,7 +1194,6 @@
    <zorder>gridLayoutWidget_2</zorder>
    <zorder>verticalLayoutWidget</zorder>
    <zorder>label_8</zorder>
-   <zorder>verticalLayoutWidget_2</zorder>
    <zorder>DataSet_NewDataSet_button</zorder>
    <zorder>DataSet_DeleteDataSet_button</zorder>
    <zorder>DataSet_AddFiles_button</zorder>
