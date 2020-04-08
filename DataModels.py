@@ -2,6 +2,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from MJOLNIR_Data import GuiDataFile
+import numpy as np
 
 
 
@@ -217,11 +218,16 @@ class DataFileModel(QtCore.QAbstractListModel):
         self.layoutChanged.emit()
 
 
-    def add(self,files):
+    def add(self,files,guiWindow=None):
+        if not guiWindow is None:
+            guiWindow.setProgressBarMaximum(len(files))
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         dfs = []
-        for f in files:
+        for i,f in enumerate(files):
             dfs.append(GuiDataFile(f))
+            if not guiWindow is None:
+                guiWindow.setProgressBarValue(i+1)
+            
 
         ds.append(dfs)
         self.layoutChanged.emit()

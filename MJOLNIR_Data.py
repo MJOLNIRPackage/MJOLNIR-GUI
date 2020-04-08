@@ -10,6 +10,23 @@ class GuiDataSet(DataSet.DataSet):
     def setData(self,column,value):
         if column == 0: self.name = value
         
+    def convertDataFile(self,dataFiles=None,binning=None,guiWindow=None):
+        
+        dataFiles = self.dataFiles
+        if not guiWindow is None:
+            guiWindow.setProgressBarMaximum(len(dataFiles))
+
+        convertedFiles = []
+        for i,rawfile in enumerate(dataFiles):
+            guiWindow.setProgressBarValue(i)
+            convFile = rawfile.convert(binning)
+                
+            convertedFiles.append(convFile)
+            
+        self._convertedFiles = []
+        self.convertedFiles = convertedFiles    
+        self._getData()
+        guiWindow.setProgressBarValue(len(dataFiles))
 
 
     def flags(self):
