@@ -14,14 +14,14 @@ class GuiDataSet(DataSet.DataSet):
         
         dataFiles = self.dataFiles
         if not guiWindow is None:
-            guiWindow.setProgressBarMaximum(len(dataFiles))
+            guiWindow.setProgressBarMaximum(len(dataFiles)+1)
 
         convertedFiles = []
         for i,rawfile in enumerate(dataFiles):
-            guiWindow.setProgressBarValue(i)
             convFile = rawfile.convert(binning)
                 
             convertedFiles.append(convFile)
+            guiWindow.setProgressBarValue(i+1)
             
         self._convertedFiles = []
         self.convertedFiles = convertedFiles    
