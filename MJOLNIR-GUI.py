@@ -222,7 +222,6 @@ class mywindow(QtWidgets.QMainWindow):
         # QELine
     ##############################################################################
     def QELine_plot_button_function(self):
-        print('This button has not been implemented yet')
         
         HStart=float(self.ui.QELine_HStart_lineEdit.text())
         KStart=float(self.ui.QELine_KStart_lineEdit.text())
@@ -267,11 +266,15 @@ class mywindow(QtWidgets.QMainWindow):
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()
-            
-        self.QELine=ds.plotCutQELine(QPoints=QPoints, width=width, \
+        
+        ax,DataLists,Bins,BinCenters,Offsets = \
+        ds.plotCutQELine(QPoints=QPoints, width=width, \
                                      minPixel=minPixel, EnergyBins=EnergyBins,\
                                          rlu=rlu)
-    
+            
+        self.QELine=ax    
+        fig = self.QELine.get_figure()
+        fig.set_size_inches(8,6)
         
         self.QELine_setCAxis_button_function()
         
@@ -282,7 +285,7 @@ class mywindow(QtWidgets.QMainWindow):
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
         
-        self.QELine.caxis=(CAxisMin,CAxisMax)
+        self.QELine.set_clim(CAxisMin,CAxisMax)
 
 
 
