@@ -18,9 +18,16 @@ class GuiDataSet(DataSet.DataSet):
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
-        
+
     def setData(self,column,value):
         if column == 0: self.name = value
 
     def flags(self):
         return QtCore.Qt.ItemIsEditable
+
+    def convert(self,*args,**kwargs):
+        convertedFile = super(GuiDataFile, self).convert(*args, **kwargs)
+        self.converted = True
+        self.name = '.'.join(self.name.split('.')[:-1])+'.nxs'
+
+        return convertedFile

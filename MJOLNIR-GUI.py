@@ -18,7 +18,7 @@ from os import path
 plt.ion()
 
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 
 from MJOLNIR_GUI_ui import Ui_MainWindow  
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
@@ -47,13 +47,15 @@ class mywindow(QtWidgets.QMainWindow):
     
         self.ui.setupUi(self)
         
-        self.currentDataSetIndex = 0
 
         self.dataSets = []
         
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles        
         
+
+        self.setupDataSet_DataFile_labels()
+
         ##############################################################################
         # View3D
         ##############################################################################       
@@ -81,12 +83,25 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
         
         
+        self.setupMenu()
 
+ 
+        
     def DataSet_convertData_button_function(self):
         #  Should add a check if a data set is selected
             
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
+        try:
+            ds.convertDataFile(binning=binning,saveFile=False)
+        except AttributeError as e:
+            msg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,title='Error')
+            msg.setText("Error")
+            msg.setInformativeText(str(e))
+            msg.resize(300,200)
+            msg.exec_()
+
+        self.DataFileModel.layoutChanged.emit()
         ds.convertDataFile(binning=binning,saveFile=False)
                 
     ##############################################################################
@@ -271,54 +286,53 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
         self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
+        self.ui.DataSet_convertData_button.setToolTip('Convert selected Dataset')
+        self.ui.DataSet_convertData_button.setStatusTip(self.ui.DataSet_convertData_button.toolTip())
+
         self.ui.DataSet_NewDataSet_button.clicked.connect(self.DataSet_NewDataSet_button_function)
+        self.ui.DataSet_NewDataSet_button.setToolTip('Add new Dataset')
+        self.ui.DataSet_NewDataSet_button.setStatusTip(self.ui.DataSet_NewDataSet_button.toolTip())
+
         self.ui.DataSet_DeleteDataSet_button.clicked.connect(self.DataSet_DeleteDataSet_button_function)
+        self.ui.DataSet_DeleteDataSet_button.setToolTip('Delete selected Dataset')
+        self.ui.DataSet_DeleteDataSet_button.setStatusTip(self.ui.DataSet_DeleteDataSet_button.toolTip())
+
         self.ui.DataSet_AddFiles_button.clicked.connect(self.DataSet_AddFiles_button_function)
+        self.ui.DataSet_AddFiles_button.setToolTip('Add new Datafiles')
+        self.ui.DataSet_AddFiles_button.setStatusTip(self.ui.DataSet_AddFiles_button.toolTip())
 
         self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
         self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
 
-        self.ui.DataSet_DataSets_listView.clicked.connect(self.selectedDataSetChanged)
+        self.DataSetSelectionModel = self.ui.DataSet_DataSets_listView.selectionModel()
+        self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
+
+        
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
 
     def setupDataFile(self): # Set up main features for Gui regarding the datafile widgets
         self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
         self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
-        self.ui.DataSet_filenames_listView.clicked.connect(self.selectedDataFileChanged)
+
+        
+        self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
+        self.DataFileSelectionModel.selectionChanged.connect(self.selectedDataFileChanged)
+        
         self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
+        self.ui.DataSet_DeleteFiles_button.setToolTip('Delete selected Datafile')
+        self.ui.DataSet_DeleteFiles_button.setStatusTip(self.ui.DataSet_DeleteFiles_button.toolTip())
 
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
 
 
-    @property
-    def currentDataFileIndex(self):
-        return self._currentDataFileIndex
-
-    @currentDataFileIndex.getter
-    def currentDataFileIndex(self):
-        return self._currentDataFileIndex
-
-    @currentDataFileIndex.setter
-    def currentDataFileIndex(self,index):
-        self._currentDataFileIndex = index
-
-    @property
-    def currentDataSetIndex(self):
-        return self._currentDataSetIndex
-
-    @currentDataSetIndex.getter
-    def currentDataSetIndex(self):
-        return self._currentDataSetIndex
-
-    @currentDataSetIndex.setter
-    def currentDataSetIndex(self,index):
-        self._currentDataSetIndex = index
 
     def selectedDataSetChanged(self,*args,**kwargs):
         self.DataFileModel.updateCurrentDataSetIndex()
+        self.selectedDataFileChanged()
 
     def selectedDataFileChanged(self,*args,**kwargs):
         self.DataFileModel.layoutChanged.emit()
+        self.updateDataFileLabels()
 
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
@@ -328,6 +342,7 @@ class mywindow(QtWidgets.QMainWindow):
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
+        self.DataFileModel.layoutChanged.emit()
         
     def DataSet_DeleteFiles_button_function(self):
         self.DataFileModel.delete()
@@ -344,11 +359,55 @@ class mywindow(QtWidgets.QMainWindow):
             folder=currentFolder
         else:
             folder = ""
-        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", folder,"HDF (*.hdf);;All Files (*)")
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
         self.DataFileModel.add(files)
-        
+
+    def setupMenu(self): # Set up all QActions and menus
+        self.ui.actionExit.setIcon(QtGui.QIcon('Icons/icons/cross-button.png'))
+        self.ui.actionExit.setToolTip('Exit the application') 
+        self.ui.actionExit.triggered.connect(self.close)
+
+
+    def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
+        self.DataFileLabels = [self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
+                    self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label]
+        self.DataFileLabelEntries = ['temperature','magneticField','sampleName','scanCommand','scanParameters']
+        for label in self.DataFileLabels:
+            label.defaultText = label.text()
+            
+
+    def updateDataFileLabels(self):
+        index = self.DataFileModel.getCurrentDatafileIndex()
+        if index is None:
+            for label in self.DataFileLabels:
+                label.setText(label.defaultText)
+        else:
+            df = self.DataFileModel.getCurrentDatafile()
+            temperature = df.temperature
+            if temperature is None:
+                temperatureEntry = 'N/A'
+            else:
+                temperatureEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(temperature),np.min(temperature),np.max(temperature))
+
+            magneticField = df.magneticField
+            if magneticField is None:
+                magneticFieldEntry = 'N/A'
+            else:
+                magneticFieldEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(magneticField,np.min(magneticField),np.max(magneticField)))
+
+            sampleNameEntry = df.sample.name
+            scanCommandEntry = df.scanCommand
+            scanParameters = df.scanParameters
+            scanParametersEntry = ', '.join(scanParameters)
+            
+            entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,scanParametersEntry]
+
+            for label,entry in zip(self.DataFileLabels,entries):
+                label.setText(label.defaultText+': '+entry)
+            
+
 
 # def run():
     

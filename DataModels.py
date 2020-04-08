@@ -17,7 +17,7 @@ class DataSetModel(QtCore.QAbstractListModel):
             return text
         
         #if role == Qt.DecorationRole:
-        #    status, _ = self.dataSets[index.row()]
+        #    status = self.dataSets[index.row()].checked
         #    if status:
         #        return tick
 
@@ -41,10 +41,11 @@ class DataSetModel(QtCore.QAbstractListModel):
             pass
 
     def item(self,index):
-        return self.dataSets[index.row()]
+        if not index is None:
+            return self.dataSets[index.row()]
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
-        ds = self.dataSets[index.row()]
+        ds = self.item(index)
         if role == QtCore.Qt.EditRole:
             ds.name = value
             self.dataChanged.emit(index, index)
@@ -94,6 +95,32 @@ conversionList = defaultList(['name',
                             'ScanCommand'])
 
 
+class defDict(dict):
+    def __init__(self,*args,**kwargs):
+        dict.__init__(self, args)
+        #super(defDict,self).__init__(*args,**kwargs)
+
+
+    def __getitem__(self, key):
+        if not key in dict.keys(self):
+            val = dict.__getitem__(self, 'default')
+        else:
+            val = dict.__getitem__(self, key)
+        
+        return val
+
+    def __setitem__(self, key, val):
+        
+        dict.__setitem__(self, key, val)
+    
+    
+
+IconDict = defDict()
+IconDict['default']=QtGui.QImage('Icons/icons/document.png')
+IconDict['hdf']=QtGui.QImage('Icons/Own/HDF_logo_16.png')
+IconDict['nxs']=QtGui.QImage('Icons/Own/NXS_logo_16.png')
+
+
 class DataFileModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None, **kwargs):
         super(DataFileModel, self).__init__(*args, **kwargs)
@@ -103,15 +130,15 @@ class DataFileModel(QtCore.QAbstractListModel):
         
     def data(self, index, role):
 
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             
             text = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].name
             return text
         
-        #if role == Qt.DecorationRole:
-        #    status, _ = self.todos[index.row()]
-        #    if status:
-        #        return tick
+        if role == Qt.DecorationRole:
+            t = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].type
+            return IconDict[t]
+
 
     def getCurrentDatasetIndex(self):
         
@@ -144,6 +171,14 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return currentIndex.row()
 
+    def getCurrentDatafile(self):
+        indexRow = self.getCurrentDatafileIndexRow()
+        if indexRow is None:
+            return None
+        else:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+            df = ds[indexRow]
+            return df
 
 
     def rowCount(self, index):
@@ -157,6 +192,7 @@ class DataFileModel(QtCore.QAbstractListModel):
             return 0
 
     def updateCurrentDataSetIndex(self):
+        self.DataSet_filenames_listView.clearSelection()
         self.layoutChanged.emit()
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
