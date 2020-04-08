@@ -249,19 +249,21 @@ class mywindow(QtWidgets.QMainWindow):
         EnergyBins=np.linspace(EMin,EMax,NPoints)
 
         
-        # fig = plt.figure(figsize=(8,6))
-        # ax = fig.gca()
-        # ax,DataLists,Bins,BinCenters,Offsets = \
-        # ds.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \
-        #       ax=ax, EnergyBins=EnergyBins)
-        # ax.set_clim(0,10e-8)       
-        
-        
         if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
             rlu=True
-            
-        if self.ui.QELine_SelectUnits_AA_radioButton.isChecked():
+        else:
             rlu=False        
+
+        if self.ui.QELine_LogScale_checkBox.isChecked():
+            log=True
+        else:
+            log=False  
+            
+        if self.ui.QELine_ConstantBins_checkBox.isChecked():
+            constantBins=True
+        else:
+            constantBins=False              
+
     
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
@@ -270,14 +272,21 @@ class mywindow(QtWidgets.QMainWindow):
         ax,DataLists,Bins,BinCenters,Offsets = \
         ds.plotCutQELine(QPoints=QPoints, width=width, \
                                      minPixel=minPixel, EnergyBins=EnergyBins,\
-                                         rlu=rlu)
+                                         rlu=rlu,log=log,constantBins=constantBins)
             
         self.QELine=ax    
         fig = self.QELine.get_figure()
         fig.set_size_inches(8,6)
+
+
+        if self.ui.QELine_Grid_checkBox.isChecked():
+            ax.grid(True)
+        else:
+            ax.grid(False)
+
         
         self.QELine_setCAxis_button_function()
-        
+        self.QELine_SetTitle_button_function()
         
 
     def QELine_setCAxis_button_function(self):
@@ -286,13 +295,15 @@ class mywindow(QtWidgets.QMainWindow):
         CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
         
         self.QELine.set_clim(CAxisMin,CAxisMax)
-
-
-
+        fig = self.QELine.get_figure()
+        fig.canvas.draw()
 
     def QELine_SetTitle_button_function(self):
-        TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
-        print('This button has not been implemented yet')
+        if hasattr(self, 'QELine'):
+            TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
+            self.QELine.set_title(TitleText)
+            fig = self.QELine.get_figure()
+            fig.canvas.draw()
 
 
         ##############################################################################
