@@ -171,6 +171,14 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return currentIndex.row()
 
+    def getCurrentDatafile(self):
+        indexRow = self.getCurrentDatafileIndexRow()
+        if indexRow is None:
+            return None
+        else:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+            df = ds[indexRow]
+            return df
 
 
     def rowCount(self, index):
@@ -184,6 +192,7 @@ class DataFileModel(QtCore.QAbstractListModel):
             return 0
 
     def updateCurrentDataSetIndex(self):
+        self.DataSet_filenames_listView.clearSelection()
         self.layoutChanged.emit()
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
