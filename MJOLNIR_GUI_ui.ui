@@ -365,6 +365,9 @@
      <property name="text">
       <string>Grid</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QWidget" name="verticalLayoutWidget_2">
      <property name="geometry">
@@ -428,7 +431,7 @@
       <string>Plot 2d cut</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="QELine_ConstantBin_checkBox">
+    <widget class="QCheckBox" name="QELine_ConstantBins_checkBox">
      <property name="geometry">
       <rect>
        <x>340</x>
@@ -439,6 +442,9 @@
      </property>
      <property name="text">
       <string>Constant bins</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="QELine_setCAxis_button">
@@ -711,6 +717,9 @@
         <property name="text">
          <string>AA-1</string>
         </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -761,6 +770,22 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QCheckBox" name="QELine_Grid_checkBox">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>100</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Grid</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
@@ -881,7 +906,7 @@
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="QPlane_EMin_lineEdit_2">
+       <widget class="QLineEdit" name="QPlane_EMax_lineEdit">
         <property name="text">
          <string>2</string>
         </property>
@@ -919,7 +944,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_41">
         <property name="text">
-         <string>Qx width</string>
+         <string>Qx bin</string>
         </property>
        </widget>
       </item>
@@ -933,7 +958,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_42">
         <property name="text">
-         <string>Qy width</string>
+         <string>Qy bin</string>
         </property>
        </widget>
       </item>
@@ -976,7 +1001,7 @@
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>110</y>
+       <y>130</y>
        <width>70</width>
        <height>17</height>
       </rect>
@@ -1085,6 +1110,19 @@
      </property>
      <property name="text">
       <string>Set c axis</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="QPlane_Grid_checkBox">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>110</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Grid</string>
      </property>
     </widget>
    </widget>

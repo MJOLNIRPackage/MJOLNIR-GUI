@@ -232,8 +232,13 @@ class mywindow(QtWidgets.QMainWindow):
         # QELine
     ##############################################################################
     @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
-    def QELine_plot_button_function(self):
-        
+    def QELine_plot_button_function(self):    
+        # First check if we have data, otherwise convert data
+        ds = self.DataSetModel.getCurrentDataSet()
+        if len(ds.convertedFiles)==0:
+            self.DataSet_convertData_button_function()
+            
+        # Get the Q points
         HStart=float(self.ui.QELine_HStart_lineEdit.text())
         KStart=float(self.ui.QELine_KStart_lineEdit.text())
         LStart=float(self.ui.QELine_LStart_lineEdit.text())
@@ -241,86 +246,139 @@ class mywindow(QtWidgets.QMainWindow):
         HEnd=float(self.ui.QELine_HEnd_lineEdit.text())
         KEnd=float(self.ui.QELine_KEnd_lineEdit.text())
         LEnd=float(self.ui.QELine_LEnd_lineEdit.text())
-        
-        
+                
         Q1 = np.array([HStart,KStart,LStart])
         Q2 = np.array([HEnd,KEnd,LEnd])
         # Collect them into one array
         QPoints = np.array([Q1,Q2])
         
         # Define orthogonal width and minimum pixel size along Q-cut
-        width = float(self.ui.QELine_Width_lineEdit.text())   # 1/AA
-        minPixel = float(self.ui.QELine_MinPixel_lineEdit.text()) # 1/AA
-        
-        EMin=float(self.ui.QELine_EMin_lineEdit.text())
-        EMax=float(self.ui.QELine_EMax_lineEdit.text())
-        NPoints=int(self.ui.QELine_NPoints_lineEdit.text())
-        
-        # Define energy bins
-        EnergyBins=np.linspace(EMin,EMax,NPoints)
+        width = float(self.ui.QELine_Width_lineEdit.text())   
+        minPixel = float(self.ui.QELine_MinPixel_lineEdit.text()) 
 
         
-        # fig = plt.figure(figsize=(8,6))
-        # ax = fig.gca()
-        # ax,DataLists,Bins,BinCenters,Offsets = \
-        # ds.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \
-        #       ax=ax, EnergyBins=EnergyBins)
-        # ax.set_clim(0,10e-8)       
-        
-        
+        # Define energy bins
+        EMin=float(self.ui.QELine_EMin_lineEdit.text())
+        EMax=float(self.ui.QELine_EMax_lineEdit.text())
+        NPoints=int(self.ui.QELine_NPoints_lineEdit.text())        
+        EnergyBins=np.linspace(EMin,EMax,NPoints)
+
+        # Check various plot settings
         if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
             rlu=True
-            
-        if self.ui.QELine_SelectUnits_AA_radioButton.isChecked():
+        else:
             rlu=False        
+
+        if self.ui.QELine_LogScale_checkBox.isChecked():
+            log=True
+        else:
+            log=False  
+            
+        if self.ui.QELine_ConstantBins_checkBox.isChecked():
+            constantBins=True
+        else:
+            constantBins=False              
     
-        ds = self.DataSetModel.getCurrentDataSet()
-        if len(ds.convertedFiles)==0:
-            self.DataSet_convertData_button_function()
+        # Make plot
+
         
         ax,DataLists,Bins,BinCenters,Offsets = \
         ds.plotCutQELine(QPoints=QPoints, width=width, \
                                      minPixel=minPixel, EnergyBins=EnergyBins,\
-                                         rlu=rlu)
-            
+                                         rlu=rlu,log=log,constantBins=constantBins)
+
+        # Make some final changes to the plot
         self.QELine=ax    
         fig = self.QELine.get_figure()
         fig.set_size_inches(8,6)
+
+        if self.ui.QELine_Grid_checkBox.isChecked():
+            ax.grid(True)
+        else:
+            ax.grid(False)
         
         self.QELine_setCAxis_button_function()
 
-        self.windows.append(self.QELine.getFigure())
+        self.windows.append(self.QELine.get_figure())
+        self.QELine_SetTitle_button_function()
         
 
-    def QELine_setCAxis_button_function(self):
-        
+    def QELine_setCAxis_button_function(self):       
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
         
         self.QELine.set_clim(CAxisMin,CAxisMax)
-
-
-
+        fig = self.QELine.get_figure()
+        fig.canvas.draw()
 
     def QELine_SetTitle_button_function(self):
-        TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
-        print('This button has not been implemented yet')
+        if hasattr(self, 'QELine'):
+            TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
+            self.QELine.set_title(TitleText)
+            fig = self.QELine.get_figure()
+            fig.canvas.draw()
 
 
         ##############################################################################
         # QPlane
         ##############################################################################        
     def QPlane_plot_button_function(self):
-        print('This button has not been implemented yet')
+        # Make plot
+        ds = self.DataSetModel.getCurrentDataSet()
+        if len(ds.convertedFiles)==0:
+            self.DataSet_convertData_button_function()        
+        
+
+        # Check various plot settings
+        if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
+            rlu=True
+        else:
+            rlu=False        
+
+        if self.ui.QPlane_LogScale_checkBox.isChecked():
+            log=True
+        else:
+            log=False          
+
+        EMin=float(self.ui.QPlane_EMin_lineEdit.text())
+        EMax=float(self.ui.QPlane_EMax_lineEdit.text())
+        QxWidth = float(self.ui.QPlane_QxWidth_lineEdit.text())           
+        QyWidth = float(self.ui.QPlane_QyWidth_lineEdit.text())           
+
+
+        Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=QxWidth,yBinTolerance=QyWidth,log=log,rlu=rlu)
+        
+        self.QPlane=ax    
+        
+        fig = self.QPlane.get_figure()
+        fig.colorbar(ax.pmeshs[0])
+        fig.set_size_inches(8,6)
+
+        if self.ui.QPlane_Grid_checkBox.isChecked():
+            ax.grid(True)
+        else:
+            ax.grid(False)
+        
+        self.QPlane_setCAxis_button_function()
+        self.QPlane_SetTitle_button_function()
+        self.windows.append(self.QPlane.get_figure())
+        
 
     def QPlane_setCAxis_button_function(self):
-        print('This button has not been implemented yet')        
         CAxisMin=float(self.ui.QPlane_CAxisMin_lineEdit.text())
         CAxisMax=float(self.ui.QPlane_CAxisMax_lineEdit.text())
 
+        self.QPlane.set_clim(CAxisMin,CAxisMax)
+        fig = self.QPlane.get_figure()
+        fig.canvas.draw()
+        
     def QPlane_SetTitle_button_function(self):
         TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
-        print('This button has not been implemented yet')
+        if hasattr(self, 'QPlane'):
+            TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
+            self.QPlane.set_title(TitleText)
+            fig = self.QPlane.get_figure()
+            fig.canvas.draw()
         
 
     def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
