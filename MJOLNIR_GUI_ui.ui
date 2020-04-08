@@ -1088,9 +1088,9 @@
    <widget class="QLabel" name="DataSet_Temperature_label">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>80</y>
-      <width>71</width>
+      <x>390</x>
+      <y>110</y>
+      <width>220</width>
       <height>16</height>
      </rect>
     </property>
@@ -1101,9 +1101,9 @@
    <widget class="QLabel" name="DataSet_MagneticField_label">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>100</y>
-      <width>81</width>
+      <x>390</x>
+      <y>130</y>
+      <width>220</width>
       <height>16</height>
      </rect>
     </property>
@@ -1114,9 +1114,9 @@
    <widget class="QLabel" name="DataSet_SampleName_label">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>120</y>
-      <width>71</width>
+      <x>390</x>
+      <y>150</y>
+      <width>220</width>
       <height>16</height>
      </rect>
     </property>
@@ -1127,9 +1127,9 @@
    <widget class="QLabel" name="DataSet_ScanCommand_label">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>140</y>
-      <width>81</width>
+      <x>390</x>
+      <y>170</y>
+      <width>220</width>
       <height>16</height>
      </rect>
     </property>
@@ -1140,9 +1140,9 @@
    <widget class="QLabel" name="DataSet_ScanType_label">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>160</y>
-      <width>81</width>
+      <x>390</x>
+      <y>190</y>
+      <width>220</width>
       <height>16</height>
      </rect>
     </property>
