@@ -23,12 +23,17 @@ from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 from MJOLNIR_GUI_ui import Ui_MainWindow  
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from DataModels import DataSetModel,DataFileModel
+from StateMachine import StateMachine
+from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
 import sys
 
 import functools
 
 
+
+
+####
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',delayInSeconds=3):
 
@@ -116,11 +121,13 @@ class mywindow(QtWidgets.QMainWindow):
         
         
         self.setupMenu()
+        self.setupStateMachine()
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
     def DataSet_convertData_button_function(self):    
         #  Should add a check if a data set is selected
+        self.stateMachine.requireStateByName('Raw')
             
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
@@ -186,6 +193,7 @@ class mywindow(QtWidgets.QMainWindow):
                     
     @ProgressBarDecoratorArguments(runningText='Generating View3D',completedText='View3D Generated')                    
     def View3D_plot_button_function(self):
+        self.stateMachine.requireStateByName('Converted')
 
         # Check if we already have data, otherwise convert current data.
         ds = self.DataSetModel.getCurrentDataSet()
@@ -234,6 +242,7 @@ class mywindow(QtWidgets.QMainWindow):
     @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
     def QELine_plot_button_function(self):    
         # First check if we have data, otherwise convert data
+        self.stateMachine.requireStateByName('Converted')
         
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
@@ -321,6 +330,7 @@ class mywindow(QtWidgets.QMainWindow):
     ##############################################################################        
     def QPlane_plot_button_function(self):
         # Make plot
+        self.stateMachine.requireStateByName('Converted')
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()        
@@ -427,8 +437,6 @@ class mywindow(QtWidgets.QMainWindow):
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
         self.DataSetModel.append(ds)
-        index = self.DataSetModel.index(self.DataSetModel.rowCount(None)-1,0)
-        self.DataSetModel.DataSet_DataSets_listView.setCurrentIndex(index)
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
@@ -445,6 +453,7 @@ class mywindow(QtWidgets.QMainWindow):
 
     @ProgressBarDecoratorArguments(runningText='Adding Data Files',completedText='Data Files Added')
     def DataSet_AddFiles_button_function(self):
+        self.stateMachine.requireStateByName('Partial')
         currentFolder = self.ui.DataSet_path_lineEdit.text()
         if path.exists(currentFolder):
             folder=currentFolder
@@ -533,6 +542,9 @@ class mywindow(QtWidgets.QMainWindow):
     def about(self):
         dialog = AboutDialog('About.txt')
         dialog.exec_()
+
+    def setupStateMachine(self):
+        self.stateMachine = StateMachine([empty,partial,raw,converted],self)
 
 # def run():
 
