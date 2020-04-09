@@ -35,28 +35,29 @@ import functools
 
 ####
 
-def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',delayInSeconds=3):
+def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed',delayInSeconds=3):
 
     def ProgressBarDecorator(func):
         @functools.wraps(func)
         def newFunc(self,*args,**kwargs):
-            blockItemsState = []
-            for button in self.blockItems:
-                blockItemsState.append(button.isEnabled())
-                button.setEnabled(False)
             self.setProgressBarValue(0)
             self.setProgressBarLabelText(runningText)
             if len(args) == 1:
                 args = ()
             else:
                 args = args[1:]
-            QtWidgets.QApplication.processEvents()
+            self.update()
             returnval = func(self,*args,**kwargs)
+
             self.setProgressBarMaximum(100)
+            if returnval is not None:
+                if returnval is False:
+                    self.setProgressBarValue(0)
+                    self.setProgressBarLabelText(failedText)
+                    return returnval
+        
             self.setProgressBarValue(100)
             self.setProgressBarLabelText(completedText)
-            for button,state in zip(self.blockItems,blockItemsState):
-                button.setEnabled(state)
             QtCore.QTimer.singleShot(int(delayInSeconds*1000), self.resetProgressBar)
             return returnval
         return newFunc
@@ -122,12 +123,14 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.setupMenu()
         self.setupStateMachine()
+        self.stateMachine.run()
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
     def DataSet_convertData_button_function(self):    
         #  Should add a check if a data set is selected
-        self.stateMachine.requireStateByName('Raw')
+        if not self.stateMachine.requireStateByName('raw'):
+            return False
             
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
@@ -141,6 +144,7 @@ class mywindow(QtWidgets.QMainWindow):
             msg.exec_()
 
         self.DataFileModel.layoutChanged.emit()
+        self.stateMachine.run()
         #ds.convertDataFile(binning=binning,saveFile=False)
                 
     ##############################################################################
@@ -193,7 +197,8 @@ class mywindow(QtWidgets.QMainWindow):
                     
     @ProgressBarDecoratorArguments(runningText='Generating View3D',completedText='View3D Generated')                    
     def View3D_plot_button_function(self):
-        self.stateMachine.requireStateByName('Converted')
+        if not self.stateMachine.requireStateByName('Converted'):
+            return False
 
         # Check if we already have data, otherwise convert current data.
         ds = self.DataSetModel.getCurrentDataSet()
@@ -242,7 +247,8 @@ class mywindow(QtWidgets.QMainWindow):
     @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
     def QELine_plot_button_function(self):    
         # First check if we have data, otherwise convert data
-        self.stateMachine.requireStateByName('Converted')
+        if not self.stateMachine.requireStateByName('Converted'):
+            return False
         
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
@@ -330,7 +336,8 @@ class mywindow(QtWidgets.QMainWindow):
     ##############################################################################        
     def QPlane_plot_button_function(self):
         # Make plot
-        self.stateMachine.requireStateByName('Converted')
+        if not self.stateMachine.requireStateByName('Converted'):
+            return False
         ds = self.DataSetModel.getCurrentDataSet()
         if len(ds.convertedFiles)==0:
             self.DataSet_convertData_button_function()        
@@ -423,7 +430,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
 
     def setupDataFile(self): # Set up main features for Gui regarding the datafile widgets
-        self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
+        self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,guiWindow=self)
         self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
 
         self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
@@ -438,21 +445,27 @@ class mywindow(QtWidgets.QMainWindow):
     def selectedDataSetChanged(self,*args,**kwargs):
         self.DataFileModel.updateCurrentDataSetIndex()
         self.selectedDataFileChanged()
+        self.stateMachine.run()
 
     def selectedDataFileChanged(self,*args,**kwargs):
         self.DataFileModel.layoutChanged.emit()
         self.updateDataFileLabels()
+        self.stateMachine.run()
 
     def DataSet_NewDataSet_button_function(self):
         ds = GuiDataSet(name='Added')
         self.DataSetModel.append(ds)
+        self.update()
+        self.stateMachine.run()
 
     def DataSet_DeleteDataSet_button_function(self):
         self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
         self.DataFileModel.layoutChanged.emit()
+        self.stateMachine.run()
         
     def DataSet_DeleteFiles_button_function(self):
         self.DataFileModel.delete()
+        self.stateMachine.run()
 
     def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
         self.ui.DataSet_DataSets_listView.edit(index)
@@ -462,7 +475,9 @@ class mywindow(QtWidgets.QMainWindow):
 
     @ProgressBarDecoratorArguments(runningText='Adding Data Files',completedText='Data Files Added')
     def DataSet_AddFiles_button_function(self):
-        self.stateMachine.requireStateByName('Partial')
+        if not self.stateMachine.requireStateByName('Partial'):
+            return False
+        
         currentFolder = self.ui.DataSet_path_lineEdit.text()
         if path.exists(currentFolder):
             folder=currentFolder
@@ -472,6 +487,8 @@ class mywindow(QtWidgets.QMainWindow):
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
         self.DataFileModel.add(files,guiWindow=self)
+        self.update()
+        self.stateMachine.run()
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon('Icons/icons/cross-button.png'))
@@ -492,12 +509,11 @@ class mywindow(QtWidgets.QMainWindow):
             
 
     def updateDataFileLabels(self):
-        index = self.DataFileModel.getCurrentDatafileIndex()
-        if index is None:
+        df = self.DataFileModel.getCurrentDatafile()
+        if df is None:
             for label in self.DataFileLabels:
                 label.setText(label.defaultText)
         else:
-            df = self.DataFileModel.getCurrentDatafile()
             temperature = df.temperature
             if temperature is None:
                 temperatureEntry = 'N/A'
@@ -554,6 +570,9 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setupStateMachine(self):
         self.stateMachine = StateMachine([empty,partial,raw,converted],self)
+
+    def update(self):
+        QtWidgets.QApplication.processEvents()
 
 # def run():
 
