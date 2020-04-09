@@ -56,7 +56,7 @@ class StateMachine(object):
     def forceRun(self,checkFunction=lambda self:True):
         """Force machine to run unto checkFunction returns True or next state is None"""
 
-        while not self.currentState.nextState is None and not checkFunction(self):
+        while (not self.currentState.nextState is None) and not checkFunction(self):
             if self.checkTransitionToNextState() == False:
                 self.currentState.transitionFunction(self)
             self.transition()

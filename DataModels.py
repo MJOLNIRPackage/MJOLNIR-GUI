@@ -73,7 +73,7 @@ class DataSetModel(QtCore.QAbstractListModel):
         if len(indices)==0:
             return None
         else:
-            return indices[0]
+            return self.DataSet_DataSets_listView.selectedIndexes()[0]
 
     def getCurrentDatasetIndexRow(self):
         currentIndex = self.getCurrentDatafileIndex()
@@ -158,12 +158,12 @@ class DataFileModel(QtCore.QAbstractListModel):
 
     def getCurrentDatasetIndex(self):
         
-        index = self.dataSetModel.getCurrentDatasetIndex()
+        indices = self.DataSet_DataSets_listView.selectedIndexes()
         
-        if index is None:
+        if len(indices)==0:
             return None
         else:
-            return index
+            return self.DataSet_DataSets_listView.selectedIndexes()[0]
 
     def getCurrentDatasetIndexRow(self):
         currentIndex = self.getCurrentDatasetIndex()
@@ -198,12 +198,14 @@ class DataFileModel(QtCore.QAbstractListModel):
 
 
     def rowCount(self, index):
-        ds = self.dataSetModel.getCurrentDataSet()
-        if ds is None:
-            return 0
-        else:
-            return len(ds)
         
+        if self.getCurrentDatasetIndexRow() is None:
+            return 0
+        try:
+            length = len(self.dataSetModel.item(self.getCurrentDatasetIndex()))
+            return length
+        except IndexError:
+            return 0
 
     def updateCurrentDataSetIndex(self):
         self.DataSet_filenames_listView.clearSelection()

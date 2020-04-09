@@ -25,7 +25,6 @@ class GuiDataSet(DataSet.DataSet):
             
         self._convertedFiles = []
         self.convertedFiles = convertedFiles    
-        
         self._getData()
         guiWindow.setProgressBarValue(len(dataFiles))
 
