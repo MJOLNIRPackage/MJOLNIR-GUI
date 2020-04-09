@@ -6,11 +6,18 @@ import numpy as np
 
 ## enterStateFunction
 def AllEnabled(StateMachine):
-    names = [item.objectName for item in StateMachine.guiWindow.blockItems]
+    names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
     enabled = np.ones(len(names))
     #enabledNames = ['DataSet_NewDataSet_button',]
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
+
+    blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button'],enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
+        if enable:
+            item.setStyleSheet("background-color: blue")
+        else:
+            item.setStyleSheet("background-color: lightgrey")
 
 
 def RawEnabled(StateMachine):
@@ -24,6 +31,13 @@ def RawEnabled(StateMachine):
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
 
+    blue = AllFalseBut(['DataSet_convertData_button'],enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
+        if enable:
+            item.setStyleSheet("background-color: blue")
+        else:
+            item.setStyleSheet("background-color: lightgrey")
+
 
 def PartialEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -35,6 +49,13 @@ def PartialEnabled(StateMachine):
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
+
+    blue = AllFalseBut(['DataSet_AddFiles_button'],enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
+        if enable:
+            item.setStyleSheet("background-color: blue")
+        else:
+            item.setStyleSheet("background-color: lightgrey")
     
 
 
@@ -46,6 +67,13 @@ def EmptyEnabled(StateMachine):
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
+
+    blue = AllFalseBut(['DataSet_NewDataSet_button'],enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
+        if enable:
+            item.setStyleSheet("background-color: blue")
+        else:
+            item.setStyleSheet("background-color: lightgrey")
     
 
 ## Transition functions
@@ -54,19 +82,21 @@ def transitionEmptyPartial(StateMachine): # What is required to transition from 
     return StateMachine.guiWindow.DataSetModel.rowCount(None)>0
 
 def transitionPartialRaw(StateMachine): # What is required to transition from partial to raw
-    count = StateMachine.guiWindow.DataFileModel.rowCount(None)
+    count = len(StateMachine.guiWindow.DataSetModel.getCurrentDataSet())
     if not count is None:
-        return count>0 and transitionEmptyPartial(StateMachine)
+        return count>0
     else:
         return False
 
 def transitionRawConverted(StateMachine): # What is required to transition from partial to raw
     ds = StateMachine.guiWindow.DataSetModel.getCurrentDataSet()
+    
     if not ds is None:
-        return len(ds.convertedFiles)>0
+        val = len(ds.convertedFiles)>0
     else:
-        return False
-
+        val = False
+    
+    return val
 ### Functions to force transition
 
 def forceTransitionEmptyPartial(StateMachine): # add DataSet
@@ -78,8 +108,9 @@ def forceTransitionPartialRaw(StateMachine): # add DataFile
     return transitionPartialRaw(StateMachine)
 
 def forceTansitionRawConverted(StateMachine): # add DataFile
-    StateMachine.guiWindow.DataSet_convertData_button_function()
-    return transitionRawConverted(StateMachine)
+    print(StateMachine.currentState.name)
+    StateMachine.guiWindow.convert()
+    return True#transitionRawConverted(StateMachine)
 
 
 ### States for state machine

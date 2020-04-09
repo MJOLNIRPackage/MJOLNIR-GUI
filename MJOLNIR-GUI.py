@@ -131,7 +131,9 @@ class mywindow(QtWidgets.QMainWindow):
         #  Should add a check if a data set is selected
         if not self.stateMachine.requireStateByName('raw'):
             return False
-            
+        self.convert()
+
+    def convert(self):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
         try:
@@ -144,7 +146,7 @@ class mywindow(QtWidgets.QMainWindow):
             msg.exec_()
 
         self.DataFileModel.layoutChanged.emit()
-        self.stateMachine.run()
+        #self.stateMachine.run()
         #ds.convertDataFile(binning=binning,saveFile=False)
                 
     ##############################################################################
