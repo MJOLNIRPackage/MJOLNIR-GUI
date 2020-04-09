@@ -384,6 +384,13 @@ class mywindow(QtWidgets.QMainWindow):
             self.QPlane.set_title(TitleText)
             fig = self.QPlane.get_figure()
             fig.canvas.draw()
+    ##############################################################################
+    # Menu options
+    #############################################################################   
+    # def Menu_File_GenerateView3D_function(self):
+        # f=fopen("View3D_script.py","w+")
+        # f.write()
+        
         
     ##############################################################################
     # DataSet
