@@ -73,10 +73,14 @@ class DataSetModel(QtCore.QAbstractListModel):
         if len(indices)==0:
             return None
         else:
-            return indices[0]
+            index = indices[0]
+            if index.row()<self.rowCount(None):
+                return index
+            else:
+                return None
 
     def getCurrentDatasetIndexRow(self):
-        currentIndex = self.getCurrentDatafileIndex()
+        currentIndex = self.getCurrentDatasetIndex()
         if currentIndex is None:
             return None
         else:
