@@ -24,10 +24,12 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+
 import sys
 
 import functools
 
+from _tools import loadSetting,updateSetting
 
 
 
@@ -80,6 +82,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
     
         self.ui.setupUi(self)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap('Icons/icons/MJOLNIR.png'))
+        self.setWindowIcon(icon)
         
         self.windows = []
 
@@ -87,6 +92,9 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
         self.blockItems.append(self.ui.DataSet_binning_comboBox)
+
+        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
+
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles        
 
@@ -122,6 +130,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.setupMenu()
         self.setupStateMachine()
         self.stateMachine.run()
+
+        self.loadFolder() # Load last folder as default 
+        self.loadLineEdits()
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
@@ -478,6 +489,11 @@ class mywindow(QtWidgets.QMainWindow):
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
         self.DataFileModel.add(files,guiWindow=self)
+
+        # Find the folder of the data files, using last data file
+        folder = path.dirname(files[-1])
+        self.setCurrentDirectory(folder)
+
         self.update()
         self.stateMachine.run()
 
@@ -489,6 +505,35 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionAbout.setIcon(QtGui.QIcon('Icons/icons/question.png'))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.triggered.connect(self.about)
+
+
+        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon('Icons/icons/folder-save.png'))
+        self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
+        self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
+
+        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon('Icons/icons/folder--arrow.png'))
+        self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
+        self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
+
+        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon('Icons/icons/script-3D.png'))
+        self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
+
+        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon('Icons/icons/script-QE.png'))
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
+
+        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon('Icons/icons/script-QP.png'))
+        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
+
+        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon('Icons/icons/script-1D.png'))
+        self.ui.actionGenerate_1d_script.setToolTip('Generate 3D Script') 
+
+        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon('Icons/icons/mask-open.png'))
+        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
+
+        self.ui.actionLoad_mask.setIcon(QtGui.QIcon('Icons/icons/mask-load.png'))
+        self.ui.actionLoad_mask.setToolTip('Load Mask') 
+        
+        
 
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
@@ -542,18 +587,29 @@ class mywindow(QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
-        print("closing PyQtTest")
+        res = QtWidgets.QMessageBox.question(self,
+                                    "Exit - Save Gui Settings",
+                                    "Do you want to save Gui Settings?",
+                                    QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+        
+        
+        if res == QtWidgets.QMessageBox.Save:
+            self.saveCurrentGui()
+            event.accept()
+        elif res == QtWidgets.QMessageBox.No:
+            self.saveCurrentFolder()
+            event.accept()
+        else:
+            event.ignore()
+            return
+
+
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
                     pass
-
-        self.SaveSettings()
-
-    def SaveSettings(self):
-        print("I really want to save the current settings but can't as this feature is not yet created... sorry :-( ")
 
     def about(self):
         dialog = AboutDialog('About.txt')
@@ -564,6 +620,107 @@ class mywindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+
+    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
+    def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
+        #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
+        
+        saveString = []
+        
+        self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
+
+        for i,ds in enumerate(self.DataSetModel.dataSets):
+
+            localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
+            localstring.insert(0,ds.name)
+            saveString.append(' '.join(localstring))
+            self.setProgressBarValue((i+1))
+
+        dataSetString = ':'.join(saveString)
+        
+        updateSetting('dataSet',dataSetString)
+
+        self.saveCurrentFolder()
+        self.saveLineEdits()    
+
+    def saveLineEdits(self):
+        lineEditValueString = ':'.join([';'.join([item.objectName(),item.text()]) for item in self.lineEdits])
+        updateSetting('lineEdits',lineEditValueString)
+
+    def saveCurrentFolder(self):
+        fileDir = self.getCurrentDirectory()
+        updateSetting('fileDir',fileDir)
+
+
+    def loadFolder(self):
+        fileDir = loadSetting('fileDir')
+        if not fileDir is None:
+            self.setCurrentDirectory(fileDir)
+
+
+    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
+    def loadGui(self):
+        self.setProgressBarLabelText('Deleating Old Data Sets and Files')
+        while self.DataSetModel.rowCount(None)>0:
+            self.DataSetModel.delete(self.DataSetModel.getCurrentDatasetIndex())
+        else:
+            self.DataSetModel.layoutChanged.emit()
+            self.DataFileModel.updateCurrentDataSetIndex()
+            self.update()
+        
+        dataSetString = loadSetting('dataSet')
+        
+        
+        lines = dataSetString.split(':')
+        totalFiles = len(dataSetString.split(' ')) # Get estimate of total number of data files
+        self.setProgressBarMaximum(totalFiles)
+        counter = 0
+
+        self.setProgressBarLabelText('Loading Data Sets and Files')
+        for line in lines:
+            
+            DSName,*files = line.split(' ')
+            dfs = None
+            if len(files)!=0: # If files in dataset, continue
+                dfs = []
+                for dfLocation in files:
+                    df = GuiDataFile(dfLocation)
+                    dfs.append(df)
+                    counter+=1
+                    self.setProgressBarValue(counter)
+            if DSName == '':
+                continue
+            ds = GuiDataSet(name=DSName,dataFiles=dfs)
+            self.DataSetModel.append(ds)
+            counter+=1
+            self.setProgressBarValue(counter)
+            
+        
+        
+
+
+        self.loadLineEdits()
+        self.DataSetModel.layoutChanged.emit()
+        self.DataFileModel.updateCurrentDataSetIndex()
+        self.update()
+
+
+    def loadLineEdits(self):
+        lineEditValueString = loadSetting('lineEdits')
+        if not lineEditValueString is None:
+            for item in lineEditValueString.split(':'):
+                name,value = item.split(';')
+                try:
+                    getattr(self.ui,name).setText(value)
+                except AttributeError:
+                    pass
+
+    def getCurrentDirectory(self):
+        return self.ui.DataSet_path_lineEdit.text()
+
+    def setCurrentDirectory(self,folder):
+        self.ui.DataSet_path_lineEdit.setText(folder)
+
 
 # def run():
 

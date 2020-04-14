@@ -21,13 +21,15 @@ class GuiDataSet(DataSet.DataSet):
             convFile = rawfile.convert(binning)
                 
             convertedFiles.append(convFile)
-            guiWindow.setProgressBarValue(i+1)
+            if not guiWindow is None:
+                guiWindow.setProgressBarValue(i+1)
             
         self._convertedFiles = []
         self.convertedFiles = convertedFiles    
         
         self._getData()
-        guiWindow.setProgressBarValue(len(dataFiles))
+        if not guiWindow is None:
+            guiWindow.setProgressBarValue(len(dataFiles))
 
 
     def flags(self):
