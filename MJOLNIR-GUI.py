@@ -26,6 +26,7 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+
 import sys
 
 import functools
@@ -83,6 +84,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
     
         self.ui.setupUi(self)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap('Icons/icons/MJOLNIR.png'))
+        self.setWindowIcon(icon)
         
         self.windows = []
 
@@ -590,18 +594,29 @@ class mywindow(QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
+        res = QtWidgets.QMessageBox.question(self,
+                                    "Exit - Save Gui Settings",
+                                    "Do you want to save Gui Settings?",
+                                    QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
         
+        
+        if res == QtWidgets.QMessageBox.Save:
+            self.saveCurrentGui()
+            event.accept()
+        elif res == QtWidgets.QMessageBox.No:
+            self.saveCurrentFolder()
+            event.accept()
+        else:
+            event.ignore()
+            return
+
+
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
                     pass
-        
-        if self.DataSetModel.rowCount(None)>0: # If no data, save only folder
-            self.saveCurrentGui()
-        else:
-            self.saveCurrentFolder()
 
     def about(self):
         dialog = AboutDialog('About.txt')
@@ -622,7 +637,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
 
         for i,ds in enumerate(self.DataSetModel.dataSets):
-            localstring = [df.fileLocation for df in ds]
+
+            localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             localstring.insert(0,ds.name)
             saveString.append(' '.join(localstring))
             self.setProgressBarValue((i+1))
@@ -646,6 +662,14 @@ class mywindow(QtWidgets.QMainWindow):
 
     @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
     def loadGui(self):
+        self.setProgressBarLabelText('Deleating Old Data Sets and Files')
+        while self.DataSetModel.rowCount(None)>0:
+            self.DataSetModel.delete(self.DataSetModel.getCurrentDatasetIndex())
+        else:
+            self.DataSetModel.layoutChanged.emit()
+            self.DataFileModel.updateCurrentDataSetIndex()
+            self.update()
+        
         dataSetString = loadSetting('dataSet')
         
         
@@ -654,6 +678,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
+        self.setProgressBarLabelText('Loading Data Sets and Files')
         for line in lines:
             
             DSName,*files = line.split(' ')
@@ -674,7 +699,10 @@ class mywindow(QtWidgets.QMainWindow):
             
         
         self.loadFolder()
-        pass
+        self.DataSetModel.layoutChanged.emit()
+        self.DataFileModel.updateCurrentDataSetIndex()
+        self.update()
+
 
     def getCurrentDirectory(self):
         return self.ui.DataSet_path_lineEdit.text()
