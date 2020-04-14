@@ -530,6 +530,13 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon('Icons/icons/script-1D.png'))
         self.ui.actionGenerate_1d_script.setToolTip('Generate 3D Script') 
 
+        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon('Icons/icons/mask-open.png'))
+        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
+
+        self.ui.actionLoad_mask.setIcon(QtGui.QIcon('Icons/icons/mask-load.png'))
+        self.ui.actionLoad_mask.setToolTip('Load Mask') 
+        
+        
 
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
