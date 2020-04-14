@@ -83,7 +83,7 @@ class mywindow(QtWidgets.QMainWindow):
     
         self.ui.setupUi(self)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap('Icons/icons/MJOLNIR.png'))
+        icon.addPixmap(QtGui.QPixmap('Icons/Own/MJOLNIR.png'))
         self.setWindowIcon(icon)
         
         self.windows = []
@@ -709,7 +709,10 @@ class mywindow(QtWidgets.QMainWindow):
         lineEditValueString = loadSetting('lineEdits')
         if not lineEditValueString is None:
             for item in lineEditValueString.split(':'):
-                name,value = item.split(';')
+                try:
+                    name,value = item.split(';')
+                except:
+                    continue
                 try:
                     getattr(self.ui,name).setText(value)
                 except AttributeError:
