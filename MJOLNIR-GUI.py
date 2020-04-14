@@ -94,6 +94,9 @@ class mywindow(QtWidgets.QMainWindow):
         
         self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
         self.blockItems.append(self.ui.DataSet_binning_comboBox)
+
+        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
+
         self.setupDataSet() # Setup datasets with buttons and call functions
         self.setupDataFile() # Setup datafiles        
 
@@ -131,6 +134,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.stateMachine.run()
 
         self.loadFolder() # Load last folder as default 
+        self.loadLineEdits()
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
@@ -648,6 +652,11 @@ class mywindow(QtWidgets.QMainWindow):
         updateSetting('dataSet',dataSetString)
 
         self.saveCurrentFolder()
+        self.saveLineEdits()    
+
+    def saveLineEdits(self):
+        lineEditValueString = ':'.join([';'.join([item.objectName(),item.text()]) for item in self.lineEdits])
+        updateSetting('lineEdits',lineEditValueString)
 
     def saveCurrentFolder(self):
         fileDir = self.getCurrentDirectory()
@@ -698,11 +707,24 @@ class mywindow(QtWidgets.QMainWindow):
             self.setProgressBarValue(counter)
             
         
-        self.loadFolder()
+        
+
+
+        self.loadLineEdits()
         self.DataSetModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
 
+
+    def loadLineEdits(self):
+        lineEditValueString = loadSetting('lineEdits')
+        if not lineEditValueString is None:
+            for item in lineEditValueString.split(':'):
+                name,value = item.split(';')
+                try:
+                    getattr(self.ui,name).setText(value)
+                except AttributeError:
+                    pass
 
     def getCurrentDirectory(self):
         return self.ui.DataSet_path_lineEdit.text()
