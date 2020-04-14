@@ -1,4 +1,3 @@
-
 # State machine and corresponding classes to deal with gui movements
 
 import numpy as np
@@ -6,26 +5,19 @@ import numpy as np
 class State(object):
     def __init__(self,name,nextState,enterStateFunction=None,transitionRequirement=None,transitionFunction=None,):
         """Create a state
-
         Args:
             - name (str): Name of state
-
             - nextState (State): Next state 
-
         Kwargs:
             - enterStateFunction (function): Function called by StateMachine as fun(self) (default lambda self: None)
-
             - transitionRequirement (function): Function returning possibility of transitioning to next state called by StateMachine as fun(self) (default lambda: False) 
-
             - transitionFunction (function): Function to be called to force transition to next state called by StateMachine as fun(self) (default None -> Raises error)
-
             
-
         """
         self.name = name
 
         if transitionRequirement is None:
-            transitionRequirement = lambda: False
+            transitionRequirement = lambda self: False
         
         if enterStateFunction is None:
             enterStateFunction = lambda self: None
@@ -43,47 +35,56 @@ class StateMachine(object):
 
         self.states = states
         self.stateNames = [s.name for s in self.states]
-        self.buttons = [True,True,False,False] # AddDataset, AddDataFile, Convert, Plot
-        self.buttonNames = ['AddDataset', 'AddDataFile', 'Convert', 'Plot']
         self.guiWindow = guiWindow
         self.currentState = states[0]
 
     def run(self):
         """Run the machine until it cannot go any further"""
+        self.currentState = self.states[0]
         while self.checkTransitionToNextState() == True: # transition requirement is made
             self.transition()
+        
+        self.currentState.enterStateFunction(self)
+        self.guiWindow.update()
     
     def forceRun(self,checkFunction=lambda self:True):
         """Force machine to run unto checkFunction returns True or next state is None"""
 
-        while (not self.currentState.nextState is None) and not checkFunction(self):
+        while not self.currentState.nextState is None and not checkFunction(self):
             if self.checkTransitionToNextState() == False:
-                self.currentState.transitionFunction(self)
+                if not self.currentState.transitionFunction(self):
+                    return checkFunction(self)
             self.transition()
+        self.currentState.enterStateFunction(self)
+        self.guiWindow.update()
+        return checkFunction(self)
 
     def requireStateByName(self,name):
         """Force run state machine until state with 'name' is reached"""
-        resquestIdx = self.stateNames.index(name)
-        currentIdx = self.states.index(self.currentState)
-        if currentIdx<resquestIdx:
-            self.currentState = self.states[0]
-            def checkName(self,Name):
-                return self.currentState.name == Name
+        #resquestIdx = self.stateNames.index(name)
+        #currentIdx = self.states.index(self.currentState)
+        #if currentIdx<resquestIdx:
+        self.currentState = self.states[0]
+        def checkName(self,Name):
+            return self.currentState.name == Name
 
-            check = lambda self: checkName(self,name)
-            self.forceRun(check)
+        check = lambda self: checkName(self,name)
+        return self.forceRun(check)
 
 
     def step(self):
         if self.checkTransitionToNextState():
             self.transition()
+            self.currentState.enterStateFunction(self)
+            self.guiWindow.update()
+            
         
-
     def transition(self):
         if self.checkTransitionToNextState():
             nextState = self.currentState.nextState
             if nextState is not None:
                 self.currentState = nextState
+                
 
     def getCurrentState(self):
         return self.currentState
@@ -104,7 +105,7 @@ class StateMachine(object):
         if not isinstance(newState,State):
             raise AttributeError('Provided attribute is not a State')
         self._currentState = newState
-        self._currentState.enterStateFunction(self)
+
         
 
 
