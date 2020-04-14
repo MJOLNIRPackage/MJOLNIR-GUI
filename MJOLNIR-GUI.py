@@ -30,6 +30,7 @@ import sys
 
 import functools
 
+from _tools import loadSetting,updateSetting
 
 
 
@@ -124,6 +125,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.setupMenu()
         self.setupStateMachine()
         self.stateMachine.run()
+
+        self.loadFolder() # Load last folder as default 
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
@@ -489,6 +492,11 @@ class mywindow(QtWidgets.QMainWindow):
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
         self.DataFileModel.add(files,guiWindow=self)
+
+        # Find the folder of the data files, using last data file
+        folder = path.dirname(files[-1])
+        self.setCurrentDirectory(folder)
+
         self.update()
         self.stateMachine.run()
 
@@ -500,6 +508,15 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionAbout.setIcon(QtGui.QIcon('Icons/icons/question.png'))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.triggered.connect(self.about)
+
+
+        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon('Icons/icons/folder-save.png'))
+        self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
+        self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
+
+        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon('Icons/icons/folder--arrow.png'))
+        self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
+        self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
@@ -553,7 +570,7 @@ class mywindow(QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
-        print("closing PyQtTest")
+        
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
@@ -561,10 +578,7 @@ class mywindow(QtWidgets.QMainWindow):
                 except:
                     pass
 
-        self.SaveSettings()
-
-    def SaveSettings(self):
-        print("I really want to save the current settings but can't as this feature is not yet created... sorry :-( ")
+        self.saveCurrentGui()
 
     def about(self):
         dialog = AboutDialog('About.txt')
@@ -575,6 +589,72 @@ class mywindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+
+    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
+    def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
+        #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
+        
+        saveString = []
+        
+        self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
+
+        for i,ds in enumerate(self.DataSetModel.dataSets):
+            localstring = [df.fileLocation for df in ds]
+            localstring.insert(0,ds.name)
+            saveString.append(' '.join(localstring))
+            self.setProgressBarValue((i+1))
+
+        dataSetString = ':'.join(saveString)
+        
+        updateSetting('dataSet',dataSetString)
+
+        fileDir = self.getCurrentDirectory()
+        updateSetting('fileDir',fileDir)
+
+
+    def loadFolder(self):
+        fileDir = loadSetting('fileDir')
+        if not fileDir is None:
+            self.setCurrentDirectory(fileDir)
+
+
+    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
+    def loadGui(self):
+        dataSetString = loadSetting('dataSet')
+        
+        
+        lines = dataSetString.split(':')
+        totalFiles = len(dataSetString.split(' ')) # Get estimate of total number of data files
+        self.setProgressBarMaximum(totalFiles)
+        counter = 0
+
+        for line in lines:
+            
+            DSName,*files = line.split(' ')
+            dfs = None
+            if len(files)!=0: # If files in dataset, continue
+                dfs = []
+                for dfLocation in files:
+                    df = GuiDataFile(dfLocation)
+                    dfs.append(df)
+                    counter+=1
+                    self.setProgressBarValue(counter)
+
+            ds = GuiDataSet(name=DSName,dataFiles=dfs)
+            self.DataSetModel.append(ds)
+            counter+=1
+            self.setProgressBarValue(counter)
+            
+        
+        self.loadFolder()
+        pass
+
+    def getCurrentDirectory(self):
+        return self.ui.DataSet_path_lineEdit.text()
+
+    def setCurrentDirectory(self,folder):
+        self.ui.DataSet_path_lineEdit.setText(folder)
+
 
 # def run():
 
