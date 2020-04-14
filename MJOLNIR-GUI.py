@@ -518,6 +518,19 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
+        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon('Icons/icons/script-3D.png'))
+        self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
+
+        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon('Icons/icons/script-QE.png'))
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
+
+        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon('Icons/icons/script-QP.png'))
+        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
+
+        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon('Icons/icons/script-1D.png'))
+        self.ui.actionGenerate_1d_script.setToolTip('Generate 3D Script') 
+
+
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
         self.DataFileLabels = [self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
@@ -577,8 +590,11 @@ class mywindow(QtWidgets.QMainWindow):
                     plt.close(window)
                 except:
                     pass
-
-        self.saveCurrentGui()
+        
+        if self.DataSetModel.rowCount(None)>0: # If no data, save only folder
+            self.saveCurrentGui()
+        else:
+            self.saveCurrentFolder()
 
     def about(self):
         dialog = AboutDialog('About.txt')
@@ -608,6 +624,9 @@ class mywindow(QtWidgets.QMainWindow):
         
         updateSetting('dataSet',dataSetString)
 
+        self.saveCurrentFolder()
+
+    def saveCurrentFolder(self):
         fileDir = self.getCurrentDirectory()
         updateSetting('fileDir',fileDir)
 
@@ -639,7 +658,8 @@ class mywindow(QtWidgets.QMainWindow):
                     dfs.append(df)
                     counter+=1
                     self.setProgressBarValue(counter)
-
+            if DSName == '':
+                continue
             ds = GuiDataSet(name=DSName,dataFiles=dfs)
             self.DataSetModel.append(ds)
             counter+=1
