@@ -1,0 +1,27 @@
+Linux setup:
+
+requirements in addition to those of the application:
+pip install fbs PyQt5 PyInstaller==3.4 setuptools<45.0.0
+change last version = xxx to =0.17 in /home/lass/anaconda3/envs/fbsevn/lib/python3.6/site-packages/importlib_metadata/__init__.py
+make distribution (fbs freeze + fbs installer)
+
+
+Windows:
+Virtual Machine Manager
+Download image from https://www.microsoft.com/en-us/software-download/windows10ISO
+Setup Virtual Machine Manager with new partition
+https://www.youtube.com/watch?v=jLRmVNWOrgo
+conda create --name distribute python==3.6 geos numpy scipy shapely
+install MJOLNIR
+pip install fbs PyQt5 PyInstaller==3.4 setuptools==44.1.0
+change last version = xxx to =0.17 in C:\Users\jakob\miniconda3\envs\distribute\Lib\site-packages\importlib_metadata __init__.py
+Installation of msvcr100.dll from https://www.microsoft.com/en-us/download/details.aspx?id=14632
+Install NSIS from https://nsis.sourceforge.io/Download
+Add NSIS to local path by: set PATH=C:\LOCATION\OF\NSIS;%PATH%
+
+Shareable folder: https://www.techrepublic.com/article/how-to-set-up-quick-and-easy-file-sharing-with-samba/ with SECURED on LASS
+
+
+Accessing local files: Run Virt Machine Manager and type: sudo virt-viewer --connect=qemu:///session --domain-name win10, in preferences under files choose folder to share
+
+
