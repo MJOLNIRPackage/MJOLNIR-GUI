@@ -22,7 +22,7 @@ def updateSetting(settingsFile, name,value):# pragma: no cover
         loaded_dict = {}
     loaded_dict[name]=value
     with open(settingsFile,"wb") as pickle_out:
-        pickle.dump(loaded_dict, pickle_out)
+        pickle.dump(loaded_dict, pickle_out,protocol=pickle.HIGHEST_PROTOCOL)
 
 def Exists(settingsFile):# pragma: no cover
     return os.path.isfile(settingsFile)

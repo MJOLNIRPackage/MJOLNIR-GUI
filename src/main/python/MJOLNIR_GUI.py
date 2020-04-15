@@ -646,7 +646,7 @@ class mywindow(QtWidgets.QMainWindow):
 
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             localstring.insert(0,ds.name)
-            saveString.append(' '.join(localstring))
+            saveString.append(';'.join(localstring))
             self.setProgressBarValue((i+1))
 
         dataSetString = ':'.join(saveString)
@@ -685,7 +685,7 @@ class mywindow(QtWidgets.QMainWindow):
         
         
         lines = dataSetString.split(':')
-        totalFiles = len(dataSetString.split(' ')) # Get estimate of total number of data files
+        totalFiles = len(dataSetString.split(';')) # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
