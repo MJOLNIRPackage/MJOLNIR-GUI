@@ -32,6 +32,9 @@ from _tools import loadSetting,updateSetting
 from pathlib import Path
 home = str(Path.home())
 
+seperator1 = '|'
+seperator2 = '*'
+
 ####
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed',delayInSeconds=3):
@@ -646,10 +649,10 @@ class mywindow(QtWidgets.QMainWindow):
 
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             localstring.insert(0,ds.name)
-            saveString.append(';'.join(localstring))
+            saveString.append(seperator2.join(localstring))
             self.setProgressBarValue((i+1))
 
-        dataSetString = ':'.join(saveString)
+        dataSetString = seperator1.join(saveString)
         
         updateSetting(self.settingsFile,'dataSet',dataSetString)
 
@@ -657,7 +660,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.saveLineEdits()    
 
     def saveLineEdits(self):
-        lineEditValueString = ':'.join([';'.join([item.objectName(),item.text()]) for item in self.lineEdits])
+        lineEditValueString = seperator1.join([seperator2.join([item.objectName(),item.text()]) for item in self.lineEdits])
         updateSetting(self.settingsFile,'lineEdits',lineEditValueString)
 
     def saveCurrentFolder(self):
@@ -684,15 +687,15 @@ class mywindow(QtWidgets.QMainWindow):
         dataSetString = loadSetting(self.settingsFile,'dataSet')
         
         
-        lines = dataSetString.split(':')
-        totalFiles = len(dataSetString.split(';')) # Get estimate of total number of data files
+        lines = dataSetString.split(seperator1)
+        totalFiles = len(dataSetString.split(seperator2)) # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
         self.setProgressBarLabelText('Loading Data Sets and Files')
         for line in lines:
             
-            DSName,*files = line.split(';')
+            DSName,*files = line.split(seperator2)
             dfs = None
             if len(files)!=0: # If files in dataset, continue
                 dfs = []
@@ -724,7 +727,7 @@ class mywindow(QtWidgets.QMainWindow):
         if not lineEditValueString is None:
             for item in lineEditValueString.split(':'):
                 try:
-                    name,value = item.split(';')
+                    name,value = item.split(seperator2)
                 except:
                     continue
                 try:
