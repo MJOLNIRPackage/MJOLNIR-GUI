@@ -3,8 +3,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from MJOLNIR_Data import GuiDataFile
 import numpy as np
+import MJOLNIR_GUI
+from os import path
 
-
+dir_path = path.dirname(path.realpath(__file__))
 
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
@@ -136,9 +138,9 @@ class defDict(dict):
     
 
 IconDict = defDict()
-IconDict['default']=QtGui.QImage('Icons/icons/document.png')
-IconDict['hdf']=QtGui.QImage('Icons/Own/HDF_logo_16.png')
-IconDict['nxs']=QtGui.QImage('Icons/Own/NXS_logo_16.png')
+IconDict['default']=QtGui.QImage(path.join(dir_path,'Icons','icons','document.png'))
+IconDict['hdf']=QtGui.QImage(path.join(dir_path,'Icons','icons','HDF_logo_16.png'))
+IconDict['nxs']=QtGui.QImage(path.join(dir_path,'Icons','icons','NXS_logo_16.png'))
 
 
 class DataFileModel(QtCore.QAbstractListModel):
