@@ -50,11 +50,12 @@ class StateMachine(object):
     def forceRun(self,checkFunction=lambda self:True):
         """Force machine to run unto checkFunction returns True or next state is None"""
 
-        while not self.currentState.nextState is None and not checkFunction(self):
+        while not (self.currentState.nextState is None) and (not checkFunction(self)):
             if self.checkTransitionToNextState() == False:
                 if not self.currentState.transitionFunction(self):
                     return checkFunction(self)
             self.transition()
+            
         self.currentState.enterStateFunction(self)
         self.guiWindow.update()
         return checkFunction(self)
@@ -64,6 +65,8 @@ class StateMachine(object):
         #resquestIdx = self.stateNames.index(name)
         #currentIdx = self.states.index(self.currentState)
         #if currentIdx<resquestIdx:
+        if not name in self.stateNames:
+            raise AttributeError('Wanted name is not in list of state names! These are\n','\n'.join(self.stateNames))
         self.currentState = self.states[0]
         def checkName(self,Name):
             return self.currentState.name == Name

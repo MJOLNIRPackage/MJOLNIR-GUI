@@ -138,13 +138,17 @@ class mywindow(QtWidgets.QMainWindow):
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
     def DataSet_convertData_button_function(self):    
         #  Should add a check if a data set is selected
-        if not self.stateMachine.requireStateByName('raw'):
+        
+        if not self.stateMachine.requireStateByName('Raw'):
             return False
-        self.convert()
-
+        
+        return self.convert()
+        
+        
     def convert(self):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
+        
         try:
             ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
@@ -153,8 +157,10 @@ class mywindow(QtWidgets.QMainWindow):
             msg.setInformativeText(str(e))
             msg.resize(300,200)
             msg.exec_()
-
+        
         self.DataFileModel.layoutChanged.emit()
+        self.stateMachine.run()
+        return True
         #self.stateMachine.run()
         #ds.convertDataFile(binning=binning,saveFile=False)
                 
@@ -251,7 +257,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.View3D_SetTitle_button_function()
         self.V.setPlane(1)
         self.V.setPlane(0)
-        
+        return True
     ##############################################################################
         # QELine
     ##############################################################################
@@ -326,6 +332,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.windows.append(self.QELine.get_figure())
         self.QELine_SetTitle_button_function()
 
+        return True
+
 
     def QELine_setCAxis_button_function(self):       
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
@@ -385,6 +393,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.QPlane_setCAxis_button_function()
         self.QPlane_SetTitle_button_function()
         self.windows.append(self.QPlane.get_figure())
+
+        return True
         
 
     def QPlane_setCAxis_button_function(self):
@@ -496,6 +506,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.update()
         self.stateMachine.run()
+        return True
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/cross-button.png')))
@@ -703,6 +714,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataSetModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
+        return True
 
 
     def loadLineEdits(self):
