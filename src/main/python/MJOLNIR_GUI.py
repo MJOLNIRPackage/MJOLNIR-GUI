@@ -29,7 +29,8 @@ import functools
 
 from _tools import loadSetting,updateSetting
 
-
+from pathlib import Path
+home = str(Path.home())
 
 ####
 
@@ -79,7 +80,8 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-        self.settingsFile = self.AppContext.get_resource('.MJOLNIRGuiSettings')
+        self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
+        print(self.settingsFile)
     
         self.ui.setupUi(self)
         icon = QtGui.QIcon()
