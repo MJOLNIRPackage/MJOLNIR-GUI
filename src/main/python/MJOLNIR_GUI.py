@@ -646,15 +646,17 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
 
         for i,ds in enumerate(self.DataSetModel.dataSets):
-
+            dsDict = {'name':ds.name}
+            
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
-            localstring.insert(0,ds.name)
-            saveString.append(seperator2.join(localstring))
+            dsDict['files']=localstring
+            
+            saveString.append(dsDict)
             self.setProgressBarValue((i+1))
 
-        dataSetString = seperator1.join(saveString)
+        #dataSetString = seperator1.join(saveString)
         
-        updateSetting(self.settingsFile,'dataSet',dataSetString)
+        updateSetting(self.settingsFile,'dataSet',saveString)
 
         self.saveCurrentFolder()
         self.saveLineEdits()    
@@ -685,17 +687,15 @@ class mywindow(QtWidgets.QMainWindow):
             self.update()
         
         dataSetString = loadSetting(self.settingsFile,'dataSet')
-        
-        
-        lines = dataSetString.split(seperator1)
-        totalFiles = len(dataSetString.split(seperator2)) # Get estimate of total number of data files
+        totalFiles = np.sum([len(dsDict['files'])+1 for dsDict in dataSetString])+1
+        # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
         self.setProgressBarLabelText('Loading Data Sets and Files')
-        for line in lines:
-            
-            DSName,*files = line.split(seperator2)
+        for dsDict in dataSetString:
+            DSName = dsDict['name']
+            files = dsDict['files']
             dfs = None
             if len(files)!=0: # If files in dataset, continue
                 dfs = []
