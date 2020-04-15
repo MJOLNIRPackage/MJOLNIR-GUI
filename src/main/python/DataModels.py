@@ -6,8 +6,6 @@ import numpy as np
 import MJOLNIR_GUI
 from os import path
 
-dir_path = path.dirname(path.realpath(__file__))
-
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
         super(DataSetModel, self).__init__(*args, **kwargs)
@@ -137,10 +135,7 @@ class defDict(dict):
     
     
 
-IconDict = defDict()
-IconDict['default']=QtGui.QImage(path.join(dir_path,'Icons','icons','document.png'))
-IconDict['hdf']=QtGui.QImage(path.join(dir_path,'Icons','icons','HDF_logo_16.png'))
-IconDict['nxs']=QtGui.QImage(path.join(dir_path,'Icons','icons','NXS_logo_16.png'))
+
 
 
 class DataFileModel(QtCore.QAbstractListModel):
@@ -150,6 +145,11 @@ class DataFileModel(QtCore.QAbstractListModel):
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.DataSet_filenames_listView = DataSet_filenames_listView
         self.guiWindow = guiWindow
+
+        self.IconDict = defDict()
+        self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/icons/document.png'))
+        self.IconDict['hdf']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/HDF_logo_16.png'))
+        self.IconDict['nxs']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/NXS_logo_16.png'))
         
     def data(self, index, role):
 
@@ -160,7 +160,7 @@ class DataFileModel(QtCore.QAbstractListModel):
         
         if role == Qt.DecorationRole:
             t = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].type
-            return IconDict[t]
+            return self.IconDict[t]
 
 
     def getCurrentDatasetIndex(self):

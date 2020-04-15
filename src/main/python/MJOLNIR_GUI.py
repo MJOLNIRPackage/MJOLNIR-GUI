@@ -30,8 +30,6 @@ import functools
 from _tools import loadSetting,updateSetting
 
 
-import os
-dir_path = os.path.dirname(os.path.realpath(__file__))
 
 ####
 
@@ -75,15 +73,17 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
 
 class mywindow(QtWidgets.QMainWindow):
 
-    def __init__(self):
+    def __init__(self,AppContext):
 
         super(mywindow, self).__init__()
 
         self.ui = Ui_MainWindow()
+        self.AppContext = AppContext
+        self.settingsFile = self.AppContext.get_resource('.MJOLNIRGuiSettings')
     
         self.ui.setupUi(self)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(path.join(dir_path,'Icons','Own','MJOLNIR.png')))
+        icon.addPixmap(QtGui.QPixmap(self.AppContext.get_resource('Icons/Own/MJOLNIR.png')))
         self.setWindowIcon(icon)
         
         self.windows = []
@@ -138,13 +138,17 @@ class mywindow(QtWidgets.QMainWindow):
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
     def DataSet_convertData_button_function(self):    
         #  Should add a check if a data set is selected
-        if not self.stateMachine.requireStateByName('raw'):
+        
+        if not self.stateMachine.requireStateByName('Raw'):
             return False
-        self.convert()
-
+        
+        return self.convert()
+        
+        
     def convert(self):
         binning=int(self.ui.DataSet_binning_comboBox.currentText())
         ds = self.DataSetModel.getCurrentDataSet()
+        
         try:
             ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
@@ -153,8 +157,10 @@ class mywindow(QtWidgets.QMainWindow):
             msg.setInformativeText(str(e))
             msg.resize(300,200)
             msg.exec_()
-
+        
         self.DataFileModel.layoutChanged.emit()
+        self.stateMachine.run()
+        return True
         #self.stateMachine.run()
         #ds.convertDataFile(binning=binning,saveFile=False)
                 
@@ -251,7 +257,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.View3D_SetTitle_button_function()
         self.V.setPlane(1)
         self.V.setPlane(0)
-        
+        return True
     ##############################################################################
         # QELine
     ##############################################################################
@@ -326,6 +332,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.windows.append(self.QELine.get_figure())
         self.QELine_SetTitle_button_function()
 
+        return True
+
 
     def QELine_setCAxis_button_function(self):       
         CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
@@ -385,6 +393,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.QPlane_setCAxis_button_function()
         self.QPlane_SetTitle_button_function()
         self.windows.append(self.QPlane.get_figure())
+
+        return True
         
 
     def QPlane_setCAxis_button_function(self):
@@ -496,41 +506,42 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.update()
         self.stateMachine.run()
+        return True
 
     def setupMenu(self): # Set up all QActions and menus
-        self.ui.actionExit.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','cross-button.png')))
+        self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/cross-button.png')))
         self.ui.actionExit.setToolTip('Exit the application') 
         self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionAbout.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','question.png')))
+        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question.png')))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.triggered.connect(self.about)
 
 
-        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','folder-save.png')))
+        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
-        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','folder--arrow.png')))
+        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
-        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','script-3D.png')))
+        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
 
-        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','script-QE.png')))
+        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
         self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
 
-        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','script-QP.png')))
+        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
         self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
 
-        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','script-1D.png')))
+        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
         self.ui.actionGenerate_1d_script.setToolTip('Generate 3D Script') 
 
-        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','mask-open.png')))
+        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-open.png')))
         self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
 
-        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(path.join(dir_path,'Icons','icons','mask-load.png')))
+        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-load.png')))
         self.ui.actionLoad_mask.setToolTip('Load Mask') 
         
         
@@ -612,7 +623,7 @@ class mywindow(QtWidgets.QMainWindow):
                     pass
 
     def about(self):
-        dialog = AboutDialog(path.join(dir_path,'About.txt'))
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
         dialog.exec_()
 
     def setupStateMachine(self):
@@ -638,22 +649,22 @@ class mywindow(QtWidgets.QMainWindow):
 
         dataSetString = ':'.join(saveString)
         
-        updateSetting('dataSet',dataSetString)
+        updateSetting(self.settingsFile,'dataSet',dataSetString)
 
         self.saveCurrentFolder()
         self.saveLineEdits()    
 
     def saveLineEdits(self):
         lineEditValueString = ':'.join([';'.join([item.objectName(),item.text()]) for item in self.lineEdits])
-        updateSetting('lineEdits',lineEditValueString)
+        updateSetting(self.settingsFile,'lineEdits',lineEditValueString)
 
     def saveCurrentFolder(self):
         fileDir = self.getCurrentDirectory()
-        updateSetting('fileDir',fileDir)
+        updateSetting(self.settingsFile,'fileDir',fileDir)
 
 
     def loadFolder(self):
-        fileDir = loadSetting('fileDir')
+        fileDir = loadSetting(self.settingsFile,'fileDir')
         if not fileDir is None:
             self.setCurrentDirectory(fileDir)
 
@@ -668,7 +679,7 @@ class mywindow(QtWidgets.QMainWindow):
             self.DataFileModel.updateCurrentDataSetIndex()
             self.update()
         
-        dataSetString = loadSetting('dataSet')
+        dataSetString = loadSetting(self.settingsFile,'dataSet')
         
         
         lines = dataSetString.split(':')
@@ -703,10 +714,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.DataSetModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
+        return True
 
 
     def loadLineEdits(self):
-        lineEditValueString = loadSetting('lineEdits')
+        lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
         if not lineEditValueString is None:
             for item in lineEditValueString.split(':'):
                 try:
