@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>633</width>
-    <height>885</height>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="DataSet_convertData_button">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>540</x>
       <y>200</y>
       <width>75</width>
       <height>23</height>
@@ -30,8 +30,8 @@
    <widget class="QComboBox" name="DataSet_binning_comboBox">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>170</y>
+      <x>460</x>
+      <y>200</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -64,8 +64,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>150</y>
+      <x>380</x>
+      <y>200</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -116,7 +116,7 @@
    <widget class="QPushButton" name="DataSet_DeleteFiles_button">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>260</x>
       <y>10</y>
       <width>131</width>
       <height>23</height>
@@ -811,7 +811,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_12">
       <item row="3" column="3">
-       <widget class="QLineEdit" name="QELine_LEnd_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_LEnd_lineEdit">
         <property name="text">
          <string>1</string>
         </property>
@@ -825,21 +825,21 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="QELine_HStart_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_HStart_lineEdit">
         <property name="text">
          <string>-1</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="QELine_KStart_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_KStart_lineEdit">
         <property name="text">
          <string>0</string>
         </property>
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QLineEdit" name="QELine_LStart_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_LStart_lineEdit">
         <property name="text">
          <string>-1</string>
         </property>
@@ -867,14 +867,14 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="QELine_HEnd_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_HEnd_lineEdit">
         <property name="text">
          <string>-1</string>
         </property>
        </widget>
       </item>
       <item row="3" column="2">
-       <widget class="QLineEdit" name="QELine_KEnd_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_KEnd_lineEdit">
         <property name="text">
          <string>0</string>
         </property>
@@ -907,14 +907,14 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="QELine_EMin_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_EMin_lineEdit">
         <property name="text">
          <string>0</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="QELine_EMax_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_EMax_lineEdit">
         <property name="text">
          <string>10</string>
         </property>
@@ -957,7 +957,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_14">
       <item row="0" column="3">
-       <widget class="QLineEdit" name="QELine_MinPixel_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_MinPixel_lineEdit">
         <property name="text">
          <string>0.03</string>
         </property>
@@ -978,7 +978,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="QELine_Width_lineEdit_2">
+       <widget class="QLineEdit" name="Cut1D_Width_lineEdit">
         <property name="text">
          <string>0.2</string>
         </property>
@@ -986,7 +986,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QPushButton" name="pushButton_14">
+    <widget class="QPushButton" name="Cut1D_plot_button">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -996,10 +996,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>Make cut</string>
+      <string>Plot 1d cut</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_5">
+    <widget class="QPushButton" name="Cut1D_fit_button">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -1273,8 +1273,8 @@
    <widget class="QLabel" name="DataSet_Temperature_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>70</y>
+      <x>360</x>
+      <y>180</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1286,8 +1286,8 @@
    <widget class="QLabel" name="DataSet_MagneticField_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>90</y>
+      <x>360</x>
+      <y>100</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1299,8 +1299,8 @@
    <widget class="QLabel" name="DataSet_SampleName_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>110</y>
+      <x>360</x>
+      <y>120</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1312,8 +1312,8 @@
    <widget class="QLabel" name="DataSet_ScanCommand_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>130</y>
+      <x>360</x>
+      <y>140</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1325,8 +1325,8 @@
    <widget class="QLabel" name="DataSet_ScanType_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>150</y>
+      <x>360</x>
+      <y>160</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1353,7 +1353,7 @@
      <rect>
       <x>130</x>
       <y>70</y>
-      <width>161</width>
+      <width>211</width>
       <height>151</height>
      </rect>
     </property>
@@ -1390,22 +1390,6 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QLabel" name="progressBar_label">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>10</y>
-       <width>551</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Ready</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
@@ -1437,7 +1421,14 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QSpinBox" name="spinBox"/>
+       <widget class="QSpinBox" name="Raw1D_Analyzer_spinBox">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>7</number>
+        </property>
+       </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_10">
@@ -1447,11 +1438,15 @@
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QSpinBox" name="spinBox_2"/>
+       <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
+        <property name="maximum">
+         <number>103</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="Raw1D_fit_button">
      <property name="geometry">
       <rect>
        <x>410</x>
@@ -1464,7 +1459,7 @@
       <string>Fit data</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_13">
+    <widget class="QPushButton" name="Raw1D_plot_button">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -1477,6 +1472,48 @@
       <string>Plot raw data</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QLabel" name="DataSet_A4_label">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>80</y>
+      <width>220</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>A4</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="DataSet_A3_label">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>60</y>
+      <width>220</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>A3</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="progressBar_label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>830</y>
+      <width>551</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ready</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
    </widget>
    <zorder>groupBox</zorder>
    <zorder>groupBox_3</zorder>
@@ -1499,6 +1536,9 @@
    <zorder>DataSet_DataSets_listView</zorder>
    <zorder>widget</zorder>
    <zorder>groupBox_4</zorder>
+   <zorder>DataSet_A4_label</zorder>
+   <zorder>DataSet_A3_label</zorder>
+   <zorder>progressBar_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
