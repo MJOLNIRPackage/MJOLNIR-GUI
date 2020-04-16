@@ -22,6 +22,7 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+from generateScripts import generateViewer3DScript
 
 import sys
 
@@ -157,11 +158,14 @@ class mywindow(QtWidgets.QMainWindow):
         try:
             ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
-            msg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,title='Error')
-            msg.setText("Error")
-            msg.setInformativeText(str(e))
-            msg.resize(300,200)
-            msg.exec_()
+            dialog = QtWidgets.QMessageBox('Error in converting data file')
+            dialog.setIcon(QtWidgets.QMessageBox.Critical)
+            dialog.setText('It is not possible to convert data file:')
+            
+            dialog.setInformativeText(str(e))
+            dialog.addButton(QtWidgets.QMessageBox.Ok)
+            
+            dialog.exec_()
         
         self.DataFileModel.layoutChanged.emit()
         self.stateMachine.run()
@@ -495,11 +499,7 @@ class mywindow(QtWidgets.QMainWindow):
         if not self.stateMachine.requireStateByName('Partial'):
             return False
         
-        currentFolder = self.ui.DataSet_path_lineEdit.text()
-        if path.exists(currentFolder):
-            folder=currentFolder
-        else:
-            folder = ""
+        folder = self.getCurrentDirectory()
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
@@ -533,6 +533,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
+        self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
         self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
@@ -740,6 +741,53 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setCurrentDirectory(self,folder):
         self.ui.DataSet_path_lineEdit.setText(folder)
+
+
+    def generate3DScript(self):
+        self.stateMachine.run()
+        if not self.stateMachine.currentState.name in ['Raw','Converted']:
+            dialog = QtWidgets.QMessageBox('Error in generating Script')
+            dialog.setIcon(QtWidgets.QMessageBox.Critical)
+            dialog.setText('It is not possible to generate a script without any data loaded.')
+            dialog.addButton(QtWidgets.QMessageBox.Ok)
+            dialog.exec() 
+
+            return False
+
+        folder = self.getCurrentDirectory()
+        saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+
+        if path.splitext(saveFile)[1] !='.py':
+            saveFile = path.splitext(saveFile)[0]+'.py'
+
+        ds = self.DataSetModel.getCurrentDataSet()
+        dataSetName = ds.name
+        
+        dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+        binning = self.ui.DataSet_binning_comboBox.currentText()
+        qx = self.ui.View3D_QXBin_lineEdit.text()
+        qy = self.ui.View3D_QYBin_lineEdit.text()
+        E = self.ui.View3D_EBin_lineEdit.text()
+
+        CAxisMin = self.ui.View3D_CAxisMin_lineEdit.text()
+        CAxisMax = self.ui.View3D_CAxisMax_lineEdit.text()
+
+        log = self.ui.View3D_LogScale_checkBox.isChecked()
+        grid = self.ui.View3D_Grid_checkBox.isChecked()
+
+        title = self.ui.View3D_SetTitle_lineEdit.text()
+
+        RLU = self.ui.View3D_SelectUnits_RLU_radioButton.isChecked()
+
+        radioState = [self.ui.View3D_SelectView_QxE_radioButton.isChecked(),
+        self.ui.View3D_SelectView_QyE_radioButton.isChecked(),self.ui.View3D_SelectView_QxQy_radioButton.isChecked()]
+        selectView = np.arange(3)[radioState]
+        selectView = selectView[0]
+
+        generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
+                                    RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
+                                    title=title, selectView=selectView)
 
 
 # def run():
