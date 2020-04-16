@@ -215,9 +215,16 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return len(ds)
         
+    def selectFirstDataFile(self):
+        Files = self.rowCount(None)
+        if Files!=0:
+            index = self.index(0,0)
+            self.DataSet_filenames_listView.setCurrentIndex(index)
+        else:
+            self.DataSet_filenames_listView.clearSelection()
 
     def updateCurrentDataSetIndex(self):
-        self.DataSet_filenames_listView.clearSelection()
+        self.selectFirstDataFile()
         self.layoutChanged.emit()
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
