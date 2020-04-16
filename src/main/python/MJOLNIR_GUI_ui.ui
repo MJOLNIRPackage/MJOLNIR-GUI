@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="DataSet_convertData_button">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>440</x>
       <y>200</y>
       <width>75</width>
       <height>23</height>
@@ -30,8 +30,8 @@
    <widget class="QComboBox" name="DataSet_binning_comboBox">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>170</y>
+      <x>360</x>
+      <y>200</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -64,8 +64,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>150</y>
+      <x>360</x>
+      <y>180</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -116,7 +116,7 @@
    <widget class="QPushButton" name="DataSet_DeleteFiles_button">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>260</x>
       <y>10</y>
       <width>131</width>
       <height>23</height>
@@ -1273,8 +1273,8 @@
    <widget class="QLabel" name="DataSet_Temperature_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>70</y>
+      <x>360</x>
+      <y>80</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1286,8 +1286,8 @@
    <widget class="QLabel" name="DataSet_MagneticField_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>90</y>
+      <x>360</x>
+      <y>100</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1299,8 +1299,8 @@
    <widget class="QLabel" name="DataSet_SampleName_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>110</y>
+      <x>360</x>
+      <y>120</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1312,8 +1312,8 @@
    <widget class="QLabel" name="DataSet_ScanCommand_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>130</y>
+      <x>360</x>
+      <y>140</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1325,8 +1325,8 @@
    <widget class="QLabel" name="DataSet_ScanType_label">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>150</y>
+      <x>360</x>
+      <y>160</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1353,7 +1353,7 @@
      <rect>
       <x>130</x>
       <y>70</y>
-      <width>161</width>
+      <width>211</width>
       <height>151</height>
      </rect>
     </property>
