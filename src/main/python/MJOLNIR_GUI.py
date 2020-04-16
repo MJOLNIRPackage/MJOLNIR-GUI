@@ -38,7 +38,7 @@ seperator2 = '*'
 
 ####
 
-def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed',delayInSeconds=3):
+def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
 
     def ProgressBarDecorator(func):
         @functools.wraps(func)
@@ -57,11 +57,12 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
                 if returnval is False:
                     self.setProgressBarValue(0)
                     self.setProgressBarLabelText(failedText)
+                    self.resetProgressBarTimed()
                     return returnval
         
             self.setProgressBarValue(100)
             self.setProgressBarLabelText(completedText)
-            QtCore.QTimer.singleShot(int(delayInSeconds*1000), self.resetProgressBar)
+            self.resetProgressBarTimed()
             return returnval
         return newFunc
     return ProgressBarDecorator
@@ -85,7 +86,6 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
-        print(self.settingsFile)
     
         self.ui.setupUi(self)
         icon = QtGui.QIcon()
@@ -95,6 +95,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.windows = []
 
         self.dataSets = []
+
+        self.current_timer = None
         
         self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
         self.blockItems.append(self.ui.DataSet_binning_comboBox)
@@ -158,7 +160,7 @@ class mywindow(QtWidgets.QMainWindow):
         try:
             ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
-            dialog = QtWidgets.QMessageBox('Error in converting data file')
+            dialog = QtWidgets.QMessageBox()
             dialog.setIcon(QtWidgets.QMessageBox.Critical)
             dialog.setText('It is not possible to convert data file:')
             
@@ -516,39 +518,59 @@ class mywindow(QtWidgets.QMainWindow):
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/cross-button.png')))
         self.ui.actionExit.setToolTip('Exit the application') 
+        self.ui.actionExit.setStatusTip(self.ui.actionExit.toolTip())
         self.ui.actionExit.triggered.connect(self.close)
 
         self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question.png')))
         self.ui.actionAbout.setToolTip('Show About') 
+        self.ui.actionAbout.setStatusTip(self.ui.actionAbout.toolTip())
         self.ui.actionAbout.triggered.connect(self.about)
 
 
         self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
+        self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
         self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
+        self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
+        self.ui.actionGenerate_View3d_script.setStatusTip(self.ui.actionGenerate_View3d_script.toolTip())
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
-        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
+        self.ui.actionGenerate_QELine_script.setDisabled(True)
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script - Not Implemented') 
+        self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
+        
 
         self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
-        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
+        self.ui.actionGenerate_QPlane_script.setDisabled(True)
+        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script - Not Implemented') 
+        self.ui.actionGenerate_QPlane_script.setStatusTip(self.ui.actionGenerate_QPlane_script.toolTip())
+        
 
         self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
-        self.ui.actionGenerate_1d_script.setToolTip('Generate 3D Script') 
+        self.ui.actionGenerate_1d_script.setDisabled(True)
+        self.ui.actionGenerate_1d_script.setToolTip('Generate 1D Script - Not Implemented') 
+        self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
+        
 
         self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-open.png')))
-        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
+        self.ui.actionOpen_mask_gui.setDisabled(True)
+        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui - Not Implemented') 
+        self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
+        
 
         self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-load.png')))
-        self.ui.actionLoad_mask.setToolTip('Load Mask') 
+        self.ui.actionLoad_mask.setDisabled(True)
+        self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
+        self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
+        
         
         
 
@@ -593,6 +615,8 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.progressBar.setValue(value)
 
     def setProgressBarLabelText(self,text):
+        if self.current_timer:
+            self.current_timer.stop()
         self.ui.progressBar_label.setText(text)
 
     def setProgressBarMaximum(self,value):
@@ -743,10 +767,11 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.DataSet_path_lineEdit.setText(folder)
 
 
+    @ProgressBarDecoratorArguments(runningText='Genrating 3D Script',completedText='Script Saved',failedText='Cancelled')
     def generate3DScript(self):
         self.stateMachine.run()
         if not self.stateMachine.currentState.name in ['Raw','Converted']:
-            dialog = QtWidgets.QMessageBox('Error in generating Script')
+            dialog = QtWidgets.QMessageBox()
             dialog.setIcon(QtWidgets.QMessageBox.Critical)
             dialog.setText('It is not possible to generate a script without any data loaded.')
             dialog.addButton(QtWidgets.QMessageBox.Ok)
@@ -756,7 +781,8 @@ class mywindow(QtWidgets.QMainWindow):
 
         folder = self.getCurrentDirectory()
         saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
-
+        if len(saveFile)!=1:
+            return False
         if path.splitext(saveFile)[1] !='.py':
             saveFile = path.splitext(saveFile)[0]+'.py'
 
@@ -788,6 +814,17 @@ class mywindow(QtWidgets.QMainWindow):
         generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
                                     RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
                                     title=title, selectView=selectView)
+
+        return True
+
+
+    def resetProgressBarTimed(self):
+        if self.current_timer:
+            self.current_timer.stop()
+        self.current_timer = QtCore.QTimer()
+        self.current_timer.timeout.connect(self.resetProgressBar)
+        self.current_timer.setSingleShot(True)
+        self.current_timer.start(3000)
 
 
 # def run():

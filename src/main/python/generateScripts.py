@@ -78,7 +78,7 @@ def generateFileLoader(dataFiles):
                             groups.append(str(group[0]))
                 files = ','.join(groups)
             
-                fileStrings.append('_tools.fileListGenerator("{:}","{:}",{:})'.format(files,uDict,year))
+                fileStrings.append('_tools.fileListGenerator("{:}",r"{:}",{:})'.format(files,uDict,year))
             else:
                 fileStrings.append('["'+'",\n"'.join(dfs)+'"]')
         else:
