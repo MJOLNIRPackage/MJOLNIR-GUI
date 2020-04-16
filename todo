@@ -17,7 +17,7 @@ pip install fbs PyQt5 PyInstaller==3.4 setuptools==44.1.0
 change last version = xxx to =0.17 in C:\Users\jakob\miniconda3\envs\distribute\Lib\site-packages\importlib_metadata __init__.py
 Installation of msvcr100.dll from https://www.microsoft.com/en-us/download/details.aspx?id=14632
 Install NSIS from https://nsis.sourceforge.io/Download
-Add NSIS to local path by: set PATH=C:\LOCATION\OF\NSIS;%PATH%
+Add NSIS to local path by: set PATH=C:\LOCATION\OF\NSIS;%PATH% (set PATH=C:\Program Files (x86)\NSIS;%PATH%)
 
 Shareable folder: https://www.techrepublic.com/article/how-to-set-up-quick-and-easy-file-sharing-with-samba/ with SECURED on LASS
 

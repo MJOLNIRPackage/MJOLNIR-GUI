@@ -577,8 +577,8 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
         self.DataFileLabels = [self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
-                    self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label]
-        self.DataFileLabelEntries = ['temperature','magneticField','sampleName','scanCommand','scanParameters']
+                    self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label,self.ui.DataSet_A3_label,self.ui.DataSet_A4_label]
+        self.DataFileLabelEntries = ['temperature','magneticField','sampleName','scanCommand','scanParameters','A3','A4']
         for label in self.DataFileLabels:
             label.defaultText = label.text()
             
@@ -595,6 +595,18 @@ class mywindow(QtWidgets.QMainWindow):
             else:
                 temperatureEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(temperature),np.min(temperature),np.max(temperature))
 
+            A3 = df.A3
+            if A3 is None:
+                A3Entry = 'N/A'
+            else:
+                A3Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A3),np.min(A3),np.max(A3))
+
+            A4 = df.A4
+            if A4 is None:
+                A4Entry = 'N/A'
+            else:
+                A4Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A4),np.min(A4),np.max(A4))
+
             magneticField = df.magneticField
             if magneticField is None:
                 magneticFieldEntry = 'N/A'
@@ -606,7 +618,7 @@ class mywindow(QtWidgets.QMainWindow):
             scanParameters = df.scanParameters
             scanParametersEntry = ', '.join(scanParameters)
             
-            entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,scanParametersEntry]
+            entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,A3Entry,A4Entry]
 
             for label,entry in zip(self.DataFileLabels,entries):
                 label.setText(label.defaultText+': '+entry)
