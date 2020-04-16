@@ -523,6 +523,7 @@ class Ui_MainWindow(object):
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_6.setObjectName("gridLayout_6")
         self.Raw1D_Analyzer_spinBox = QtWidgets.QSpinBox(self.gridLayoutWidget_6)
+        self.Raw1D_Analyzer_spinBox.setEnabled(True)
         self.Raw1D_Analyzer_spinBox.setMinimum(0)
         self.Raw1D_Analyzer_spinBox.setMaximum(7)
         self.Raw1D_Analyzer_spinBox.setObjectName("Raw1D_Analyzer_spinBox")
