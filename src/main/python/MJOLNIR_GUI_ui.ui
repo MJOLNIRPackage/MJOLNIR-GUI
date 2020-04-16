@@ -1425,10 +1425,27 @@
        <x>10</x>
        <y>30</y>
        <width>481</width>
-       <height>48</height>
+       <height>74</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
+      <item row="1" column="1">
+       <widget class="QLabel" name="Raw1D_Detector_label">
+        <property name="text">
+         <string>Detector number (A4 = 0 deg)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
+        <property name="maximum">
+         <number>103</number>
+        </property>
+        <property name="displayIntegerBase">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QSpinBox" name="Raw1D_Analyzer_spinBox">
         <property name="enabled">
@@ -1446,23 +1463,6 @@
        <widget class="QLabel" name="Raw1D_Analyzer_label">
         <property name="text">
          <string>Analyzer number (E = 0 meV)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
-        <property name="maximum">
-         <number>103</number>
-        </property>
-        <property name="displayIntegerBase">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="Raw1D_Detector_label">
-        <property name="text">
-         <string>Detector number (A4 = 0 deg)</string>
         </property>
        </widget>
       </item>
@@ -1580,6 +1580,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionHelb"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
@@ -1644,6 +1645,11 @@
   <action name="actionGenerate_1d_script">
    <property name="text">
     <string>Generate 1d script</string>
+   </property>
+  </action>
+  <action name="actionHelb">
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>
