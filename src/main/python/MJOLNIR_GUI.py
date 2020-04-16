@@ -22,6 +22,7 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+from generateScripts import generateViewer3DScript
 
 import sys
 
@@ -29,7 +30,11 @@ import functools
 
 from _tools import loadSetting,updateSetting
 
+from pathlib import Path
+home = str(Path.home())
 
+seperator1 = '|'
+seperator2 = '*'
 
 ####
 
@@ -79,7 +84,8 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-        self.settingsFile = self.AppContext.get_resource('.MJOLNIRGuiSettings')
+        self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
+        print(self.settingsFile)
     
         self.ui.setupUi(self)
         icon = QtGui.QIcon()
@@ -152,11 +158,14 @@ class mywindow(QtWidgets.QMainWindow):
         try:
             ds.convertDataFile(binning=binning,guiWindow=self)
         except AttributeError as e:
-            msg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,title='Error')
-            msg.setText("Error")
-            msg.setInformativeText(str(e))
-            msg.resize(300,200)
-            msg.exec_()
+            dialog = QtWidgets.QMessageBox('Error in converting data file')
+            dialog.setIcon(QtWidgets.QMessageBox.Critical)
+            dialog.setText('It is not possible to convert data file:')
+            
+            dialog.setInformativeText(str(e))
+            dialog.addButton(QtWidgets.QMessageBox.Ok)
+            
+            dialog.exec_()
         
         self.DataFileModel.layoutChanged.emit()
         self.stateMachine.run()
@@ -490,11 +499,7 @@ class mywindow(QtWidgets.QMainWindow):
         if not self.stateMachine.requireStateByName('Partial'):
             return False
         
-        currentFolder = self.ui.DataSet_path_lineEdit.text()
-        if path.exists(currentFolder):
-            folder=currentFolder
-        else:
-            folder = ""
+        folder = self.getCurrentDirectory()
         files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
         if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
             self.DataSet_NewDataSet_button_function()
@@ -528,6 +533,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
+        self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
         self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
@@ -641,21 +647,23 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
 
         for i,ds in enumerate(self.DataSetModel.dataSets):
-
+            dsDict = {'name':ds.name}
+            
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
-            localstring.insert(0,ds.name)
-            saveString.append(' '.join(localstring))
+            dsDict['files']=localstring
+            
+            saveString.append(dsDict)
             self.setProgressBarValue((i+1))
 
-        dataSetString = ':'.join(saveString)
+        #dataSetString = seperator1.join(saveString)
         
-        updateSetting(self.settingsFile,'dataSet',dataSetString)
+        updateSetting(self.settingsFile,'dataSet',saveString)
 
         self.saveCurrentFolder()
         self.saveLineEdits()    
 
     def saveLineEdits(self):
-        lineEditValueString = ':'.join([';'.join([item.objectName(),item.text()]) for item in self.lineEdits])
+        lineEditValueString = seperator1.join([seperator2.join([item.objectName(),item.text()]) for item in self.lineEdits])
         updateSetting(self.settingsFile,'lineEdits',lineEditValueString)
 
     def saveCurrentFolder(self):
@@ -680,17 +688,15 @@ class mywindow(QtWidgets.QMainWindow):
             self.update()
         
         dataSetString = loadSetting(self.settingsFile,'dataSet')
-        
-        
-        lines = dataSetString.split(':')
-        totalFiles = len(dataSetString.split(' ')) # Get estimate of total number of data files
+        totalFiles = np.sum([len(dsDict['files'])+1 for dsDict in dataSetString])+1
+        # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
         self.setProgressBarLabelText('Loading Data Sets and Files')
-        for line in lines:
-            
-            DSName,*files = line.split(' ')
+        for dsDict in dataSetString:
+            DSName = dsDict['name']
+            files = dsDict['files']
             dfs = None
             if len(files)!=0: # If files in dataset, continue
                 dfs = []
@@ -722,7 +728,7 @@ class mywindow(QtWidgets.QMainWindow):
         if not lineEditValueString is None:
             for item in lineEditValueString.split(':'):
                 try:
-                    name,value = item.split(';')
+                    name,value = item.split(seperator2)
                 except:
                     continue
                 try:
@@ -735,6 +741,53 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setCurrentDirectory(self,folder):
         self.ui.DataSet_path_lineEdit.setText(folder)
+
+
+    def generate3DScript(self):
+        self.stateMachine.run()
+        if not self.stateMachine.currentState.name in ['Raw','Converted']:
+            dialog = QtWidgets.QMessageBox('Error in generating Script')
+            dialog.setIcon(QtWidgets.QMessageBox.Critical)
+            dialog.setText('It is not possible to generate a script without any data loaded.')
+            dialog.addButton(QtWidgets.QMessageBox.Ok)
+            dialog.exec() 
+
+            return False
+
+        folder = self.getCurrentDirectory()
+        saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+
+        if path.splitext(saveFile)[1] !='.py':
+            saveFile = path.splitext(saveFile)[0]+'.py'
+
+        ds = self.DataSetModel.getCurrentDataSet()
+        dataSetName = ds.name
+        
+        dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+        binning = self.ui.DataSet_binning_comboBox.currentText()
+        qx = self.ui.View3D_QXBin_lineEdit.text()
+        qy = self.ui.View3D_QYBin_lineEdit.text()
+        E = self.ui.View3D_EBin_lineEdit.text()
+
+        CAxisMin = self.ui.View3D_CAxisMin_lineEdit.text()
+        CAxisMax = self.ui.View3D_CAxisMax_lineEdit.text()
+
+        log = self.ui.View3D_LogScale_checkBox.isChecked()
+        grid = self.ui.View3D_Grid_checkBox.isChecked()
+
+        title = self.ui.View3D_SetTitle_lineEdit.text()
+
+        RLU = self.ui.View3D_SelectUnits_RLU_radioButton.isChecked()
+
+        radioState = [self.ui.View3D_SelectView_QxE_radioButton.isChecked(),
+        self.ui.View3D_SelectView_QyE_radioButton.isChecked(),self.ui.View3D_SelectView_QxQy_radioButton.isChecked()]
+        selectView = np.arange(3)[radioState]
+        selectView = selectView[0]
+
+        generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
+                                    RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
+                                    title=title, selectView=selectView)
 
 
 # def run():
