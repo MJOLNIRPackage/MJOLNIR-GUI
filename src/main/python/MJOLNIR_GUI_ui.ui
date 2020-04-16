@@ -1580,7 +1580,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="actionHelb"/>
+    <addaction name="actionHelp"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
@@ -1647,7 +1647,7 @@
     <string>Generate 1d script</string>
    </property>
   </action>
-  <action name="actionHelb">
+  <action name="actionHelp">
    <property name="text">
     <string>Help</string>
    </property>
