@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>633</width>
-    <height>885</height>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="DataSet_convertData_button">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>540</x>
       <y>200</y>
       <width>75</width>
       <height>23</height>
@@ -30,7 +30,7 @@
    <widget class="QComboBox" name="DataSet_binning_comboBox">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>460</x>
       <y>200</y>
       <width>69</width>
       <height>22</height>
@@ -64,8 +64,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>180</y>
+      <x>380</x>
+      <y>200</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -1274,7 +1274,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>80</y>
+      <y>180</y>
       <width>220</width>
       <height>16</height>
      </rect>
@@ -1390,22 +1390,6 @@
       <number>0</number>
      </property>
     </widget>
-    <widget class="QLabel" name="progressBar_label">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>10</y>
-       <width>551</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Ready</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
@@ -1478,6 +1462,48 @@
      </property>
     </widget>
    </widget>
+   <widget class="QLabel" name="DataSet_A4_label">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>80</y>
+      <width>220</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>A4</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="DataSet_A3_label">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>60</y>
+      <width>220</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>A3</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="progressBar_label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>830</y>
+      <width>551</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ready</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>groupBox</zorder>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
@@ -1499,6 +1525,9 @@
    <zorder>DataSet_DataSets_listView</zorder>
    <zorder>widget</zorder>
    <zorder>groupBox_4</zorder>
+   <zorder>DataSet_A4_label</zorder>
+   <zorder>DataSet_A3_label</zorder>
+   <zorder>progressBar_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
