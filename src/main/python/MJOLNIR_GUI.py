@@ -22,6 +22,7 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+from HelpDialog import HelpDialog
 from generateScripts import generateViewer3DScript
 
 import sys
@@ -521,10 +522,15 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionExit.setStatusTip(self.ui.actionExit.toolTip())
         self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question.png')))
+        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/information-button.png')))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.setStatusTip(self.ui.actionAbout.toolTip())
         self.ui.actionAbout.triggered.connect(self.about)
+
+        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question-button.png')))
+        self.ui.actionHelp.setToolTip('Show Help') 
+        self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
+        self.ui.actionHelp.triggered.connect(self.help)
 
 
         self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
@@ -667,6 +673,11 @@ class mywindow(QtWidgets.QMainWindow):
     def about(self):
         dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
         dialog.exec_()
+
+    def help(self):
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog.exec_()
+
 
     def setupStateMachine(self):
         self.stateMachine = StateMachine([empty,partial,raw,converted],self)
