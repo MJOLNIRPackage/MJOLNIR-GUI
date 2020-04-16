@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>633</width>
-    <height>895</height>
+    <width>627</width>
+    <height>904</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1372,9 +1372,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>800</y>
+      <y>830</y>
       <width>611</width>
-      <height>41</height>
+      <height>61</height>
      </rect>
     </property>
     <widget class="QProgressBar" name="progressBar">
@@ -1390,6 +1390,22 @@
       <number>0</number>
      </property>
     </widget>
+    <widget class="QLabel" name="progressBar_label">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>30</y>
+       <width>551</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ready</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
@@ -1397,7 +1413,7 @@
       <x>0</x>
       <y>730</y>
       <width>621</width>
-      <height>61</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
@@ -1408,18 +1424,11 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>381</width>
-       <height>22</height>
+       <width>481</width>
+       <height>48</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Detector number (A4 = 0 deg)</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QSpinBox" name="Raw1D_Analyzer_spinBox">
         <property name="minimum">
@@ -1431,13 +1440,13 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_10">
+       <widget class="QLabel" name="Raw1D_Analyzer_label">
         <property name="text">
          <string>Analyzer number (E = 0 meV)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="1" column="0">
        <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
         <property name="maximum">
          <number>103</number>
@@ -1447,13 +1456,20 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="Raw1D_Detector_label">
+        <property name="text">
+         <string>Detector number (A4 = 0 deg)</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
     <widget class="QPushButton" name="Raw1D_fit_button">
      <property name="geometry">
       <rect>
-       <x>410</x>
-       <y>30</y>
+       <x>510</x>
+       <y>60</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -1502,22 +1518,6 @@
      <string>A3</string>
     </property>
    </widget>
-   <widget class="QLabel" name="progressBar_label">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>830</y>
-      <width>551</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ready</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
    <zorder>groupBox</zorder>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
@@ -1541,14 +1541,13 @@
    <zorder>groupBox_4</zorder>
    <zorder>DataSet_A4_label</zorder>
    <zorder>DataSet_A3_label</zorder>
-   <zorder>progressBar_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>633</width>
+     <width>627</width>
      <height>21</height>
     </rect>
    </property>
