@@ -590,40 +590,62 @@ class mywindow(QtWidgets.QMainWindow):
             
 
     def updateDataFileLabels(self):
-        df = self.DataFileModel.getCurrentDatafile()
-        if df is None:
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
             for label in self.DataFileLabels:
                 label.setText(label.defaultText)
         else:
-            temperature = df.temperature
-            if temperature is None:
+            temperature = []
+            A3 = []
+            A4 = []
+            magneticField = []
+            sampleName = []
+            scanCommand = []
+            scanParameter = []
+
+            formatString = '{:.2f} [{:.2f}  -  {:.2f}]'
+
+            for df in dfs:
+                temperature.append(df.temperature)
+                A3.append(df.A3)
+                A4.append(df.A4)
+                magneticField.append(df.magneticField)
+
+                sampleName.append(df.sample.name)
+                scanCommand.append(df.scanCommand)
+                scanParameter.append(df.scanParameters)
+                
+                
+            if np.any([temp is None for temp in temperature]):
                 temperatureEntry = 'N/A'
             else:
-                temperatureEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(temperature),np.min(temperature),np.max(temperature))
+                conTemp = np.concatenate(temperature,axis=0)
+                temperatureEntry = formatString.format(np.mean(conTemp),np.min(conTemp),np.max(conTemp))
 
-            A3 = df.A3
-            if A3 is None:
+            if np.any([a3 is None for a3 in A3]):
                 A3Entry = 'N/A'
             else:
-                A3Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A3),np.min(A3),np.max(A3))
+                conA3 = np.concatenate(A3,axis=0)
+                A3Entry = formatString.format(np.mean(conA3),np.min(conA3),np.max(conA3))
 
-            A4 = df.A4
-            if A4 is None:
+            if np.any([a4 is None for a4 in A4]):
                 A4Entry = 'N/A'
             else:
-                A4Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A4),np.min(A4),np.max(A4))
+                conA4 = np.concatenate(A4,axis=0)
+                A4Entry = formatString.format(np.mean(conA4),np.min(conA4),np.max(conA4))
 
-            magneticField = df.magneticField
-            if magneticField is None:
+            if np.any([magField is None for magField in magneticField]):
                 magneticFieldEntry = 'N/A'
             else:
-                magneticFieldEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(magneticField,np.min(magneticField),np.max(magneticField)))
-
-            sampleNameEntry = df.sample.name
-            scanCommandEntry = df.scanCommand
-            scanParameters = df.scanParameters
-            scanParametersEntry = ', '.join(scanParameters)
+                conMagField = np.concatenate(magneticField,axis=0)
+                magneticFieldEntry = formatString.format(np.mean(conMagField),np.min(conMagField),np.max(conMagField))
             
+            sampleNameEntry = list(set(sampleName))[0]
+            scanCommandEntry = path.commonprefix(scanCommand)
+            scanParameters = list(set(np.array(scanParameter).flatten()))
+
+            scanParametersEntry = ', '.join(scanParameters)
+
             entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,A3Entry,A4Entry]
 
             for label,entry in zip(self.DataFileLabels,entries):

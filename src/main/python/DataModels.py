@@ -179,32 +179,35 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return currentIndex.row()
 
-    def getCurrentDatafileIndex(self):
+    def getCurrentDatafileIndexs(self):
         indices = self.DataSet_filenames_listView.selectedIndexes()
         
-        if len(indices)==0:
+        if indices is None:
             return None
         else:
-            idx = self.DataSet_filenames_listView.selectedIndexes()[0]
-            if idx.row()<self.rowCount(None):
-                return idx
+            idxs = self.DataSet_filenames_listView.selectedIndexes()
+            
+            if np.all([idx.row()<self.rowCount(None) for idx in idxs]):
+                return idxs
             else:
                 return None
 
-    def getCurrentDatafileIndexRow(self):
-        currentIndex = self.getCurrentDatafileIndex()
-        if currentIndex is None:
+    def getCurrentDatafileIndexRows(self):
+        currentIndeces = self.getCurrentDatafileIndexs()
+        if currentIndeces is None:
             return None
         else:
-            return currentIndex.row()
+            return [idx.row() for idx in currentIndeces]
 
-    def getCurrentDatafile(self):
-        indexRow = self.getCurrentDatafileIndexRow()
-        if indexRow is None:
+    def getCurrentDatafiles(self):
+        indexRows = np.array(self.getCurrentDatafileIndexRows())
+        if len(indexRows)==0:
+            return None
+        if np.any([idx is None for idx in indexRows]):
             return None
         else:
             ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
-            df = ds[indexRow]
+            df = [ds[idx] for idx in indexRows]
             return df
 
 
@@ -245,8 +248,10 @@ class DataFileModel(QtCore.QAbstractListModel):
 
     def delete(self):
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
-        if self.getCurrentDatafileIndexRow()<len(ds):
-            del ds[self.getCurrentDatafileIndexRow()]
+        indices = self.getCurrentDatafileIndexRows()
+        if np.all([row<len(ds) for row in indices]):
+            for idx in indices:
+                del ds[idx]
             self.layoutChanged.emit()
             self.guiWindow.updateDataFileLabels()
 
