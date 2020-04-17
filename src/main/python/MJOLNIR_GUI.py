@@ -22,6 +22,7 @@ from DataModels import DataSetModel,DataFileModel
 from StateMachine import StateMachine
 from GuiStates import empty,partial,raw,converted
 from AboutDialog import AboutDialog
+from HelpDialog import HelpDialog
 from generateScripts import generateViewer3DScript
 
 import sys
@@ -107,6 +108,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.setupDataFile() # Setup datafiles        
 
         self.setupDataSet_DataFile_labels()
+        self.setupRaw1DCutSpinBoxes()
 
         ##############################################################################
         # View3D
@@ -133,8 +135,15 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.QPlane_plot_button.clicked.connect(self.QPlane_plot_button_function)
         self.ui.QPlane_setCAxis_button.clicked.connect(self.QPlane_setCAxis_button_function)
         self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
-        
-        
+
+
+        ##############################################################################
+        # 1Dcut
+        ##############################################################################
+        self.ui.Raw1D_plot_button.clicked.connect(self.Raw1D_plot_button_function)
+
+        self.ui.Cut1D_plot_button.clicked.connect(self.Cut1D_plot_button_funcion)
+
         self.setupMenu()
         self.setupStateMachine()
         self.stateMachine.run()
@@ -521,10 +530,15 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionExit.setStatusTip(self.ui.actionExit.toolTip())
         self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question.png')))
+        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/information-button.png')))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.setStatusTip(self.ui.actionAbout.toolTip())
         self.ui.actionAbout.triggered.connect(self.about)
+
+        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question-button.png')))
+        self.ui.actionHelp.setToolTip('Show Help') 
+        self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
+        self.ui.actionHelp.triggered.connect(self.help)
 
 
         self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
@@ -584,45 +598,227 @@ class mywindow(QtWidgets.QMainWindow):
             
 
     def updateDataFileLabels(self):
-        df = self.DataFileModel.getCurrentDatafile()
-        if df is None:
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
             for label in self.DataFileLabels:
                 label.setText(label.defaultText)
+            self.updateRaw1DCutSpinBoxes()
         else:
-            temperature = df.temperature
-            if temperature is None:
+            temperature = []
+            A3 = []
+            A4 = []
+            magneticField = []
+            sampleName = []
+            scanCommand = []
+            scanParameter = []
+
+            formatString = '{:.2f} [{:.2f}  -  {:.2f}]'
+
+            for df in dfs:
+                temperature.append(df.temperature)
+                A3.append(df.A3)
+                A4.append(df.A4)
+                magneticField.append(df.magneticField)
+
+                sampleName.append(df.sample.name)
+                scanCommand.append(df.scanCommand)
+                scanParameter.append(df.scanParameters)
+                
+                
+            if np.any([temp is None for temp in temperature]):
                 temperatureEntry = 'N/A'
             else:
-                temperatureEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(temperature),np.min(temperature),np.max(temperature))
+                conTemp = np.concatenate(temperature,axis=0)
+                temperatureEntry = formatString.format(np.mean(conTemp),np.min(conTemp),np.max(conTemp))
 
-            A3 = df.A3
-            if A3 is None:
+            if np.any([a3 is None for a3 in A3]):
                 A3Entry = 'N/A'
             else:
-                A3Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A3),np.min(A3),np.max(A3))
+                conA3 = np.concatenate(A3,axis=0)
+                A3Entry = formatString.format(np.mean(conA3),np.min(conA3),np.max(conA3))
 
-            A4 = df.A4
-            if A4 is None:
+            if np.any([a4 is None for a4 in A4]):
                 A4Entry = 'N/A'
             else:
-                A4Entry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(A4),np.min(A4),np.max(A4))
+                conA4 = np.concatenate(A4,axis=0)
+                A4Entry = formatString.format(np.mean(conA4),np.min(conA4),np.max(conA4))
 
-            magneticField = df.magneticField
-            if magneticField is None:
+            if np.any([magField is None for magField in magneticField]):
                 magneticFieldEntry = 'N/A'
             else:
-                magneticFieldEntry = '{:.2f} [{:.2f} - {:.2f}]'.format(np.mean(magneticField,np.min(magneticField),np.max(magneticField)))
-
-            sampleNameEntry = df.sample.name
-            scanCommandEntry = df.scanCommand
-            scanParameters = df.scanParameters
-            scanParametersEntry = ', '.join(scanParameters)
+                conMagField = np.concatenate(magneticField,axis=0)
+                magneticFieldEntry = formatString.format(np.mean(conMagField),np.min(conMagField),np.max(conMagField))
             
+            sampleNameEntry = list(set(sampleName))[0]
+            scanCommandEntry = path.commonprefix(scanCommand)
+            scanParameters = list(set(np.array(scanParameter).flatten()))
+
+            scanParametersEntry = ', '.join(scanParameters)
+
             entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,A3Entry,A4Entry]
 
             for label,entry in zip(self.DataFileLabels,entries):
                 label.setText(label.defaultText+': '+entry)
+        
+            self.updateRaw1DCutSpinBoxes()
+        
+    def setupRaw1DCutSpinBoxes(self):
+        self.ui.Raw1D_Analyzer_spinBox.valueChanged.connect(self.raw1DCutAnalyzerSpinBoxChanged)
+        self.ui.Raw1D_Detector_spinBox.valueChanged.connect(self.raw1DCutDetectorSpinBoxChanged)
+        self.resetRaw1DCutSpinBoxes()
+
             
+    def resetRaw1DCutSpinBoxes(self):
+        self.ui.Raw1D_Analyzer_spinBox.setEnabled(False)
+        self.ui.Raw1D_Detector_spinBox.setEnabled(False)
+        self.ui.Raw1D_Analyzer_spinBox.setValue(0)
+        self.ui.Raw1D_Detector_spinBox.setValue(0)
+
+        self.ui.Raw1D_Analyzer_Original_label.setText('Original N/A')
+        self.ui.Raw1D_Detector_Original_label.setText('Original N/A')
+
+        EfEntry = '{:.2f}'.format(0).rjust(9,' ')
+        A4Entry = '{:+.2f}'.format(0).rjust(9,' ')
+
+        self.ui.Raw1D_Analyzer_label.setText('Analyzer number (Ef = {} meV)'.format(EfEntry))
+        self.ui.Raw1D_Detector_label.setText('Detector number (A4 = {} deg)'.format(A4Entry))
+
+
+    def updateRaw1DCutSpinBoxes(self,dfs=None):
+        if dfs is None:
+            dfs = self.DataFileModel.getCurrentDatafiles()
+            if dfs is None:
+                return self.resetRaw1DCutSpinBoxes()
+        if len(dfs)>1:
+            return self.resetRaw1DCutSpinBoxes()
+        
+        df = dfs[0]
+        
+
+        self.ui.Raw1D_Analyzer_spinBox.setEnabled(True)
+        self.ui.Raw1D_Detector_spinBox.setEnabled(True)
+        self.ui.Raw1D_Analyzer_spinBox.setValue(df.analyzerSelection)
+        self.ui.Raw1D_Detector_spinBox.setValue(df.detectorSelection)
+        self.updateRaw1DCutLabels(dfs)
+        
+
+    def updateRaw1DCutLabels(self,dfs=None):
+        if dfs is None:
+            dfs = self.DataFileModel.getCurrentDatafiles()
+            if dfs is None:
+                return self.resetRaw1DCutSpinBoxes()
+        if len(dfs)>1:
+            return self.resetRaw1DCutSpinBoxes()
+        
+        df = dfs[0]
+
+        self.ui.Raw1D_Analyzer_Original_label.setText('Original {}'.format(df.analyzerSelectionOriginal))
+        self.ui.Raw1D_Detector_Original_label.setText('Original {}'.format(df.detectorSelectionOriginal))
+        
+        if df.instrument == 'CAMEA':
+            EPrDetector = 8 
+            detectors = 104
+        elif df.type == 'MultiFLEXX':
+            EPrDetector = 1
+            detectors = 31
+        elif df.type == 'FlatCone':
+            EPrDetector = 1
+            detectors = 31
+
+        binning = 1
+        calibrationIndex = list(df.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
+        instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
+        
+        
+        instrumentCalibrationEf.shape = (detectors,EPrDetector*binning,4)
+        instrumentCalibrationA4.shape = (detectors,EPrDetector*binning)
+
+        analyzerValue = self.ui.Raw1D_Analyzer_spinBox.value()
+        detectorValue = self.ui.Raw1D_Detector_spinBox.value() #
+        Ef = instrumentCalibrationEf[detectorValue,analyzerValue,1]
+        A4 = instrumentCalibrationA4[detectorValue,analyzerValue]
+
+        EfEntry = '{:.2f}'.format(Ef).rjust(9,' ')
+        A4Entry = '{:+.2f}'.format(A4).rjust(9,' ')
+
+        self.ui.Raw1D_Analyzer_label.setText('Analyzer number (Ef = {} meV)'.format(EfEntry))
+        self.ui.Raw1D_Detector_label.setText('Detector number (A4 = {} deg)'.format(A4Entry))
+
+        
+    def raw1DCutAnalyzerSpinBoxChanged(self):
+        value = self.ui.Raw1D_Analyzer_spinBox.value()
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
+            return None
+        if len(dfs)>1:
+            return None
+        
+        df = dfs[0]
+        df.analyzerSelection = np.array(value)
+        self.updateRaw1DCutLabels(dfs=dfs)
+    
+    def raw1DCutDetectorSpinBoxChanged(self):
+        value = self.ui.Raw1D_Detector_spinBox.value()
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
+            return None
+        if len(dfs)>1:
+            return None
+        
+        df = dfs[0]
+        df.detectorSelection = np.array(value)
+        self.updateRaw1DCutLabels(dfs=dfs)
+            
+    @ProgressBarDecoratorArguments(runningText='Plotting raw 1D Data',completedText='Plotting Done')
+    def Raw1D_plot_button_function(self):
+        if not self.stateMachine.requireStateByName('Raw'):
+            return False
+        dataFiles = self.DataFileModel.getCurrentDatafiles()
+        if dataFiles is None:
+            ds = self.DataSetModel.getCurrentDataSet()
+        elif len(dataFiles) == 0: # No data files selected, use them all
+            ds = self.DataSetModel.getCurrentDataSet()
+        else:
+            ds = GuiDataSet(dataFiles)
+        
+        if ds is None:
+            return False
+
+        
+        ax = ds.plot1D()
+        self.windows.append(ax.get_figure())
+        return True
+        
+    @ProgressBarDecoratorArguments(runningText='Plotting Cut1D',completedText='Plotting Done')
+    def Cut1D_plot_button_funcion(self):
+        if not self.stateMachine.requireStateByName('Converted'):
+            return False
+
+        HStart = self.ui.Cut1D_HStart_lineEdit.text()
+        HEnd = self.ui.Cut1D_HEnd_lineEdit.text()
+        KStart = self.ui.Cut1D_KStart_lineEdit.text()
+        KEnd = self.ui.Cut1D_KEnd_lineEdit.text()
+        LStart = self.ui.Cut1D_LStart_lineEdit.text()
+        LEnd = self.ui.Cut1D_LEnd_lineEdit.text()
+
+        EMax = float(self.ui.Cut1D_EMax_lineEdit.text())
+        EMin = float(self.ui.Cut1D_EMin_lineEdit.text())
+
+        width = float(self.ui.Cut1D_Width_lineEdit.text())
+        minPixel = float(self.ui.Cut1D_MinPixel_lineEdit.text())
+
+        ds = self.DataSetModel.getCurrentDataSet()
+
+        q1 = np.array([HStart,KStart,LStart],dtype=float)
+        q2 = np.array([HEnd,KEnd,LEnd],dtype=float)
+
+        
+        ax,*_ = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)
+        self.windows.append(ax.get_figure())
+        return True
+
+
+    
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
 
@@ -667,6 +863,11 @@ class mywindow(QtWidgets.QMainWindow):
     def about(self):
         dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
         dialog.exec_()
+
+    def help(self):
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog.exec_()
+
 
     def setupStateMachine(self):
         self.stateMachine = StateMachine([empty,partial,raw,converted],self)

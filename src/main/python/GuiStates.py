@@ -19,19 +19,34 @@ def AllEnabled(StateMachine):
         else:
             item.setStyleSheet("background-color: lightgrey")
 
+def ConvertedEnabled(StateMachine):
+    names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
+    enabled = np.ones(len(names))
+    enabledNames = ['Raw1D_fit_button','Cut1D_fit_button']
+    
+    enabled = AllTrueBut(enabledNames,enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
+        item.setEnabled(enable)
+
+    blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button'],enabled,names)
+    for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
+        if enable:
+            item.setStyleSheet("background-color: blue")
+        else:
+            item.setStyleSheet("background-color: lightgrey")
 
 def RawEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
     enabled = np.ones(len(names))
     enabledNames = ['DataSet_NewDataSet_button','DataSet_DeleteDataSet_button',
     'DataSet_AddFiles_button','DataSet_DeleteFiles_button','DataSet_convertData_button','DataSet_binning_comboBox',
-    'View3D_plot_button','QELine_plot_button','QPlane_plot_button']
+    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
 
-    blue = AllFalseBut(['DataSet_convertData_button'],enabled,names)
+    blue = AllFalseBut(['DataSet_convertData_button','Raw1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
             item.setStyleSheet("background-color: blue")
@@ -44,7 +59,7 @@ def PartialEnabled(StateMachine):
     enabled = np.ones(len(names))
     enabledNames = ['DataSet_NewDataSet_button','DataSet_DeleteDataSet_button',
     'DataSet_AddFiles_button',
-    'View3D_plot_button','QELine_plot_button','QPlane_plot_button']
+    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
@@ -62,7 +77,7 @@ def PartialEnabled(StateMachine):
 def EmptyEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
     enabled = np.ones(len(names))
-    enabledNames = ['DataSet_NewDataSet_button','View3D_plot_button','QELine_plot_button','QPlane_plot_button']
+    enabledNames = ['DataSet_NewDataSet_button','View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
@@ -116,7 +131,7 @@ def forceTansitionRawConverted(StateMachine): # add DataFile
 ### States for state machine
 
 # Allows plotting, fitting and all the fun
-converted = State('Converted',nextState=None,enterStateFunction=AllEnabled) 
+converted = State('Converted',nextState=None,enterStateFunction=ConvertedEnabled) 
 
 # Has DataSet, DataFiles but not converded yet
 raw = State('Raw',enterStateFunction=RawEnabled,transitionRequirement=transitionRawConverted,

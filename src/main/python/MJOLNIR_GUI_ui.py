@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MJOLNIR_GUI_ui.ui'
+# Form implementation generated from reading ui file 'src/main/python/MJOLNIR_GUI_ui.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.2
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(627, 904)
+        MainWindow.resize(627, 921)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.DataSet_convertData_button = QtWidgets.QPushButton(self.centralwidget)
@@ -498,6 +496,7 @@ class Ui_MainWindow(object):
         self.DataSet_path_lineEdit.setObjectName("DataSet_path_lineEdit")
         self.DataSet_filenames_listView = QtWidgets.QListView(self.centralwidget)
         self.DataSet_filenames_listView.setGeometry(QtCore.QRect(130, 70, 211, 151))
+        self.DataSet_filenames_listView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.DataSet_filenames_listView.setObjectName("DataSet_filenames_listView")
         self.DataSet_DataSets_listView = QtWidgets.QListView(self.centralwidget)
         self.DataSet_DataSets_listView.setGeometry(QtCore.QRect(10, 70, 111, 151))
@@ -522,23 +521,30 @@ class Ui_MainWindow(object):
         self.gridLayout_6 = QtWidgets.QGridLayout(self.gridLayoutWidget_6)
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_6.setObjectName("gridLayout_6")
-        self.Raw1D_Detector_label = QtWidgets.QLabel(self.gridLayoutWidget_6)
-        self.Raw1D_Detector_label.setObjectName("Raw1D_Detector_label")
-        self.gridLayout_6.addWidget(self.Raw1D_Detector_label, 1, 1, 1, 1)
         self.Raw1D_Detector_spinBox = QtWidgets.QSpinBox(self.gridLayoutWidget_6)
         self.Raw1D_Detector_spinBox.setMaximum(103)
         self.Raw1D_Detector_spinBox.setDisplayIntegerBase(10)
         self.Raw1D_Detector_spinBox.setObjectName("Raw1D_Detector_spinBox")
-        self.gridLayout_6.addWidget(self.Raw1D_Detector_spinBox, 1, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.Raw1D_Detector_spinBox, 1, 2, 1, 1)
         self.Raw1D_Analyzer_spinBox = QtWidgets.QSpinBox(self.gridLayoutWidget_6)
         self.Raw1D_Analyzer_spinBox.setEnabled(True)
+        self.Raw1D_Analyzer_spinBox.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.Raw1D_Analyzer_spinBox.setMinimum(0)
         self.Raw1D_Analyzer_spinBox.setMaximum(7)
         self.Raw1D_Analyzer_spinBox.setObjectName("Raw1D_Analyzer_spinBox")
-        self.gridLayout_6.addWidget(self.Raw1D_Analyzer_spinBox, 0, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.Raw1D_Analyzer_spinBox, 0, 2, 1, 1)
         self.Raw1D_Analyzer_label = QtWidgets.QLabel(self.gridLayoutWidget_6)
         self.Raw1D_Analyzer_label.setObjectName("Raw1D_Analyzer_label")
-        self.gridLayout_6.addWidget(self.Raw1D_Analyzer_label, 0, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.Raw1D_Analyzer_label, 0, 0, 1, 1)
+        self.Raw1D_Analyzer_Original_label = QtWidgets.QLabel(self.gridLayoutWidget_6)
+        self.Raw1D_Analyzer_Original_label.setObjectName("Raw1D_Analyzer_Original_label")
+        self.gridLayout_6.addWidget(self.Raw1D_Analyzer_Original_label, 0, 3, 1, 1)
+        self.Raw1D_Detector_label = QtWidgets.QLabel(self.gridLayoutWidget_6)
+        self.Raw1D_Detector_label.setObjectName("Raw1D_Detector_label")
+        self.gridLayout_6.addWidget(self.Raw1D_Detector_label, 1, 0, 1, 1)
+        self.Raw1D_Detector_Original_label = QtWidgets.QLabel(self.gridLayoutWidget_6)
+        self.Raw1D_Detector_Original_label.setObjectName("Raw1D_Detector_Original_label")
+        self.gridLayout_6.addWidget(self.Raw1D_Detector_Original_label, 1, 3, 1, 1)
         self.Raw1D_fit_button = QtWidgets.QPushButton(self.groupBox_4)
         self.Raw1D_fit_button.setGeometry(QtCore.QRect(510, 60, 75, 23))
         self.Raw1D_fit_button.setObjectName("Raw1D_fit_button")
@@ -576,7 +582,7 @@ class Ui_MainWindow(object):
         self.DataSet_A3_label.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -633,7 +639,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.DataSet_binning_comboBox.setCurrentIndex(2)
-        # QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -762,8 +768,10 @@ class Ui_MainWindow(object):
         self.DataSet_path_lineEdit.setText(_translate("MainWindow", "C:\\Users\\jacobsen_h\\Dropbox\\MJOLINRfun\\rawdata"))
         self.progressBar_label.setText(_translate("MainWindow", "Ready"))
         self.groupBox_4.setTitle(_translate("MainWindow", "1d raw data"))
-        self.Raw1D_Detector_label.setText(_translate("MainWindow", "Detector number (A4 = 0 deg)"))
-        self.Raw1D_Analyzer_label.setText(_translate("MainWindow", "Analyzer number (E = 0 meV)"))
+        self.Raw1D_Analyzer_label.setText(_translate("MainWindow", "Analyzer number (Ef = 0.00 meV)"))
+        self.Raw1D_Analyzer_Original_label.setText(_translate("MainWindow", "Original 0"))
+        self.Raw1D_Detector_label.setText(_translate("MainWindow", "Detector number (A4 = 0.00 deg)"))
+        self.Raw1D_Detector_Original_label.setText(_translate("MainWindow", "Original 0"))
         self.Raw1D_fit_button.setText(_translate("MainWindow", "Fit data"))
         self.Raw1D_plot_button.setText(_translate("MainWindow", "Plot raw data"))
         self.DataSet_A4_label.setText(_translate("MainWindow", "A4"))
@@ -784,3 +792,4 @@ class Ui_MainWindow(object):
         self.actionGenerate_QPlane_script.setText(_translate("MainWindow", "Generate QPlane script"))
         self.actionGenerate_1d_script.setText(_translate("MainWindow", "Generate 1d script"))
         self.actionHelp.setText(_translate("MainWindow", "Help"))
+
