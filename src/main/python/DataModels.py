@@ -200,7 +200,9 @@ class DataFileModel(QtCore.QAbstractListModel):
             return [idx.row() for idx in currentIndeces]
 
     def getCurrentDatafiles(self):
-        indexRows = np.array(self.getCurrentDatafileIndexRows())
+        indexRows = self.getCurrentDatafileIndexRows()
+        if indexRows is None:
+            return None
         if len(indexRows)==0:
             return None
         if np.any([idx is None for idx in indexRows]):
@@ -248,10 +250,11 @@ class DataFileModel(QtCore.QAbstractListModel):
 
     def delete(self):
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
-        indices = self.getCurrentDatafileIndexRows()
+        indices = np.array(self.getCurrentDatafileIndexRows())
         if np.all([row<len(ds) for row in indices]):
             for idx in indices:
                 del ds[idx]
+                indices-=1
             self.layoutChanged.emit()
             self.guiWindow.updateDataFileLabels()
 
