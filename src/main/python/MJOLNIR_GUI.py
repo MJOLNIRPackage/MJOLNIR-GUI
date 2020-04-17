@@ -108,6 +108,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.setupDataFile() # Setup datafiles        
 
         self.setupDataSet_DataFile_labels()
+        self.setupRaw1DCutSpinBoxes()
 
         ##############################################################################
         # View3D
@@ -134,8 +135,13 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.QPlane_plot_button.clicked.connect(self.QPlane_plot_button_function)
         self.ui.QPlane_setCAxis_button.clicked.connect(self.QPlane_setCAxis_button_function)
         self.ui.QPlane_SetTitle_button.clicked.connect(self.QPlane_SetTitle_button_function)
-        
-        
+
+
+        ##############################################################################
+        # Raw1Dcut
+        ##############################################################################
+        self.ui.Raw1D_plot_button.clicked.connect(self.Raw1D_plot_button_function)
+
         self.setupMenu()
         self.setupStateMachine()
         self.stateMachine.run()
@@ -594,6 +600,7 @@ class mywindow(QtWidgets.QMainWindow):
         if dfs is None:
             for label in self.DataFileLabels:
                 label.setText(label.defaultText)
+            self.updateRaw1DCutSpinBoxes()
         else:
             temperature = []
             A3 = []
@@ -650,7 +657,137 @@ class mywindow(QtWidgets.QMainWindow):
 
             for label,entry in zip(self.DataFileLabels,entries):
                 label.setText(label.defaultText+': '+entry)
+        
+            self.updateRaw1DCutSpinBoxes()
+        
+    def setupRaw1DCutSpinBoxes(self):
+        self.ui.Raw1D_Analyzer_spinBox.valueChanged.connect(self.raw1DCutAnalyzerSpinBoxChanged)
+        self.ui.Raw1D_Detector_spinBox.valueChanged.connect(self.raw1DCutDetectorSpinBoxChanged)
+        self.resetRaw1DCutSpinBoxes()
+
             
+    def resetRaw1DCutSpinBoxes(self):
+        self.ui.Raw1D_Analyzer_spinBox.setEnabled(False)
+        self.ui.Raw1D_Detector_spinBox.setEnabled(False)
+        self.ui.Raw1D_Analyzer_spinBox.setValue(0)
+        self.ui.Raw1D_Detector_spinBox.setValue(0)
+
+        self.ui.Raw1D_Analyzer_Original_label.setText('Original N/A')
+        self.ui.Raw1D_Detector_Original_label.setText('Original N/A')
+
+        EfEntry = '{:.2f}'.format(0).rjust(9,' ')
+        A4Entry = '{:+.2f}'.format(0).rjust(9,' ')
+
+        self.ui.Raw1D_Analyzer_label.setText('Analyzer number (Ef = {} meV)'.format(EfEntry))
+        self.ui.Raw1D_Detector_label.setText('Detector number (A4 = {} deg)'.format(A4Entry))
+
+
+    def updateRaw1DCutSpinBoxes(self,dfs=None):
+        if dfs is None:
+            dfs = self.DataFileModel.getCurrentDatafiles()
+            if dfs is None:
+                return self.resetRaw1DCutSpinBoxes()
+        if len(dfs)>1:
+            return self.resetRaw1DCutSpinBoxes()
+        
+        df = dfs[0]
+        
+
+        self.ui.Raw1D_Analyzer_spinBox.setEnabled(True)
+        self.ui.Raw1D_Detector_spinBox.setEnabled(True)
+        self.ui.Raw1D_Analyzer_spinBox.setValue(df.analyzerSelection)
+        self.ui.Raw1D_Detector_spinBox.setValue(df.detectorSelection)
+        self.updateRaw1DCutLabels(dfs)
+        
+
+    def updateRaw1DCutLabels(self,dfs=None):
+        if dfs is None:
+            dfs = self.DataFileModel.getCurrentDatafiles()
+            if dfs is None:
+                return self.resetRaw1DCutSpinBoxes()
+        if len(dfs)>1:
+            return self.resetRaw1DCutSpinBoxes()
+        
+        df = dfs[0]
+
+        self.ui.Raw1D_Analyzer_Original_label.setText('Original {}'.format(df.analyzerSelectionOriginal))
+        self.ui.Raw1D_Detector_Original_label.setText('Original {}'.format(df.detectorSelectionOriginal))
+        
+        if df.instrument == 'CAMEA':
+            EPrDetector = 8 
+            detectors = 104
+        elif df.type == 'MultiFLEXX':
+            EPrDetector = 1
+            detectors = 31
+        elif df.type == 'FlatCone':
+            EPrDetector = 1
+            detectors = 31
+
+        binning = 1
+        calibrationIndex = list(df.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
+        instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
+        
+        
+        instrumentCalibrationEf.shape = (detectors,EPrDetector*binning,4)
+        instrumentCalibrationA4.shape = (detectors,EPrDetector*binning)
+
+        analyzerValue = self.ui.Raw1D_Analyzer_spinBox.value()
+        detectorValue = self.ui.Raw1D_Detector_spinBox.value() #
+        Ef = instrumentCalibrationEf[detectorValue,analyzerValue,1]
+        A4 = instrumentCalibrationA4[detectorValue,analyzerValue]
+
+        EfEntry = '{:.2f}'.format(Ef).rjust(9,' ')
+        A4Entry = '{:+.2f}'.format(A4).rjust(9,' ')
+
+        self.ui.Raw1D_Analyzer_label.setText('Analyzer number (Ef = {} meV)'.format(EfEntry))
+        self.ui.Raw1D_Detector_label.setText('Detector number (A4 = {} deg)'.format(A4Entry))
+
+        
+    def raw1DCutAnalyzerSpinBoxChanged(self):
+        value = self.ui.Raw1D_Analyzer_spinBox.value()
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
+            return None
+        if len(dfs)>1:
+            return None
+        
+        df = dfs[0]
+        df.analyzerSelection = np.array(value)
+        self.updateRaw1DCutLabels(dfs=dfs)
+    
+    def raw1DCutDetectorSpinBoxChanged(self):
+        value = self.ui.Raw1D_Detector_spinBox.value()
+        dfs = self.DataFileModel.getCurrentDatafiles()
+        if dfs is None:
+            return None
+        if len(dfs)>1:
+            return None
+        
+        df = dfs[0]
+        df.detectorSelection = np.array(value)
+        self.updateRaw1DCutLabels(dfs=dfs)
+            
+    @ProgressBarDecoratorArguments(runningText='Plotting raw 1D Data',completedText='Plotting Done')
+    def Raw1D_plot_button_function(self):
+        if not self.stateMachine.requireStateByName('Raw'):
+            return False
+        dataFiles = self.DataFileModel.getCurrentDatafiles()
+        if dataFiles is None:
+            ds = self.DataSetModel.getCurrentDataSet()
+        elif len(dataFiles) == 0: # No data files selected, use them all
+            ds = self.DataSetModel.getCurrentDataSet()
+        else:
+            ds = GuiDataSet(dataFiles)
+        
+        if ds is None:
+            return False
+
+        
+        ax = ds.plot1D()
+        self.windows.append(ax)
+        return True
+        
+    
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
 

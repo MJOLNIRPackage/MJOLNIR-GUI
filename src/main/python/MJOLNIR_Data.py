@@ -38,6 +38,8 @@ class GuiDataSet(DataSet.DataSet):
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
+        self.detectorSelectionOriginal = self.detectorSelection
+        self.analyzerSelectionOriginal = self.analyzerSelection
 
     def setData(self,column,value):
         if column == 0: self.name = value
