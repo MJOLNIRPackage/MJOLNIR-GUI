@@ -149,7 +149,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.stateMachine.run()
 
         self.loadFolder() # Load last folder as default 
-        self.loadLineEdits()
+        self.loadedGuiSettings = None
 
  
     @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
@@ -834,8 +834,7 @@ class mywindow(QtWidgets.QMainWindow):
         self.setProgressBarValue(0)
         self.setProgressBarLabelText('Ready')
 
-
-    def closeEvent(self, event):
+    def saveSettingsDialog(self,event):
         res = QtWidgets.QMessageBox.question(self,
                                     "Exit - Save Gui Settings",
                                     "Do you want to save Gui Settings?",
@@ -846,11 +845,37 @@ class mywindow(QtWidgets.QMainWindow):
             self.saveCurrentGui()
             event.accept()
         elif res == QtWidgets.QMessageBox.No:
-            self.saveCurrentFolder()
             event.accept()
         else:
             event.ignore()
-            return
+            return 0
+
+    def quitDialog(self,event):
+        res = QtWidgets.QMessageBox.question(self,
+                                    "Exit",
+                                    "Do you want to exit the Gui?",
+                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        
+        if res == QtWidgets.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+            return 0
+
+    def closeEvent(self, event):
+        
+        if self.loadedGuiSettings is None:
+            if not self.saveSettingsDialog(event): # The dialog is cancelled
+                return
+        
+        elif np.all([s1==s2 for s1,s2 in zip(self.loadedGuiSettings,self.generateCurrentGuiSettings())]):
+            if not self.quitDialog(event):
+                return
+
+        else:
+             if not self.saveSettingsDialog(event): # The dialog is cancelled
+                return
+        
 
 
         if hasattr(self,'windows'):
@@ -879,9 +904,18 @@ class mywindow(QtWidgets.QMainWindow):
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
+        saveString,lineEditString,fileDir = self.generateCurrentGuiSettings(True)
+        
+        updateSetting(self.settingsFile,'dataSet',saveString)
+        updateSetting(self.settingsFile,'lineEdits',lineEditString)
+        updateSetting(self.settingsFile,'fileDir',fileDir)
+        return True
+
+
+    def generateCurrentGuiSettings(self,updateProgressBar=False):
         saveString = []
         
-        self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
+        if updateProgressBar: self.setProgressBarMaximum(len(self.DataSetModel.dataSets))
 
         for i,ds in enumerate(self.DataSetModel.dataSets):
             dsDict = {'name':ds.name}
@@ -890,22 +924,18 @@ class mywindow(QtWidgets.QMainWindow):
             dsDict['files']=localstring
             
             saveString.append(dsDict)
-            self.setProgressBarValue((i+1))
+            if updateProgressBar: self.setProgressBarValue((i+1))
 
-        #dataSetString = seperator1.join(saveString)
-        
-        updateSetting(self.settingsFile,'dataSet',saveString)
-
-        self.saveCurrentFolder()
-        self.saveLineEdits()    
-
-    def saveLineEdits(self):
-        lineEditValueString = seperator1.join([seperator2.join([item.objectName(),item.text()]) for item in self.lineEdits])
-        updateSetting(self.settingsFile,'lineEdits',lineEditValueString)
-
-    def saveCurrentFolder(self):
+        lineEditString = self.generateCurrentLineEditSettings()
         fileDir = self.getCurrentDirectory()
-        updateSetting(self.settingsFile,'fileDir',fileDir)
+
+        return saveString, lineEditString, fileDir
+
+    def generateCurrentLineEditSettings(self):
+        lineEditValueString = {}
+        for item in self.lineEdits:
+            lineEditValueString[item.objectName()] = item.text()
+        return lineEditValueString
 
 
     def loadFolder(self):
@@ -949,27 +979,26 @@ class mywindow(QtWidgets.QMainWindow):
             counter+=1
             self.setProgressBarValue(counter)
             
-        
-        
-
-
         self.loadLineEdits()
         self.DataSetModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
+
+
+        self.loadedGuiSettings = self.generateCurrentGuiSettings()
+        print(self.loadedGuiSettings)
         return True
 
 
     def loadLineEdits(self):
         lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
         if not lineEditValueString is None:
-            for item in lineEditValueString.split(':'):
+            if isinstance(lineEditValueString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in lineEditValueString.items():
                 try:
-                    name,value = item.split(seperator2)
-                except:
-                    continue
-                try:
-                    getattr(self.ui,name).setText(value)
+                    getattr(self.ui,item).setText(value)
                 except AttributeError:
                     pass
 
