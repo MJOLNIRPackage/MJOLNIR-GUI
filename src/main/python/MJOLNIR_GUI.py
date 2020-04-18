@@ -845,7 +845,6 @@ class mywindow(QtWidgets.QMainWindow):
             self.saveCurrentGui()
             event.accept()
         elif res == QtWidgets.QMessageBox.No:
-            self.saveCurrentFolder()
             event.accept()
         else:
             event.ignore()
