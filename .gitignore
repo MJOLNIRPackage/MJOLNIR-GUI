@@ -127,5 +127,23 @@ dmypy.json
 
 # fbs keys
 *.gpg
-
 secret.json
+
+# Pip stuff 
+MJOLNIRGui/DataModels.py
+MJOLNIRGui/MJOLNIR_GUI.py
+MJOLNIRGui/HelpDialog.py
+MJOLNIRGui/src
+MJOLNIRGui/StateMachine.py
+MJOLNIRGui/About.txt
+MJOLNIRGui/_tools.py
+MJOLNIRGui/MJOLNIR_Data.py
+MJOLNIRGui/MJOLNIR_GUI_ui.py
+MJOLNIRGui/generateScripts.py
+MJOLNIRGui/main.py
+MJOLNIRGui/AboutDialog.py
+MJOLNIRGui/GuiStates.py
+MJOLNIRGui/MJOLNIR_GUI_old.py
+
+*.egg-info
+MJOLNIRGui-*

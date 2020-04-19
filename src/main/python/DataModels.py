@@ -1,9 +1,17 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from MJOLNIR_Data import GuiDataFile
+
 import numpy as np
-import MJOLNIR_GUI
+import sys
+
+try:
+    import MJOLNIR_GUI
+    from MJOLNIR_Data import GuiDataFile
+except ModuleNotFoundError:
+    from . import MJOLNIR_GUI
+    from  .MJOLNIR_Data import GuiDataFile
+
 from os import path
 
 class DataSetModel(QtCore.QAbstractListModel):
