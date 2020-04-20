@@ -9,6 +9,7 @@ except:
 from MJOLNIR import _tools # Usefull tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 from os import path
 import os
@@ -16,20 +17,33 @@ import os
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
-from MJOLNIR_GUI_ui import Ui_MainWindow  
-from MJOLNIR_Data import GuiDataFile,GuiDataSet
-from DataModels import DataSetModel,DataFileModel
-from StateMachine import StateMachine
-from GuiStates import empty,partial,raw,converted
-from AboutDialog import AboutDialog
-from HelpDialog import HelpDialog
-from generateScripts import generateViewer3DScript
+try:
+    from MJOLNIR_GUI_ui import Ui_MainWindow  
+    from MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from DataModels import DataSetModel,DataFileModel
+    from StateMachine import StateMachine
+    from GuiStates import empty,partial,raw,converted
+    from AboutDialog import AboutDialog
+    from HelpDialog import HelpDialog
+    from generateScripts import generateViewer3DScript
+    from _tools import loadSetting,updateSetting
+except ModuleNotFoundError:
+    sys.path.append('.')
+    from .MJOLNIR_GUI_ui import Ui_MainWindow  
+    from .MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from .DataModels import DataSetModel,DataFileModel
+    from .StateMachine import StateMachine
+    from .GuiStates import empty,partial,raw,converted
+    from .AboutDialog import AboutDialog
+    from .HelpDialog import HelpDialog
+    from .generateScripts import generateViewer3DScript
+    from ._tools import loadSetting,updateSetting
 
 import sys
 
 import functools
 
-from _tools import loadSetting,updateSetting
+
 
 from pathlib import Path
 home = str(Path.home())
