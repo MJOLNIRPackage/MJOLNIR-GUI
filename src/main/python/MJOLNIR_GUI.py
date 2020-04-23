@@ -1037,7 +1037,7 @@ class mywindow(QtWidgets.QMainWindow):
 
         folder = self.getCurrentDirectory()
         saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
-        if len(saveFile)!=1:
+        if len(saveFile)==0:
             return False
         if path.splitext(saveFile)[1] !='.py':
             saveFile = path.splitext(saveFile)[0]+'.py'
