@@ -1,10 +1,10 @@
 #from fbs_runtime.application_context.PyQt5 import ApplicationContext
 import sys
 try:
-    from MJOLNIR_GUI import mywindow
+    from MJOLNIR_GUI import MJOLNIRMainWindow
 except ModuleNotFoundError:
     sys.path.append('.')
-    from .MJOLNIR_GUI import mywindow
+    from .MJOLNIR_GUI import MJOLNIRMainWindow
     import os
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     
@@ -33,7 +33,7 @@ class AppContext(ApplicationContext):
 
     @cached_property
     def main_window(self):
-        return mywindow(self)  # Pass context to the window.
+        return MJOLNIRMainWindow(self)  # Pass context to the window.
 
 #if __name__ == '__main__':
 #    ctx = ApplicationContext()
