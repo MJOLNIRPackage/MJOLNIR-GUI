@@ -109,12 +109,8 @@ def loadDataSet(dataSetName='ds',DataFiles=None):
 
     return '\n'.join(loadString)
 
-
-def plotViewer3D(dataSetName='ds',binning = None, qx=0.05, qy=0.05, E = 0.08, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
-
+def binDataSet(dataSetName='ds',binning=8):
     plotString = []
-
     if binning is None:
         binString = ''
     else:
@@ -122,6 +118,22 @@ def plotViewer3D(dataSetName='ds',binning = None, qx=0.05, qy=0.05, E = 0.08, RL
     plotString.append('# Run the converter. This automatically generates nxs-file(s). \n'
                         +'# Binning can be changed with binning argument.')
     plotString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+    
+    return '\n'.join(plotString)
+
+
+def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
+
+    plotString = []
+
+    # if binning is None:
+    #     binString = ''
+    # else:
+    #     binString = 'binning = {},'.format(binning)
+    # plotString.append('# Run the converter. This automatically generates nxs-file(s). \n'
+    #                     +'# Binning can be changed with binning argument.')
+    # plotString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
 
     if RLU == False:
         rluArgument = ',rlu = False'
@@ -143,7 +155,7 @@ def plotViewer3D(dataSetName='ds',binning = None, qx=0.05, qy=0.05, E = 0.08, RL
     plotString.append('# Plotting data quickly in equi-sized voxels can be done by')
     plotString.append('Viewer = {}.View3D({}{})'.format(dataSetName,','.join([str(x) for x in [qx,qy,E]]),args))
 
-    plotString.append("# Above, all data is binned in voxels of size 0.03/AA, 0.03/AA, and 0.05 meV.\n"\
+    plotString.append("# Above, all data is binned in voxels of size " +str(qx) + "/AA, " + str(qy) +"/AA, and " +str(E) +" meV.\n"\
                         +"# Automatically, data is plotted in reciprocal lattice as provided by the\n"\
                         +"# UB matrix saved in the data file. Alternatively, one can plot in 'raw'\n"\
                         +"# coordinates (orthogonal and in units of 1/AA) by issuing rlu=False above.\n")
@@ -173,9 +185,11 @@ def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, qx=0.0
     
     saveString.append(startString())
     saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
 
 
-    saveString.append(plotViewer3D(dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
+    saveString.append(plotViewer3D(dataSetName=dataSetName, qx=qx, qy=qy, E=E, 
                                     RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
                                     title=title, selectView=selectView))
 
