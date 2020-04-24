@@ -25,7 +25,7 @@ try:
     from GuiStates import empty,partial,raw,converted
     from AboutDialog import AboutDialog
     from HelpDialog import HelpDialog
-    from generateScripts import generateViewer3DScript
+    from generateScripts import generateViewer3DScript,generatePlotQELineScript
     from _tools import loadSetting,updateSetting
 except ModuleNotFoundError:
     sys.path.append('.')
@@ -36,7 +36,7 @@ except ModuleNotFoundError:
     from .GuiStates import empty,partial,raw,converted
     from .AboutDialog import AboutDialog
     from .HelpDialog import HelpDialog
-    from .generateScripts import generateViewer3DScript
+    from .generateScripts import generateViewer3DScript,generatePlotQELineScript
     from ._tools import loadSetting,updateSetting
 
 import sys
@@ -571,9 +571,9 @@ class mywindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
-        self.ui.actionGenerate_QELine_script.setDisabled(True)
-        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script - Not Implemented') 
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
         self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
+        self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQELineScript)
         
 
         self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
@@ -1021,9 +1021,9 @@ class mywindow(QtWidgets.QMainWindow):
 
     def setCurrentDirectory(self,folder):
         self.ui.DataSet_path_lineEdit.setText(folder)
+        
 
-
-    @ProgressBarDecoratorArguments(runningText='Genrating 3D Script',completedText='Script Saved',failedText='Cancelled')
+    @ProgressBarDecoratorArguments(runningText='Generating 3D Script',completedText='Script Saved',failedText='Cancelled')
     def generate3DScript(self):
         self.stateMachine.run()
         if not self.stateMachine.currentState.name in ['Raw','Converted']:
@@ -1072,6 +1072,64 @@ class mywindow(QtWidgets.QMainWindow):
                                     title=title, selectView=selectView)
 
         return True
+    
+    
+    @ProgressBarDecoratorArguments(runningText='Generating QELine Script',completedText='Script Saved',failedText='Cancelled')
+    def generateQELineScript(self):
+        self.stateMachine.run()
+        if not self.stateMachine.currentState.name in ['Raw','Converted']:
+            dialog = QtWidgets.QMessageBox()
+            dialog.setIcon(QtWidgets.QMessageBox.Critical)
+            dialog.setText('It is not possible to generate a script without any data loaded.')
+            dialog.addButton(QtWidgets.QMessageBox.Ok)
+            dialog.exec() 
+
+            return False
+
+        folder = self.getCurrentDirectory()
+        saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+        if len(saveFile)==0:
+            return False
+        if path.splitext(saveFile)[1] !='.py':
+            saveFile = path.splitext(saveFile)[0]+'.py'
+
+        ds = self.DataSetModel.getCurrentDataSet()
+        dataSetName = ds.name
+        
+        dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+        binning = self.ui.DataSet_binning_comboBox.currentText()
+        
+        HStart = self.ui.QELine_HStart_lineEdit.text()
+        KStart = self.ui.QELine_KStart_lineEdit.text()
+        LStart = self.ui.QELine_LStart_lineEdit.text()
+        HEnd = self.ui.QELine_HEnd_lineEdit.text()
+        KEnd = self.ui.QELine_KEnd_lineEdit.text()
+        LEnd = self.ui.QELine_LEnd_lineEdit.text()
+        width = self.ui.QELine_Width_lineEdit.text()
+        minPixel = self.ui.QELine_MinPixel_lineEdit.text()
+        EMin = self.ui.QELine_EMin_lineEdit.text()
+        EMax = self.ui.QELine_EMax_lineEdit.text()
+        NPoints = self.ui.QELine_NPoints_lineEdit.text()
+
+
+        CAxisMin = self.ui.QELine_CAxisMin_lineEdit.text()
+        CAxisMax = self.ui.QELine_CAxisMax_lineEdit.text()
+
+        log = self.ui.QELine_LogScale_checkBox.isChecked()
+        grid = self.ui.QELine_Grid_checkBox.isChecked()
+
+        title = self.ui.QELine_SetTitle_lineEdit.text()
+
+        RLU = self.ui.QELine_SelectUnits_RLU_radioButton.isChecked()
+        
+        
+        generatePlotQELineScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
+                                  HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
+                                  width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
+                                  CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title)
+
+        return True    
 
 
     def resetProgressBarTimed(self):

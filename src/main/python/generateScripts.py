@@ -177,7 +177,74 @@ def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True,
     plotString.append('plt.show()\n')
         
     return '\n'.join(plotString)
+
+
+
+
+def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+               width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+
+    plotString = []
+
+    if RLU == False:
+        rluArgument = ',rlu = False'
+    else:
+        rluArgument = ''
+    
+    if log == True:
+        logArgument = ', log=True'
+    else:
+        logArgument = ''
+
+    args = rluArgument+logArgument
+
+    plotString.append('# Plotting a cut through data in Q and E is done using this code')
+    
+    
+    plotString.append('# First define the positions to be cut through.')
+    plotString.append('# The GUI is limited to two Q points, but more can be added below')
+    
+    plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
+    plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
+    
+    plotString.append('# Collect them into one array')
+    plotString.append('QPoints = np.array([Q1,Q2])')
+    
+    plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+    plotString.append('width = ' + width + ' # 1/AA')
+    plotString.append('minPixel = ' + minPixel + ' # 1/AA')
+    
+    plotString.append('# Define energy bins')
+    plotString.append('EnergyBins=np.linspace(' + EMin + ',' + EMax + ',' + NPoints +')')  
         
+    
+    plotString.append('fig = plt.figure(figsize=(14,6))')
+    plotString.append('ax = fig.gca()')
+    plotString.append("ax,DataLists,Bins,BinCenters,Offsets = \\" )
+    plotString.append('        ' + dataSetName + '.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \\')
+    plotString.append('        ' +'ax=ax, EnergyBins=EnergyBins' +args +')')
+
+    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
+                        +"# This is countered by specifying min and max for colour by the call below.\n"\
+                        +"# Alternatively, one can provide this as input to plotCutQELine\n")
+
+#    plotString.append('# Change the colorbar of the plot')
+    plotString.append('ax.set_clim(0,2e-5)')
+
+
+    if grid == True:
+        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
+
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('ax.set_title("{}")\n'.format(title))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
+
 
 def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, qx=0.05, qy=0.05, E = 0.08, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
@@ -195,7 +262,24 @@ def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, qx=0.0
 
     saveString = '\n'.join(saveString)
     
+def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
+                             HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+                             width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+    saveString = []
     
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+
+
+    saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
+               width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
+                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
+
+    saveString = '\n'.join(saveString)    
+        
     with open(saveFile,'w') as file:
         file.write(saveString)
 
