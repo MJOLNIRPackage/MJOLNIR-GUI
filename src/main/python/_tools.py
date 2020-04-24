@@ -1,5 +1,35 @@
 import pickle as pickle
 import os
+import functools
+
+def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
+
+    def ProgressBarDecorator(func):
+        @functools.wraps(func)
+        def newFunc(self,*args,**kwargs):
+            self.setProgressBarValue(0)
+            self.setProgressBarLabelText(runningText)
+            if len(args) == 1:
+                args = ()
+            else:
+                args = args[1:]
+            self.update()
+            returnval = func(self,*args,**kwargs)
+
+            self.setProgressBarMaximum(100)
+            if returnval is not None:
+                if returnval is False:
+                    self.setProgressBarValue(0)
+                    self.setProgressBarLabelText(failedText)
+                    self.resetProgressBarTimed()
+                    return returnval
+        
+            self.setProgressBarValue(100)
+            self.setProgressBarLabelText(completedText)
+            self.resetProgressBarTimed()
+            return returnval
+        return newFunc
+    return ProgressBarDecorator
 
 
 def loadSetting(settingsFile,string): # pragma: no cover

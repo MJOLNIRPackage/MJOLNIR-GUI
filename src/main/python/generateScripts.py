@@ -1,8 +1,13 @@
 
-from MJOLNIR import _tools
+
 import numpy as np
 from os import path
 
+from PyQt5 import QtWidgets
+
+from _tools import ProgressBarDecoratorArguments
+
+from MJOLNIR import _tools
 
 def startString():
     importString = []
@@ -127,14 +132,6 @@ def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True,
 
     plotString = []
 
-    # if binning is None:
-    #     binString = ''
-    # else:
-    #     binString = 'binning = {},'.format(binning)
-    # plotString.append('# Run the converter. This automatically generates nxs-file(s). \n'
-    #                     +'# Binning can be changed with binning argument.')
-    # plotString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
-
     if RLU == False:
         rluArgument = ',rlu = False'
     else:
@@ -229,7 +226,7 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
                         +"# This is countered by specifying min and max for colour by the call below.\n"\
                         +"# Alternatively, one can provide this as input to plotCutQELine\n")
 
-#    plotString.append('# Change the colorbar of the plot')
+
     plotString.append('ax.set_clim(0,2e-5)')
 
 
@@ -283,3 +280,122 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
     with open(saveFile,'w') as file:
         file.write(saveString)
 
+
+
+@ProgressBarDecoratorArguments(runningText='Generating 3D Script',completedText='Script Saved',failedText='Cancelled')
+def generate3DScript(self):
+    self.stateMachine.run()
+    if not self.stateMachine.currentState.name in ['Raw','Converted']:
+        dialog = QtWidgets.QMessageBox()
+        dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        dialog.setText('It is not possible to generate a script without any data loaded.')
+        dialog.addButton(QtWidgets.QMessageBox.Ok)
+        dialog.exec() 
+
+        return False
+
+    folder = self.getCurrentDirectory()
+    saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+    if len(saveFile)==0:
+        return False
+    if path.splitext(saveFile)[1] !='.py':
+        saveFile = path.splitext(saveFile)[0]+'.py'
+
+    ds = self.DataSetModel.getCurrentDataSet()
+    dataSetName = ds.name
+    
+    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+    binning = self.ui.DataSet_binning_comboBox.currentText()
+    qx = self.ui.View3D_QXBin_lineEdit.text()
+    qy = self.ui.View3D_QYBin_lineEdit.text()
+    E = self.ui.View3D_EBin_lineEdit.text()
+
+    CAxisMin = self.ui.View3D_CAxisMin_lineEdit.text()
+    CAxisMax = self.ui.View3D_CAxisMax_lineEdit.text()
+
+    log = self.ui.View3D_LogScale_checkBox.isChecked()
+    grid = self.ui.View3D_Grid_checkBox.isChecked()
+
+    title = self.ui.View3D_SetTitle_lineEdit.text()
+
+    RLU = self.ui.View3D_SelectUnits_RLU_radioButton.isChecked()
+
+    radioState = [self.ui.View3D_SelectView_QxE_radioButton.isChecked(),
+    self.ui.View3D_SelectView_QyE_radioButton.isChecked(),self.ui.View3D_SelectView_QxQy_radioButton.isChecked()]
+    selectView = np.arange(3)[radioState]
+    selectView = selectView[0]
+
+    generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
+                                RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
+                                title=title, selectView=selectView)
+
+    return True
+
+
+@ProgressBarDecoratorArguments(runningText='Generating QELine Script',completedText='Script Saved',failedText='Cancelled')
+def generateQELineScript(self):
+    self.stateMachine.run()
+    if not self.stateMachine.currentState.name in ['Raw','Converted']:
+        dialog = QtWidgets.QMessageBox()
+        dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        dialog.setText('It is not possible to generate a script without any data loaded.')
+        dialog.addButton(QtWidgets.QMessageBox.Ok)
+        dialog.exec() 
+
+        return False
+
+    folder = self.getCurrentDirectory()
+    saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+    if len(saveFile)==0:
+        return False
+    if path.splitext(saveFile)[1] !='.py':
+        saveFile = path.splitext(saveFile)[0]+'.py'
+
+    ds = self.DataSetModel.getCurrentDataSet()
+    dataSetName = ds.name
+    
+    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+    binning = self.ui.DataSet_binning_comboBox.currentText()
+    
+    HStart = self.ui.QELine_HStart_lineEdit.text()
+    KStart = self.ui.QELine_KStart_lineEdit.text()
+    LStart = self.ui.QELine_LStart_lineEdit.text()
+    HEnd = self.ui.QELine_HEnd_lineEdit.text()
+    KEnd = self.ui.QELine_KEnd_lineEdit.text()
+    LEnd = self.ui.QELine_LEnd_lineEdit.text()
+    width = self.ui.QELine_Width_lineEdit.text()
+    minPixel = self.ui.QELine_MinPixel_lineEdit.text()
+    EMin = self.ui.QELine_EMin_lineEdit.text()
+    EMax = self.ui.QELine_EMax_lineEdit.text()
+    NPoints = self.ui.QELine_NPoints_lineEdit.text()
+
+
+    CAxisMin = self.ui.QELine_CAxisMin_lineEdit.text()
+    CAxisMax = self.ui.QELine_CAxisMax_lineEdit.text()
+
+    log = self.ui.QELine_LogScale_checkBox.isChecked()
+    grid = self.ui.QELine_Grid_checkBox.isChecked()
+
+    title = self.ui.QELine_SetTitle_lineEdit.text()
+
+    RLU = self.ui.QELine_SelectUnits_RLU_radioButton.isChecked()
+    
+    
+    generatePlotQELineScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
+                                HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
+                                width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
+                                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title)
+
+    return True    
+
+
+
+
+def initGenerateScript(guiWindow):
+    guiWindow.generateQELineScript = lambda: generateQELineScript(guiWindow)
+    guiWindow.generate3DScript = lambda: generate3DScript(guiWindow)
+
+def setupGenerateScript(guiWindow):
+    pass
