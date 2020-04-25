@@ -18,13 +18,15 @@ import os
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
-    from MJOLNIR_GUI_ui import Ui_MainWindow  
-    from Views.DataSetManager import setupDataSetManager,initDataSetManager
-    from Views.View3DManager import setupView3DManager,initView3DManager
-    from Views.QELineManager import setupQELineManager,initQELineManager
-    from Views.QPlaneManager import setupQPlaneManager,initQPlaneManager
-    from Views.Cut1DManager import setupCut1DManager,initCut1DManager
-    from Views.Raw1DManager import setupRaw1DManager,initRaw1DManager
+    #from MJOLNIR_GUI_ui import Ui_MainWindow  
+    from Views.main import Ui_MainWindow
+    from Views.DataSetManager import DataSetManager
+    from Views.View3DManager import View3DManager
+    from Views.QELineManager import QELineManager
+    from Views.QPlaneManager import QPlaneManager
+    from Views.Cut1DManager import Cut1DManager
+    from Views.Raw1DManager import Raw1DManager
+    from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
@@ -35,13 +37,15 @@ try:
     from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 except ModuleNotFoundError:
     sys.path.append('.')
-    from .MJOLNIR_GUI_ui import Ui_MainWindow  
-    from .Views.DataSetManager import setupDataSetManager,initDataSetManager
-    from .Views.View3DManager import setupView3DManager,initView3DManager
-    from .Views.QELineManager import setupQELineManager,initQELineManager
-    from .Views.QPlaneManager import setupQPlaneManager,initQPlaneManager
-    from .Views.Cut1DManager import setupCut1DManager,initCut1DManager
-    from .Views.Raw1DManager import setupRaw1DManager,initRaw1DManager
+    #from .MJOLNIR_GUI_ui import Ui_MainWindow  
+    from .Views.main import Ui_MainWindow
+    from .Views.DataSetManager import DataSetManager
+    from .Views.View3DManager import View3DManager
+    from .Views.QELineManager import QELineManager
+    from .Views.QPlaneManager import QPlaneManager
+    from .Views.Cut1DManager import Cut1DManager
+    from .Views.Raw1DManager import Raw1DManager
+    from .Views.Raw1DManager import Raw1DManager
     from .MJOLNIR_Data import GuiDataFile,GuiDataSet
     from .DataModels import DataSetModel,DataFileModel
     from .StateMachine import StateMachine
@@ -79,11 +83,39 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
     
         self.ui.setupUi(self)
+
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(self.AppContext.get_resource('Icons/Own/MJOLNIR.png')))
         self.setWindowIcon(icon)
+
+        # List to hold all views that need to be setup
+        self.views = []
+        ## Set up DataSetManager
+        self.ui.dataSetManager = DataSetManager(self.ui.fixedOpen,self)
         
-        self.windows = []
+        self.views.append(self.ui.dataSetManager)
+
+        # Lists of views in shown order
+        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data']
+        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D]
+        self.startState = [True,False,False,False,True] # If not collapsed
+
+        # Find correct layout to insert views
+        vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
+        # Insert all views
+        for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
+            box = CollapsibleBox(name,startState=state)
+            vlay.addWidget(box)
+            lay = QtWidgets.QVBoxLayout()
+
+            widget = Type(guiWindow=self)
+            self.views.append(widget)
+            lay.addWidget(widget)
+           
+            box.setContentLayout(lay)
+        vlay.addStretch()
+
+        self.windows = [] # Holder for generated plotting windows
 
         self.dataSets = []
 
@@ -95,29 +127,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
         
 
-        ##############################################################################
-        # initalize functions
-        ############################################################################## 
-        initDataSetManager(self)
-        initView3DManager(self)
-        initQELineManager(self)
-        initQPlaneManager(self)
-        initCut1DManager(self)
-        initRaw1DManager(self)
         initGenerateScript(self)
 
-        ##############################################################################
-        # setup functions
-        ##############################################################################
-        setupDataSetManager(self)
-        setupView3DManager(self)
-        setupQELineManager(self)
-        setupQPlaneManager(self)
-        setupCut1DManager(self)
-        setupRaw1DManager(self)
+        for view in self.views: # Run through all views to set them up
+            view.setup()
+
         setupGenerateScript(self)
-
-
 
         self.setupMenu()
         self.setupStateMachine()

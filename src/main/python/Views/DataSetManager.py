@@ -6,7 +6,7 @@ from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from _tools import ProgressBarDecoratorArguments
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,uic
 import numpy as np
 
 def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
@@ -129,8 +129,8 @@ def convert(self):
     
 
 def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
-    self.DataFileLabels = [self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
-                self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label,self.ui.DataSet_A3_label,self.ui.DataSet_A4_label]
+    self.DataFileLabels = []#[self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
+             #   self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label,self.ui.DataSet_A3_label,self.ui.DataSet_A4_label]
     self.DataFileLabelEntries = ['temperature','magneticField','sampleName','scanCommand','scanParameters','A3','A4']
     for label in self.DataFileLabels:
         label.defaultText = label.text()
@@ -201,31 +201,46 @@ def updateDataFileLabels(self):
     
         self.updateRaw1DCutSpinBoxes()
 
-def initDataSetManager(guiWindow):
- 
-    guiWindow.selectedDataSetChanged = lambda:selectedDataSetChanged(guiWindow)
-    guiWindow.selectedDataFileChanged = lambda:selectedDataFileChanged(guiWindow)
-    guiWindow.DataSet_NewDataSet_button_function = lambda:DataSet_NewDataSet_button_function(guiWindow)
-    guiWindow.DataSet_DeleteDataSet_button_function = lambda:DataSet_DeleteDataSet_button_function(guiWindow)
-    guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(guiWindow)
-    guiWindow.DataSet_DoubleClick_Selection_function = lambda index:DataSet_DoubleClick_Selection_function(guiWindow,index)
-    guiWindow.DataFile_DoubleClick_Selection_function = lambda index:DataFile_DoubleClick_Selection_function(guiWindow,index)
 
-    guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(guiWindow)
+DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+class DataSetManager(DataSetManagerBase, DataSetManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(DataSetManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initDataSetManager()
 
-    guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(guiWindow)
-    guiWindow.convert = lambda: convert(guiWindow)
+    def initDataSetManager(self):
+    
+        self.guiWindow.selectedDataSetChanged = lambda:selectedDataSetChanged(self.guiWindow)
+        self.guiWindow.selectedDataFileChanged = lambda:selectedDataFileChanged(self.guiWindow)
+        self.guiWindow.DataSet_NewDataSet_button_function = lambda:DataSet_NewDataSet_button_function(self.guiWindow)
+        self.guiWindow.DataSet_DeleteDataSet_button_function = lambda:DataSet_DeleteDataSet_button_function(self.guiWindow)
+        self.guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(self.guiWindow)
+        self.guiWindow.DataSet_DoubleClick_Selection_function = lambda index:DataSet_DoubleClick_Selection_function(self.guiWindow,index)
+        self.guiWindow.DataFile_DoubleClick_Selection_function = lambda index:DataFile_DoubleClick_Selection_function(self.guiWindow,index)
 
-    guiWindow.setupDataSet_DataFile_labels = lambda: setupDataSet_DataFile_labels(guiWindow)
-    guiWindow.updateDataFileLabels = lambda: updateDataFileLabels(guiWindow)
+        self.guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(self.guiWindow)
 
-    guiWindow.setupDataSet = lambda:setupDataSet(guiWindow)
-    guiWindow.setupDataFile =  lambda:setupDataFile(guiWindow)
+        self.guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(self.guiWindow)
+        self.guiWindow.convert = lambda: convert(self.guiWindow)
+
+        self.guiWindow.setupDataSet_DataFile_labels = lambda: setupDataSet_DataFile_labels(self.guiWindow)
+        self.guiWindow.updateDataFileLabels = lambda: updateDataFileLabels(self.guiWindow)
+
+        self.guiWindow.setupDataSet = lambda:setupDataSet(self.guiWindow)
+        self.guiWindow.setupDataFile =  lambda:setupDataFile(self.guiWindow)
+
+        
+        
+        for key,value in self.__dict__.items():
+            if 'DataSet' in key:
+                self.guiWindow.ui.__dict__[key] = value
 
 
 
-def setupDataSetManager(guiWindow):
-    guiWindow.setupDataSet() # Setup datasets with buttons and call functions
-    guiWindow.setupDataFile() # Setup datafiles      
-    guiWindow.setupRaw1DCutSpinBoxes()
-    guiWindow.setupDataSet_DataFile_labels()
+    def setup(self):
+        self.guiWindow.setupDataSet() # Setup datasets with buttons and call functions
+        self.guiWindow.setupDataFile() # Setup datafiles      
+        self.guiWindow.setupRaw1DCutSpinBoxes()
+        self.guiWindow.setupDataSet_DataFile_labels()

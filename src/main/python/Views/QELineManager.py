@@ -4,7 +4,7 @@ sys.path.append('..')
 from _tools import ProgressBarDecoratorArguments
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, uic
 import numpy as np
 
 
@@ -98,14 +98,25 @@ def QELine_SetTitle_button_function(self):
         fig.canvas.draw()
 
 
+QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
+class QELineManager(QELineManagerBase, QELineManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(QELineManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initQELineManager()
 
-def initQELineManager(guiWindow):
-    guiWindow.QELine_plot_button_function = lambda: QELine_plot_button_function(guiWindow)
-    guiWindow.QELine_setCAxis_button_function = lambda: QELine_setCAxis_button_function(guiWindow)
-    guiWindow.QELine_SetTitle_button_function = lambda: QELine_SetTitle_button_function(guiWindow)
+    def initQELineManager(self):
+        self.guiWindow.QELine_plot_button_function = lambda: QELine_plot_button_function(self.guiWindow)
+        self.guiWindow.QELine_setCAxis_button_function = lambda: QELine_setCAxis_button_function(self.guiWindow)
+        self.guiWindow.QELine_SetTitle_button_function = lambda: QELine_SetTitle_button_function(self.guiWindow)
 
-def setupQELineManager(guiWindow):
-    
-    guiWindow.ui.QELine_plot_button.clicked.connect(guiWindow.QELine_plot_button_function)
-    guiWindow.ui.QELine_setCAxis_button.clicked.connect(guiWindow.QELine_setCAxis_button_function)
-    guiWindow.ui.QELine_SetTitle_button.clicked.connect(guiWindow.QELine_SetTitle_button_function)
+        for key,value in self.__dict__.items():
+            if 'QELine' in key:
+                self.guiWindow.ui.__dict__[key] = value
+
+    def setup(self):
+        
+        self.guiWindow.ui.QELine_plot_button.clicked.connect(self.guiWindow.QELine_plot_button_function)
+        self.guiWindow.ui.QELine_setCAxis_button.clicked.connect(self.guiWindow.QELine_setCAxis_button_function)
+        self.guiWindow.ui.QELine_SetTitle_button.clicked.connect(self.guiWindow.QELine_SetTitle_button_function)

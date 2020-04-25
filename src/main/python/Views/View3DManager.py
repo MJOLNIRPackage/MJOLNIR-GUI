@@ -4,7 +4,7 @@ sys.path.append('..')
 from _tools import ProgressBarDecoratorArguments
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,uic
 import numpy as np
 
 
@@ -99,25 +99,36 @@ def View3D_plot_button_function(self):
     self.V.setPlane(0)
     return True
 
+View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+class View3DManager(View3DManagerBase, View3DManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(View3DManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initView3DManager()
 
-
-def initView3DManager(guiWindow):
- 
-    guiWindow.View3D_setCAxis_button_function = lambda:View3D_setCAxis_button_function(guiWindow)
-    guiWindow.View3D_SelectView_QxE_radioButton_function = lambda:View3D_SelectView_QxE_radioButton_function(guiWindow)
-    guiWindow.View3D_SelectView_QyE_radioButton_function = lambda:View3D_SelectView_QyE_radioButton_function(guiWindow)
-    guiWindow.View3D_SelectView_QxQy_radioButton_function = lambda:View3D_SelectView_QxQy_radioButton_function(guiWindow)
-    guiWindow.View3D_SetTitle_button_function = lambda:View3D_SetTitle_button_function(guiWindow)
-    guiWindow.View3D_plot_button_function = lambda:View3D_plot_button_function(guiWindow)
-
-
-
-def setupView3DManager(guiWindow):
-    guiWindow.ui.View3D_plot_button.clicked.connect(guiWindow.View3D_plot_button_function)
-    guiWindow.ui.View3D_setCAxis_button.clicked.connect(guiWindow.View3D_setCAxis_button_function)
-    guiWindow.ui.View3D_SetTitle_button.clicked.connect(guiWindow.View3D_SetTitle_button_function)
+        
+    def initView3DManager(self):
     
-    # Radiobutton to select viewing type
-    guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(guiWindow.View3D_SelectView_QxE_radioButton_function)
-    guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(guiWindow.View3D_SelectView_QyE_radioButton_function)
-    guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(guiWindow.View3D_SelectView_QxQy_radioButton_function)
+        self.guiWindow.View3D_setCAxis_button_function = lambda:View3D_setCAxis_button_function(self.guiWindow)
+        self.guiWindow.View3D_SelectView_QxE_radioButton_function = lambda:View3D_SelectView_QxE_radioButton_function(self.guiWindow)
+        self.guiWindow.View3D_SelectView_QyE_radioButton_function = lambda:View3D_SelectView_QyE_radioButton_function(self.guiWindow)
+        self.guiWindow.View3D_SelectView_QxQy_radioButton_function = lambda:View3D_SelectView_QxQy_radioButton_function(self.guiWindow)
+        self.guiWindow.View3D_SetTitle_button_function = lambda:View3D_SetTitle_button_function(self.guiWindow)
+        self.guiWindow.View3D_plot_button_function = lambda:View3D_plot_button_function(self.guiWindow)
+
+        for key,value in self.__dict__.items():
+            if 'View3D' in key:
+                self.guiWindow.ui.__dict__[key] = value
+
+
+
+    def setup(self):
+        self.guiWindow.ui.View3D_plot_button.clicked.connect(self.guiWindow.View3D_plot_button_function)
+        self.guiWindow.ui.View3D_setCAxis_button.clicked.connect(self.guiWindow.View3D_setCAxis_button_function)
+        self.guiWindow.ui.View3D_SetTitle_button.clicked.connect(self.guiWindow.View3D_SetTitle_button_function)
+        
+        # Radiobutton to select viewing type
+        self.guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxE_radioButton_function)
+        self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
+        self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)

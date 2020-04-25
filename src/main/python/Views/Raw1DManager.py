@@ -7,7 +7,7 @@ from _tools import ProgressBarDecoratorArguments
 
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,uic
 import numpy as np
 
 
@@ -140,21 +140,31 @@ def Raw1D_plot_button_function(self):
 
 
 
-
-def initRaw1DManager(guiWindow):
-
-    guiWindow.setupRaw1DCutSpinBoxes = lambda: setupRaw1DCutSpinBoxes(guiWindow)
-    guiWindow.resetRaw1DCutSpinBoxes = lambda: resetRaw1DCutSpinBoxes(guiWindow)
-    guiWindow.updateRaw1DCutSpinBoxes = lambda dfs=None: updateRaw1DCutSpinBoxes(guiWindow, dfs)
-    guiWindow.updateRaw1DCutLabels = lambda dfs=None: updateRaw1DCutLabels(guiWindow,dfs)
-    guiWindow.raw1DCutAnalyzerSpinBoxChanged = lambda: raw1DCutAnalyzerSpinBoxChanged(guiWindow)
-    
-    guiWindow.raw1DCutDetectorSpinBoxChanged = lambda: raw1DCutDetectorSpinBoxChanged(guiWindow)
-    guiWindow.Raw1D_plot_button_function = lambda: Raw1D_plot_button_function(guiWindow)
+Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
+class Raw1DManager(Raw1DManagerBase, Raw1DManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(Raw1DManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initRaw1DManager()
 
 
+    def initRaw1DManager(self):
 
-def setupRaw1DManager(guiWindow):
-    
-    guiWindow.ui.Raw1D_plot_button.clicked.connect(guiWindow.Raw1D_plot_button_function)
+        self.guiWindow.setupRaw1DCutSpinBoxes = lambda: setupRaw1DCutSpinBoxes(self.guiWindow)
+        self.guiWindow.resetRaw1DCutSpinBoxes = lambda: resetRaw1DCutSpinBoxes(self.guiWindow)
+        self.guiWindow.updateRaw1DCutSpinBoxes = lambda dfs=None: updateRaw1DCutSpinBoxes(self.guiWindow, dfs)
+        self.guiWindow.updateRaw1DCutLabels = lambda dfs=None: updateRaw1DCutLabels(self.guiWindow,dfs)
+        self.guiWindow.raw1DCutAnalyzerSpinBoxChanged = lambda: raw1DCutAnalyzerSpinBoxChanged(self.guiWindow)
+        
+        self.guiWindow.raw1DCutDetectorSpinBoxChanged = lambda: raw1DCutDetectorSpinBoxChanged(self.guiWindow)
+        self.guiWindow.Raw1D_plot_button_function = lambda: Raw1D_plot_button_function(self.guiWindow)
+
+        for key,value in self.__dict__.items():
+            if 'Raw1D' in key:
+                self.guiWindow.ui.__dict__[key] = value
+
+    def setup(self):
+        
+        self.guiWindow.ui.Raw1D_plot_button.clicked.connect(self.guiWindow.Raw1D_plot_button_function)
     
