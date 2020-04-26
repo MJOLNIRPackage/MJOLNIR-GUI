@@ -4,7 +4,7 @@ sys.path.append('..')
 from _tools import ProgressBarDecoratorArguments
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, uic
 import numpy as np
 
 def QPlane_plot_button_function(self):
@@ -68,15 +68,24 @@ def QPlane_SetTitle_button_function(self):
         fig.canvas.draw()
     
 
+QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
+class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(QPlaneManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initQPlaneManager()
 
+    def initQPlaneManager(self):
+        self.guiWindow.QPlane_plot_button_function = lambda: QPlane_plot_button_function(self.guiWindow)
+        self.guiWindow.QPlane_setCAxis_button_function = lambda: QPlane_setCAxis_button_function(self.guiWindow)
+        self.guiWindow.QPlane_SetTitle_button_function = lambda: QPlane_SetTitle_button_function(self.guiWindow)
+        for key,value in self.__dict__.items():
+            if 'QPlane' in key:
+                self.guiWindow.ui.__dict__[key] = value
 
-def initQPlaneManager(guiWindow):
-    guiWindow.QPlane_plot_button_function = lambda: QPlane_plot_button_function(guiWindow)
-    guiWindow.QPlane_setCAxis_button_function = lambda: QPlane_setCAxis_button_function(guiWindow)
-    guiWindow.QPlane_SetTitle_button_function = lambda: QPlane_SetTitle_button_function(guiWindow)
-
-def setupQPlaneManager(guiWindow):
-    
-    guiWindow.ui.QPlane_plot_button.clicked.connect(guiWindow.QPlane_plot_button_function)
-    guiWindow.ui.QPlane_setCAxis_button.clicked.connect(guiWindow.QPlane_setCAxis_button_function)
-    guiWindow.ui.QPlane_SetTitle_button.clicked.connect(guiWindow.QPlane_SetTitle_button_function)
+    def setup(self):
+        
+        self.guiWindow.ui.QPlane_plot_button.clicked.connect(self.guiWindow.QPlane_plot_button_function)
+        self.guiWindow.ui.QPlane_setCAxis_button.clicked.connect(self.guiWindow.QPlane_setCAxis_button_function)
+        self.guiWindow.ui.QPlane_SetTitle_button.clicked.connect(self.guiWindow.QPlane_SetTitle_button_function)

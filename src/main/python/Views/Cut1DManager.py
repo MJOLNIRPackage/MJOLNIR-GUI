@@ -4,7 +4,7 @@ sys.path.append('..')
 from _tools import ProgressBarDecoratorArguments
 
 from os import path
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, uic
 import numpy as np
 
 
@@ -37,9 +37,21 @@ def Cut1D_plot_button_funcion(self):
     return True
 
 
-def initCut1DManager(guiWindow):
-    guiWindow.Cut1D_plot_button_funcion = lambda: Cut1D_plot_button_funcion(guiWindow)
-    
-def setupCut1DManager(guiWindow):
-    guiWindow.ui.Cut1D_plot_button.clicked.connect(guiWindow.Cut1D_plot_button_funcion)
+Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D.ui"))
+class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
+    def __init__(self, parent=None, guiWindow=None):
+        super(Cut1DManager, self).__init__(parent)
+        self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.initCut1DManager()
+
+    def initCut1DManager(self):
+        self.guiWindow.Cut1D_plot_button_funcion = lambda: Cut1D_plot_button_funcion(self.guiWindow)
+
+        for key,value in self.__dict__.items():
+                if 'Cut1D' in key:
+                    self.guiWindow.ui.__dict__[key] = value
+        
+    def setup(self):
+        self.guiWindow.ui.Cut1D_plot_button.clicked.connect(self.guiWindow.Cut1D_plot_button_funcion)
     
