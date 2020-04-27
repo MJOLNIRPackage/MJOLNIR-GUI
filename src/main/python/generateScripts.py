@@ -227,7 +227,7 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
                         +"# Alternatively, one can provide this as input to plotCutQELine\n")
 
 
-    plotString.append('ax.set_clim(0,2e-5)')
+    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
 
 
     if grid == True:
@@ -243,7 +243,59 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
     return '\n'.join(plotString)
 
 
-def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, qx=0.05, qy=0.05, E = 0.08, RLU=True, 
+
+def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
+                EMin = 0.0,EMax=10, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+
+    plotString = []
+
+    if RLU == False:
+        rluArgument = ',rlu = False'
+    else:
+        rluArgument = ''
+    
+    if log == True:
+        logArgument = ', log=True'
+    else:
+        logArgument = ''
+
+    args = rluArgument+logArgument
+
+    plotString.append('# Plotting a Q plane done using this code')
+
+    plotString.append('EMin = ' + EMin)
+    plotString.append('EMax = ' + EMax)
+    plotString.append('xBinTolerance = ' + xBinTolerance)
+    plotString.append('yBinTolerance = ' + yBinTolerance)
+    plotString.append('Data,Bins,ax = '+ dataSetName + '.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance' + args + ')')
+
+    plotString.append('fig = ax.get_figure() # Extract figure from returned axis')
+    plotString.append('fig.colorbar(ax.pmeshs[0]) # Create colorbar from plot\n')
+
+    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
+                        +"# This is countered by specifying min and max for colour by the call below.\n"\
+                        +"# Alternatively, one can provide this as input to plotCutQPlane\n")
+
+    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
+
+
+    if grid == True:
+        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
+
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('ax.set_title("{}")\n'.format(title))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
+
+
+
+def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, 
+                           qx=0.05, qy=0.05, E = 0.08, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
     saveString = []
     
@@ -258,6 +310,8 @@ def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, qx=0.0
                                     title=title, selectView=selectView))
 
     saveString = '\n'.join(saveString)
+    with open(saveFile,'w') as file:
+        file.write(saveString)    
     
 def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
                              HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
@@ -280,7 +334,25 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
     with open(saveFile,'w') as file:
         file.write(saveString)
 
+def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None, 
+                             xBinTolerance=0.03, yBinTolerance=0.03,
+                             EMin = 0.0,EMax=10, RLU=True, 
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+    saveString = []
+    
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+    
+    saveString.append(plotQPlaneText(dataSetName=dataSetName, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
+                EMin = EMin,EMax=EMax, RLU=RLU, 
+                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
 
+    saveString = '\n'.join(saveString)    
+        
+    with open(saveFile,'w') as file:
+        file.write(saveString)
 
 @ProgressBarDecoratorArguments(runningText='Generating 3D Script',completedText='Script Saved',failedText='Cancelled')
 def generate3DScript(self):
@@ -390,12 +462,63 @@ def generateQELineScript(self):
 
     return True    
 
+@ProgressBarDecoratorArguments(runningText='Generating QPlane Script',completedText='Script Saved',failedText='Cancelled')
+def generateQPlaneScript(self):
+    self.stateMachine.run()
+    if not self.stateMachine.currentState.name in ['Raw','Converted']:
+        dialog = QtWidgets.QMessageBox()
+        dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        dialog.setText('It is not possible to generate a script without any data loaded.')
+        dialog.addButton(QtWidgets.QMessageBox.Ok)
+        dialog.exec() 
 
+        return False
+
+    folder = self.getCurrentDirectory()
+    saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+    if len(saveFile)==0:
+        return False
+    if path.splitext(saveFile)[1] !='.py':
+        saveFile = path.splitext(saveFile)[0]+'.py'
+
+    ds = self.DataSetModel.getCurrentDataSet()
+    dataSetName = ds.name
+    
+    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+    binning = self.ui.DataSet_binning_comboBox.currentText()
+    
+    
+    
+    EMin = self.ui.QPlane_EMin_lineEdit.text()
+    EMax = self.ui.QPlane_EMax_lineEdit.text()
+
+    xBinTolerance = self.ui.QPlane_xBinTolerance_lineEdit.text()
+    yBinTolerance = self.ui.QPlane_yBinTolerance_lineEdit.text()
+
+    CAxisMin = self.ui.QPlane_CAxisMin_lineEdit.text()
+    CAxisMax = self.ui.QPlane_CAxisMax_lineEdit.text()
+
+    log = self.ui.QPlane_LogScale_checkBox.isChecked()
+    grid = self.ui.QPlane_Grid_checkBox.isChecked()
+
+    title = self.ui.QPlane_SetTitle_lineEdit.text()
+
+    RLU = self.ui.QPlane_SelectUnits_RLU_radioButton.isChecked()
+    
+    
+    generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = binning, 
+                             xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
+                             EMin = EMin,EMax=EMax, RLU=RLU, 
+                             CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title)
+
+    return True    
 
 
 def initGenerateScript(guiWindow):
     guiWindow.generateQELineScript = lambda: generateQELineScript(guiWindow)
     guiWindow.generate3DScript = lambda: generate3DScript(guiWindow)
+    guiWindow.generateQPlaneScript = lambda: generateQPlaneScript(guiWindow)
 
 def setupGenerateScript(guiWindow):
     pass

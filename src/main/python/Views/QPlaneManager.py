@@ -28,10 +28,10 @@ def QPlane_plot_button_function(self):
 
     EMin=float(self.ui.QPlane_EMin_lineEdit.text())
     EMax=float(self.ui.QPlane_EMax_lineEdit.text())
-    QxWidth = float(self.ui.QPlane_QxWidth_lineEdit.text())           
-    QyWidth = float(self.ui.QPlane_QyWidth_lineEdit.text())           
+    xBinTolerance = float(self.ui.QPlane_xBinTolerance_lineEdit.text())           
+    yBinTolerance = float(self.ui.QPlane_yBinTolerance_lineEdit.text())           
 
-    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=QxWidth,yBinTolerance=QyWidth,log=log,rlu=rlu)
+    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu)
     
     self.QPlane=ax    
     

@@ -183,9 +183,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
 
         self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
-        self.ui.actionGenerate_QPlane_script.setDisabled(True)
-        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script - Not Implemented') 
+        self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
         self.ui.actionGenerate_QPlane_script.setStatusTip(self.ui.actionGenerate_QPlane_script.toolTip())
+        self.ui.actionGenerate_QPlane_script.triggered.connect(self.generateQPlaneScript)
         
 
         self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
