@@ -12,7 +12,7 @@ class GuiDataSet(DataSet.DataSet):
         
     def convertDataFile(self,dataFiles=None,guiWindow=None):
         
-        dataFiles = self.dataFiles
+        dataFiles = list(self)
         if not guiWindow is None:
             guiWindow.setProgressBarMaximum(len(dataFiles)+1)
 
@@ -40,9 +40,7 @@ class GuiDataFile(DataFile.DataFile):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
         self.detectorSelectionOriginal = self.detectorSelection
         self.analyzerSelectionOriginal = self.analyzerSelection
-        self.binningOrignal = self.binning
 
-        
 
     def setData(self,column,value):
         if column == 0: self.name = value
@@ -50,22 +48,11 @@ class GuiDataFile(DataFile.DataFile):
     def flags(self):
         return QtCore.Qt.ItemIsEditable
 
-    def convert(self,):
-        convertedFile = super(GuiDataFile, self).convert(binning = self.binning)
-        self.converted = True
-        self.name = '.'.join(self.name.split('.')[:-1])+'.nxs'
-
+    def convert(self):
+        if self.type == 'nxs':
+            df = self.original_file
+        else:
+            df = self
+        convertedFile = GuiDataFile(super(GuiDataFile, df).convert(binning = df.binning))
+        
         return convertedFile
-
-    @property
-    def binning(self):
-        return self._binning
-
-
-
-    @binning.setter
-    def binning(self,value):
-        if not value in self.possibleBinnings:
-            raise AttributeError('Wanted binning ({}) not allowed in {}. Possible binnings are: {}'.format(value,self.name,self.possibleBinnings))
-        self._binning = value
-        #self.binning = [value]

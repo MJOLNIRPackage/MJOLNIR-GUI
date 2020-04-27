@@ -113,7 +113,10 @@ def DataSet_convertData_button_function(self):
     if not self.stateMachine.requireStateByName('Raw'):
         return False
     
-    return self.convert()
+    val = self.convert()
+    self.DataFileModel.layoutChanged.emit()
+    self.DataFileInfoModel.layoutChanged.emit()
+    return val
     
     
 def convert(self):
@@ -146,7 +149,7 @@ def DataSet_binning_comboBox_Changed(self):
     idx = self.ui.DataSet_binning_comboBox.currentIndex()
     newValue = int(self.ui.DataSet_binning_comboBox.itemText(idx))
     
-    dfs = self.DataFileModel.getCurrentDatafiles()
+    dfs = self.DataFileModel.getCurrentDatafiles(raw=True)
     if dfs  is None:
         dfs  = self.DataFileModel.getData() #If all or non are chosen, update all
     
@@ -154,17 +157,17 @@ def DataSet_binning_comboBox_Changed(self):
         if newValue == df.binning:
             continue
 
-        df.loadBinning(newValue)
+        df.binning = newValue
     self.updateDataFileLabels()
 
 def updateBinningComboBox(self):
-    dfs = self.DataFileModel.getCurrentDatafiles()
+    dfs = self.DataFileModel.getCurrentDatafiles(raw=True)
     self.ui.DataSet_binning_comboBox.reset()
     if dfs is None:
         dfs = self.DataFileModel.getData()
     if len(dfs)==0:
         return
-    possibleBinnings = set(dfs[0].possibleBinnings)
+    possibleBinnings = set(dfs[0].possibleBinnings.copy())
     if len(dfs)>1:
         for df in dfs[1:]:
             possibleBinnings = possibleBinnings & set(df.possibleBinnings)

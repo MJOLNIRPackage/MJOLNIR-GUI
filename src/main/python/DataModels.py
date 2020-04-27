@@ -206,7 +206,8 @@ class DataFileModel(QtCore.QAbstractListModel):
         else:
             return [idx.row() for idx in currentIndeces]
 
-    def getCurrentDatafiles(self):
+    def getCurrentDatafiles(self,raw=False):
+        """return current selected data files. If raw is true, return only raw."""
         indexRows = self.getCurrentDatafileIndexRows()
         if indexRows is None:
             return None
@@ -216,14 +217,24 @@ class DataFileModel(QtCore.QAbstractListModel):
             return None
         else:
             ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
-            df = [ds[idx] for idx in indexRows]
-            return df
+            if raw:
+                dfs = [ds[idx] if not ds[idx].type == 'nxs' else ds[idx].original_file for idx in indexRows]
+            else:
+                dfs = [ds[idx] for idx in indexRows]
+            return dfs
 
-    def getData(self):
+    def getData(self,raw = False):
+        """Return all data files in dataset independent of selection. If raw is true, return only raw."""
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         if ds is None:
             return []
-        dfs = [df for df in ds]
+        if len(ds) == 0:
+            return []
+        if raw:
+            dfs = [df if not df.type == 'nxs' else df.original_file for df in ds]
+        else:
+            dfs = [df for df in ds]
+        
         return dfs
 
     def rowCount(self, index):
