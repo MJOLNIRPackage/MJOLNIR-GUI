@@ -143,7 +143,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MJOLNIRGui"))
         self.progressBar_label.setText(_translate("MainWindow", "Ready"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuMask.setTitle(_translate("MainWindow", "Mask"))
