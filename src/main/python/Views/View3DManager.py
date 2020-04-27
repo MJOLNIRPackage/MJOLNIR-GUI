@@ -8,6 +8,9 @@ from PyQt5 import QtWidgets,uic
 import numpy as np
 
 
+# Handles all functionality related to the View3D box. Each button has its own 
+# definition, which should be pretty selfexplanatory.
+
 def View3D_setCAxis_button_function(self):
     if not hasattr(self, 'V'):
         self.View3D_plot_button_function()
@@ -61,7 +64,8 @@ def View3D_plot_button_function(self):
     ds = self.DataSetModel.getCurrentDataSet()
     if len(ds.convertedFiles)==0:
         self.DataSet_convertData_button_function()
-    
+
+    # Extract all the information from the GUI
     QXBin=float(self.ui.View3D_QXBin_lineEdit.text())
     QYBin=float(self.ui.View3D_QYBin_lineEdit.text())
     EBin =float(self.ui.View3D_EBin_lineEdit.text())
@@ -99,6 +103,7 @@ def View3D_plot_button_function(self):
     self.V.setPlane(0)
     return True
 
+# All of this connects the buttons and their functions to the main window.
 View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
 class View3DManager(View3DManagerBase, View3DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
@@ -106,10 +111,8 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.setupUi(self)
         self.guiWindow = guiWindow
         self.initView3DManager()
-
         
-    def initView3DManager(self):
-    
+    def initView3DManager(self):    
         self.guiWindow.View3D_setCAxis_button_function = lambda:View3D_setCAxis_button_function(self.guiWindow)
         self.guiWindow.View3D_SelectView_QxE_radioButton_function = lambda:View3D_SelectView_QxE_radioButton_function(self.guiWindow)
         self.guiWindow.View3D_SelectView_QyE_radioButton_function = lambda:View3D_SelectView_QyE_radioButton_function(self.guiWindow)
@@ -120,8 +123,6 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         for key,value in self.__dict__.items():
             if 'View3D' in key:
                 self.guiWindow.ui.__dict__[key] = value
-
-
 
     def setup(self):
         self.guiWindow.ui.View3D_plot_button.clicked.connect(self.guiWindow.View3D_plot_button_function)
