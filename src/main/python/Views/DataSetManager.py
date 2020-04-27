@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from DataModels import DataSetModel,DataFileModel
+from DataModels import DataSetModel,DataFileModel,DataFileInfoModel
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from _tools import ProgressBarDecoratorArguments
 
@@ -46,6 +46,15 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     self.ui.DataSet_DeleteFiles_button.setStatusTip(self.ui.DataSet_DeleteFiles_button.toolTip())
 
     self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
+
+    self.DataFileInfoModel = DataFileInfoModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,
+    DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,dataFileModel=self.DataFileModel,guiWindow=self)
+    self.ui.DataSet_fileAttributs_listView.setModel(self.DataFileInfoModel)
+
+def setupDataSet_binning_comboBox(self):
+    self.ui.DataSet_binning_comboBox.reset = lambda:DataSet_binning_comboBoxReset(self.ui.DataSet_binning_comboBox)
+    self.ui.DataSet_binning_comboBox.reset()
+    self.ui.DataSet_binning_comboBox.activated.connect(self.DataSet_binning_comboBox_Changed)
 
 def selectedDataSetChanged(self,*args,**kwargs):
     self.DataFileModel.updateCurrentDataSetIndex()
@@ -108,11 +117,10 @@ def DataSet_convertData_button_function(self):
     
     
 def convert(self):
-    binning=int(self.ui.DataSet_binning_comboBox.currentText())
     ds = self.DataSetModel.getCurrentDataSet()
     
     try:
-        ds.convertDataFile(binning=binning,guiWindow=self)
+        ds.convertDataFile(guiWindow=self)
     except AttributeError as e:
         dialog = QtWidgets.QMessageBox()
         dialog.setIcon(QtWidgets.QMessageBox.Critical)
@@ -128,79 +136,50 @@ def convert(self):
     return True
     
 
-def setupDataSet_DataFile_labels(self): # Set up labels containing information on current data file
-    self.DataFileLabels = []#[self.ui.DataSet_Temperature_label,self.ui.DataSet_MagneticField_label,self.ui.DataSet_SampleName_label,
-             #   self.ui.DataSet_ScanCommand_label,self.ui.DataSet_ScanType_label,self.ui.DataSet_A3_label,self.ui.DataSet_A4_label]
-    self.DataFileLabelEntries = ['temperature','magneticField','sampleName','scanCommand','scanParameters','A3','A4']
-    for label in self.DataFileLabels:
-        label.defaultText = label.text()
-        
 
 def updateDataFileLabels(self):
-    dfs = self.DataFileModel.getCurrentDatafiles()
-    if dfs is None:
-        for label in self.DataFileLabels:
-            label.setText(label.defaultText)
-        self.updateRaw1DCutSpinBoxes()
-    else:
-        temperature = []
-        A3 = []
-        A4 = []
-        magneticField = []
-        sampleName = []
-        scanCommand = []
-        scanParameter = []
+    self.DataFileInfoModel.layoutChanged.emit()
+    self.updateRaw1DCutSpinBoxes()
+    self.updateBinningComboBox()
 
-        formatString = '{:.2f} [{:.2f}  -  {:.2f}]'
-
-        for df in dfs:
-            temperature.append(df.temperature)
-            A3.append(df.A3)
-            A4.append(df.A4)
-            magneticField.append(df.magneticField)
-
-            sampleName.append(df.sample.name)
-            scanCommand.append(df.scanCommand)
-            scanParameter.append(df.scanParameters)
-            
-            
-        if np.any([temp is None for temp in temperature]):
-            temperatureEntry = 'N/A'
-        else:
-            conTemp = np.concatenate(temperature,axis=0)
-            temperatureEntry = formatString.format(np.mean(conTemp),np.min(conTemp),np.max(conTemp))
-
-        if np.any([a3 is None for a3 in A3]):
-            A3Entry = 'N/A'
-        else:
-            conA3 = np.concatenate(A3,axis=0)
-            A3Entry = formatString.format(np.mean(conA3),np.min(conA3),np.max(conA3))
-
-        if np.any([a4 is None for a4 in A4]):
-            A4Entry = 'N/A'
-        else:
-            conA4 = np.concatenate(A4,axis=0)
-            A4Entry = formatString.format(np.mean(conA4),np.min(conA4),np.max(conA4))
-
-        if np.any([magField is None for magField in magneticField]):
-            magneticFieldEntry = 'N/A'
-        else:
-            conMagField = np.concatenate(magneticField,axis=0)
-            magneticFieldEntry = formatString.format(np.mean(conMagField),np.min(conMagField),np.max(conMagField))
-        
-        sampleNameEntry = list(set(sampleName))[0]
-        scanCommandEntry = path.commonprefix(scanCommand)
-        scanParameters = list(set(np.array(scanParameter).flatten()))
-
-        scanParametersEntry = ', '.join(scanParameters)
-
-        entries = [temperatureEntry,magneticFieldEntry,sampleNameEntry,scanCommandEntry,scanParametersEntry,A3Entry,A4Entry]
-
-        for label,entry in zip(self.DataFileLabels,entries):
-            label.setText(label.defaultText+': '+entry)
+def DataSet_binning_comboBox_Changed(self):
+    idx = self.ui.DataSet_binning_comboBox.currentIndex()
+    newValue = int(self.ui.DataSet_binning_comboBox.itemText(idx))
     
-        self.updateRaw1DCutSpinBoxes()
+    dfs = self.DataFileModel.getCurrentDatafiles()
+    if dfs  is None:
+        dfs  = self.DataFileModel.getData() #If all or non are chosen, update all
+    
+    for df in dfs:
+        if newValue == df.binning:
+            continue
 
+        df.loadBinning(newValue)
+    self.updateDataFileLabels()
+
+def updateBinningComboBox(self):
+    dfs = self.DataFileModel.getCurrentDatafiles()
+    self.ui.DataSet_binning_comboBox.reset()
+    if dfs is None:
+        dfs = self.DataFileModel.getData()
+    if len(dfs)==0:
+        return
+    possibleBinnings = set(dfs[0].possibleBinnings)
+    if len(dfs)>1:
+        for df in dfs[1:]:
+            possibleBinnings = possibleBinnings & set(df.possibleBinnings)
+
+    possibleBinnings = list(np.sort(list(possibleBinnings)))
+    self.ui.DataSet_binning_comboBox.addItems([str(b) for b in possibleBinnings])
+    binning = dfs[0].binning
+    idx = possibleBinnings.index(binning)
+    
+    self.ui.DataSet_binning_comboBox.setCurrentIndex(idx)
+
+def DataSet_binning_comboBoxReset(self):
+    values = self.count()
+    for _ in range(values):
+        self.removeItem(0)
 
 DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
@@ -225,12 +204,13 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(self.guiWindow)
         self.guiWindow.convert = lambda: convert(self.guiWindow)
 
-        self.guiWindow.setupDataSet_DataFile_labels = lambda: setupDataSet_DataFile_labels(self.guiWindow)
         self.guiWindow.updateDataFileLabels = lambda: updateDataFileLabels(self.guiWindow)
 
         self.guiWindow.setupDataSet = lambda:setupDataSet(self.guiWindow)
         self.guiWindow.setupDataFile =  lambda:setupDataFile(self.guiWindow)
-
+        self.guiWindow.setupDataSet_binning_comboBox = lambda:setupDataSet_binning_comboBox(self.guiWindow)
+        self.guiWindow.updateBinningComboBox = lambda: updateBinningComboBox(self.guiWindow)
+        self.guiWindow.DataSet_binning_comboBox_Changed = lambda:DataSet_binning_comboBox_Changed(self.guiWindow)
         
         
         for key,value in self.__dict__.items():
@@ -243,4 +223,4 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataSet() # Setup datasets with buttons and call functions
         self.guiWindow.setupDataFile() # Setup datafiles      
         self.guiWindow.setupRaw1DCutSpinBoxes()
-        self.guiWindow.setupDataSet_DataFile_labels()
+        self.guiWindow.setupDataSet_binning_comboBox()

@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MJOLNIRGui</string>
   </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>

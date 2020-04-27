@@ -13,6 +13,7 @@ except ModuleNotFoundError:
     from  .MJOLNIR_Data import GuiDataFile
 
 from os import path
+from collections import namedtuple
 
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
@@ -38,13 +39,11 @@ class DataSetModel(QtCore.QAbstractListModel):
 
     def append(self,ds):
         self.dataSets.append(ds)
-        print("DataSet '{}' was added.".format(ds.name))
         self.selectLastDataSet()
         self.layoutChanged.emit()
 
     def delete(self,index):
         try:
-            print("DataSet '{}' was deleted.".format(self.dataSets[index.row()].name))
             del self.dataSets[index.row()]
             self.layoutChanged.emit()
         except:
@@ -220,6 +219,12 @@ class DataFileModel(QtCore.QAbstractListModel):
             df = [ds[idx] for idx in indexRows]
             return df
 
+    def getData(self):
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        if ds is None:
+            return []
+        dfs = [df for df in ds]
+        return dfs
 
     def rowCount(self, index):
         ds = self.dataSetModel.getCurrentDataSet()
@@ -281,3 +286,91 @@ class DataFileModel(QtCore.QAbstractListModel):
         ds.append(dfs)
         self.layoutChanged.emit()
         guiWindow.updateDataFileLabels()
+
+
+def formatValueArray(array, formatString = '{:.2f} [{:.2f}  -  {:.2f}]'):
+    """Format array to string using mean, min, max"""
+    try:
+        array = np.concatenate(array)
+    except ValueError:
+        return 'N/A'
+    mean = np.mean(array)
+    max_ = np.max(array)
+    min_ = np.min(array)
+
+    return formatString.format(mean,min_,max_)
+
+def formatTextArray(array):
+    """Return string only if all entries are equal"""
+    if len(array)==1:
+        return array[0].strip()
+        
+    if np.all([array[0]==a for a in array]):
+        return array[0].strip()
+    else:
+        return 'Multiple Values'
+
+def formatTextArrayAdder(array):
+    """Return list of all values"""
+    array = np.array(array).flatten()
+    if len(array)==1:
+        return array[0]
+    
+    Set = set(array) # Set only conains one of each
+    return ', '.join([str(s) for s in Set])
+
+def getAttribute(obj,location):
+    if not '/' in location:
+        return getattr(obj,location)
+    
+    splitLocation = location.split('/')
+    newLocation = '/'.join(splitLocation[1:])
+    newObj = getattr(obj,splitLocation[0])
+    return getAttribute(newObj,newLocation)
+
+def formatRaw(array):
+    if len(array) == 1:
+        return str(array[0])
+    return str(array)
+
+class DataFileInfoModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):
+        super(DataFileInfoModel, self).__init__(*args, **kwargs)
+        self.dataSetModel = dataSetModel
+        self.dataFileModel = dataFileModel
+        self.DataSet_DataSets_listView = DataSet_DataSets_listView
+        self.DataSet_filenames_listView = DataSet_filenames_listView
+        self.guiWindow = guiWindow
+
+        Info = namedtuple('Info','location baseText formatter')
+        name = Info('sample/name','Sample: ',formatTextArray)
+        A3 = Info('A3','A3 [deg]: ',formatValueArray)
+        A4 = Info('A4','A4 [deg]: ',formatValueArray)
+        magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
+        temperature = Info('temperature','Temperature [K]: ',formatValueArray)
+        scanCommand = Info('scanCommand','Command: ',formatTextArray)
+        scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
+        comment = Info('comment','Comment: ',formatTextArray)
+        binning = Info('binning','Binning: ',formatRaw)
+
+        self.infos = [name,A3,A4,magneticField,temperature,scanCommand,scanParameters,comment,binning]
+        
+        
+    def data(self, index, role):
+        if role == Qt.DisplayRole or role == Qt.EditRole:
+            dfs = self.dataFileModel.getCurrentDatafiles()
+            I = index.row()
+            info = self.infos[I]
+            if not dfs is None:
+                
+                if len(dfs)==1:
+                    data = [getAttribute(dfs[0],info.location)]
+                else:
+                    data =[getAttribute(df,info.location) for df in dfs]
+                return info.baseText+info.formatter(data)
+            else:
+                return info.baseText
+        
+        
+    def rowCount(self,index):
+        return len(self.infos)
