@@ -96,7 +96,7 @@
      <item>
       <widget class="QCheckBox" name="QELine_ConstantBins_checkBox">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Constant Bins</string>
        </property>
        <property name="checked">
         <bool>true</bool>
