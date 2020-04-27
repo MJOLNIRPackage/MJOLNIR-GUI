@@ -8,7 +8,13 @@ except ModuleNotFoundError:
 
 import numpy as np
 
+import platform
 
+platform.system()
+if platform == 'Windows':
+    markerColor = 'lightblue'
+else:
+    markerColor = 'blue'
 
 ## enterStateFunction
 def AllEnabled(StateMachine):
@@ -21,7 +27,7 @@ def AllEnabled(StateMachine):
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: blue")
+            item.setStyleSheet("background-color: {}".format(markerColor))
         else:
             item.setStyleSheet("background-color: lightgrey")
 
@@ -37,7 +43,7 @@ def ConvertedEnabled(StateMachine):
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: blue")
+            item.setStyleSheet("background-color: {}".format(markerColor))
         else:
             item.setStyleSheet("background-color: lightgrey")
 
@@ -55,7 +61,7 @@ def RawEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_convertData_button','Raw1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: blue")
+            item.setStyleSheet("background-color: {}".format(markerColor))
         else:
             item.setStyleSheet("background-color: lightgrey")
 
@@ -74,7 +80,7 @@ def PartialEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_AddFiles_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: blue")
+            item.setStyleSheet("background-color: {}".format(markerColor))
         else:
             item.setStyleSheet("background-color: lightgrey")
     
@@ -92,7 +98,7 @@ def EmptyEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_NewDataSet_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: blue")
+            item.setStyleSheet("background-color: {}".format(markerColor))
         else:
             item.setStyleSheet("background-color: lightgrey")
     
