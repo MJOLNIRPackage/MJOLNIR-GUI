@@ -189,9 +189,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
 
         self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
-        self.ui.actionGenerate_1d_script.setDisabled(True)
-        self.ui.actionGenerate_1d_script.setToolTip('Generate 1D Script - Not Implemented') 
+        self.ui.actionGenerate_1d_script.setToolTip('Generate Cut1D Script') 
         self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
+        self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
 
         self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-open.png')))

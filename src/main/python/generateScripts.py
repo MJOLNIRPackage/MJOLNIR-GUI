@@ -29,8 +29,6 @@ def startString():
     
     return '\n'.join(importString)
 
-
-
 def generateFileLoader(dataFiles):
     """Generate a string to be run in order to load the provided data file paths"""
     try:
@@ -38,14 +36,12 @@ def generateFileLoader(dataFiles):
     except ValueError:
         pass
     
-    
     dataFiles = np.array(dataFiles)
     
     directories = np.array([path.dirname(df) for df in dataFiles])
     
     uniqueDictionaries, indices = np.unique(directories,return_inverse = True)
-    
-    
+        
     fileStrings = []
     
     for I, uDict in enumerate(uniqueDictionaries):
@@ -127,232 +123,6 @@ def binDataSet(dataSetName='ds',binning=8):
     return '\n'.join(plotString)
 
 
-def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
-
-    plotString = []
-
-    if RLU == False:
-        rluArgument = ',rlu = False'
-    else:
-        rluArgument = ''
-    
-    if log == True:
-        logArgument = ', log=True'
-    else:
-        logArgument = ''
-
-    if grid == True:
-        gridArgument = ', grid=True'
-    else:
-        gridArgument = ', grid=False'
-
-    args = rluArgument+logArgument+gridArgument
-
-    plotString.append('# Plotting data quickly in equi-sized voxels can be done by')
-    plotString.append('Viewer = {}.View3D({}{})'.format(dataSetName,','.join([str(x) for x in [qx,qy,E]]),args))
-
-    plotString.append("# Above, all data is binned in voxels of size " +str(qx) + "/AA, " + str(qy) +"/AA, and " +str(E) +" meV.\n"\
-                        +"# Automatically, data is plotted in reciprocal lattice as provided by the\n"\
-                        +"# UB matrix saved in the data file. Alternatively, one can plot in 'raw'\n"\
-                        +"# coordinates (orthogonal and in units of 1/AA) by issuing rlu=False above.\n")
-    
-    plotString.append('Viewer.caxis=({},{})'.format(CAxisMin,CAxisMax))
-
-    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
-                        +"# This is countered by specifying min and max for colour by the call above.\n"\
-                        +"# Alternatively, one can provide this as input to View3D\n")
-
-    if title !='':
-        plotString.append('# Set title of plot')
-        plotString.append('Viewer.ax.set_title("{}")\n'.format(title))
-
-    if selectView !=2:
-        plotString.append('# Set View direction')
-        plotString.append('Viewer.setProjection({})\n'.format(selectView))
-
-    plotString.append('plt.show()\n')
-        
-    return '\n'.join(plotString)
-
-
-
-
-def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
-               width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
-
-    plotString = []
-
-    if RLU == False:
-        rluArgument = ',rlu = False'
-    else:
-        rluArgument = ''
-    
-    if log == True:
-        logArgument = ', log=True'
-    else:
-        logArgument = ''
-
-    args = rluArgument+logArgument
-
-    plotString.append('# Plotting a cut through data in Q and E is done using this code')
-    
-    
-    plotString.append('# First define the positions to be cut through.')
-    plotString.append('# The GUI is limited to two Q points, but more can be added below')
-    
-    plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
-    plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
-    
-    plotString.append('# Collect them into one array')
-    plotString.append('QPoints = np.array([Q1,Q2])')
-    
-    plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
-    plotString.append('width = ' + width + ' # 1/AA')
-    plotString.append('minPixel = ' + minPixel + ' # 1/AA')
-    
-    plotString.append('# Define energy bins')
-    plotString.append('EnergyBins=np.linspace(' + EMin + ',' + EMax + ',' + NPoints +')')  
-        
-    
-    plotString.append('fig = plt.figure(figsize=(14,6))')
-    plotString.append('ax = fig.gca()')
-    plotString.append("ax,DataLists,Bins,BinCenters,Offsets = \\" )
-    plotString.append('        ' + dataSetName + '.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \\')
-    plotString.append('        ' +'ax=ax, EnergyBins=EnergyBins' +args +')')
-
-    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
-                        +"# This is countered by specifying min and max for colour by the call below.\n"\
-                        +"# Alternatively, one can provide this as input to plotCutQELine\n")
-
-
-    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
-
-
-    if grid == True:
-        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
-
-
-    if title !='':
-        plotString.append('# Set title of plot')
-        plotString.append('ax.set_title("{}")\n'.format(title))
-
-    plotString.append('plt.show()\n')
-        
-    return '\n'.join(plotString)
-
-
-
-def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
-                EMin = 0.0,EMax=10, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
-
-    plotString = []
-
-    if RLU == False:
-        rluArgument = ',rlu = False'
-    else:
-        rluArgument = ''
-    
-    if log == True:
-        logArgument = ', log=True'
-    else:
-        logArgument = ''
-
-    args = rluArgument+logArgument
-
-    plotString.append('# Plotting a Q plane done using this code')
-
-    plotString.append('EMin = ' + EMin)
-    plotString.append('EMax = ' + EMax)
-    plotString.append('xBinTolerance = ' + xBinTolerance)
-    plotString.append('yBinTolerance = ' + yBinTolerance)
-    plotString.append('Data,Bins,ax = '+ dataSetName + '.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance' + args + ')')
-
-    plotString.append('fig = ax.get_figure() # Extract figure from returned axis')
-    plotString.append('fig.colorbar(ax.pmeshs[0]) # Create colorbar from plot\n')
-
-    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
-                        +"# This is countered by specifying min and max for colour by the call below.\n"\
-                        +"# Alternatively, one can provide this as input to plotCutQPlane\n")
-
-    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
-
-
-    if grid == True:
-        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
-
-
-    if title !='':
-        plotString.append('# Set title of plot')
-        plotString.append('ax.set_title("{}")\n'.format(title))
-
-    plotString.append('plt.show()\n')
-        
-    return '\n'.join(plotString)
-
-
-
-def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, 
-                           qx=0.05, qy=0.05, E = 0.08, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
-    saveString = []
-    
-    saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
-
-
-    saveString.append(plotViewer3D(dataSetName=dataSetName, qx=qx, qy=qy, E=E, 
-                                    RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
-                                    title=title, selectView=selectView))
-
-    saveString = '\n'.join(saveString)
-    with open(saveFile,'w') as file:
-        file.write(saveString)    
-    
-def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
-                             HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
-                             width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
-                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
-    saveString = []
-    
-    saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
-
-
-    saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
-               width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
-                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
-
-    saveString = '\n'.join(saveString)    
-        
-    with open(saveFile,'w') as file:
-        file.write(saveString)
-
-def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None, 
-                             xBinTolerance=0.03, yBinTolerance=0.03,
-                             EMin = 0.0,EMax=10, RLU=True, 
-                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
-    saveString = []
-    
-    saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
-    
-    saveString.append(plotQPlaneText(dataSetName=dataSetName, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
-                EMin = EMin,EMax=EMax, RLU=RLU, 
-                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
-
-    saveString = '\n'.join(saveString)    
-        
-    with open(saveFile,'w') as file:
-        file.write(saveString)
 
 @ProgressBarDecoratorArguments(runningText='Generating 3D Script',completedText='Script Saved',failedText='Cancelled')
 def generate3DScript(self):
@@ -403,6 +173,77 @@ def generate3DScript(self):
                                 title=title, selectView=selectView)
 
     return True
+
+
+
+def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, 
+                           qx=0.05, qy=0.05, E = 0.08, RLU=True, 
+                           CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
+    saveString = []
+    
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+
+
+    saveString.append(plotViewer3D(dataSetName=dataSetName, qx=qx, qy=qy, E=E, 
+                                    RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
+                                    title=title, selectView=selectView))
+
+    saveString = '\n'.join(saveString)
+    with open(saveFile,'w') as file:
+        file.write(saveString)    
+
+
+
+def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2):
+
+    plotString = []
+
+    if RLU == False:
+        rluArgument = ',rlu = False'
+    else:
+        rluArgument = ''
+    
+    if log == True:
+        logArgument = ', log=True'
+    else:
+        logArgument = ''
+
+    if grid == True:
+        gridArgument = ', grid=True'
+    else:
+        gridArgument = ', grid=False'
+
+    args = rluArgument+logArgument+gridArgument
+
+    plotString.append('# Plotting data quickly in equi-sized voxels can be done by')
+    plotString.append('Viewer = {}.View3D({}{})'.format(dataSetName,','.join([str(x) for x in [qx,qy,E]]),args))
+
+    plotString.append("# Above, all data is binned in voxels of size " +str(qx) + "/AA, " + str(qy) +"/AA, and " +str(E) +" meV.\n"\
+                        +"# Automatically, data is plotted in reciprocal lattice as provided by the\n"\
+                        +"# UB matrix saved in the data file. Alternatively, one can plot in 'raw'\n"\
+                        +"# coordinates (orthogonal and in units of 1/AA) by issuing rlu=False above.\n")
+    
+    plotString.append('Viewer.caxis=({},{})'.format(CAxisMin,CAxisMax))
+
+    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
+                        +"# This is countered by specifying min and max for colour by the call above.\n"\
+                        +"# Alternatively, one can provide this as input to View3D\n")
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('Viewer.ax.set_title("{}")\n'.format(title))
+
+    if selectView !=2:
+        plotString.append('# Set View direction')
+        plotString.append('Viewer.setProjection({})\n'.format(selectView))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
 
 
 @ProgressBarDecoratorArguments(runningText='Generating QELine Script',completedText='Script Saved',failedText='Cancelled')
@@ -462,6 +303,92 @@ def generateQELineScript(self):
 
     return True    
 
+    
+def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
+                             HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+                             width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+    saveString = []
+    
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+
+    saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
+               width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
+                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
+
+    saveString = '\n'.join(saveString)    
+        
+    with open(saveFile,'w') as file:
+        file.write(saveString)
+        
+
+def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+               width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+
+    plotString = []
+
+    if RLU == False:
+        rluArgument = ',rlu = False'
+    else:
+        rluArgument = ''
+    
+    if log == True:
+        logArgument = ', log=True'
+    else:
+        logArgument = ''
+
+    args = rluArgument+logArgument
+
+    plotString.append('# Plotting a cut through data in Q and E is done using this code')
+    
+    
+    plotString.append('# First define the positions to be cut through.')
+    plotString.append('# The GUI is limited to two Q points, but more can be added below')
+    
+    plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
+    plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
+    
+    plotString.append('# Collect them into one array')
+    plotString.append('QPoints = np.array([Q1,Q2])')
+    
+    plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+    plotString.append('width = ' + width + ' # 1/AA')
+    plotString.append('minPixel = ' + minPixel + ' # 1/AA')
+    
+    plotString.append('# Define energy bins')
+    plotString.append('EnergyBins=np.linspace(' + EMin + ',' + EMax + ',' + NPoints +')')  
+        
+    
+    plotString.append('fig = plt.figure(figsize=(14,6))')
+    plotString.append('ax = fig.gca()')
+    plotString.append("ax,DataLists,Bins,BinCenters,Offsets = \\" )
+    plotString.append('        ' + dataSetName + '.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \\')
+    plotString.append('        ' +'ax=ax, EnergyBins=EnergyBins' +args +')')
+
+    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
+                        +"# This is countered by specifying min and max for colour by the call below.\n"\
+                        +"# Alternatively, one can provide this as input to plotCutQELine\n")
+
+    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
+
+    if grid == True:
+        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
+
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('ax.set_title("{}")\n'.format(title))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
+
+        
+
 @ProgressBarDecoratorArguments(runningText='Generating QPlane Script',completedText='Script Saved',failedText='Cancelled')
 def generateQPlaneScript(self):
     self.stateMachine.run()
@@ -515,10 +442,184 @@ def generateQPlaneScript(self):
     return True    
 
 
+def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None, 
+                             xBinTolerance=0.03, yBinTolerance=0.03,
+                             EMin = 0.0,EMax=10, RLU=True, 
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+    saveString = []
+    
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+    
+    saveString.append(plotQPlaneText(dataSetName=dataSetName, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
+                EMin = EMin,EMax=EMax, RLU=RLU, 
+                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
+
+    saveString = '\n'.join(saveString)    
+        
+    with open(saveFile,'w') as file:
+        file.write(saveString)
+
+
+def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
+                EMin = 0.0,EMax=10, RLU=True, 
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+
+    plotString = []
+
+    if RLU == False:
+        rluArgument = ',rlu = False'
+    else:
+        rluArgument = ''
+    
+    if log == True:
+        logArgument = ', log=True'
+    else:
+        logArgument = ''
+
+    args = rluArgument+logArgument
+
+    plotString.append('# Plotting a Q plane done using this code')
+
+    plotString.append('EMin = ' + EMin)
+    plotString.append('EMax = ' + EMax)
+    plotString.append('xBinTolerance = ' + xBinTolerance)
+    plotString.append('yBinTolerance = ' + yBinTolerance)
+    plotString.append('Data,Bins,ax = '+ dataSetName + '.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance' + args + ')')
+
+    plotString.append('fig = ax.get_figure() # Extract figure from returned axis')
+    plotString.append('fig.colorbar(ax.pmeshs[0]) # Create colorbar from plot\n')
+
+    plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
+                        +"# This is countered by specifying min and max for colour by the call below.\n"\
+                        +"# Alternatively, one can provide this as input to plotCutQPlane\n")
+
+    plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
+
+    if grid == True:
+        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
+
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('ax.set_title("{}")\n'.format(title))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
+
+
+
+@ProgressBarDecoratorArguments(runningText='Generating Cut1D Script',completedText='Script Saved',failedText='Cancelled')
+def generateCut1DScript(self):
+    self.stateMachine.run()
+    if not self.stateMachine.currentState.name in ['Raw','Converted']:
+        dialog = QtWidgets.QMessageBox()
+        dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        dialog.setText('It is not possible to generate a script without any data loaded.')
+        dialog.addButton(QtWidgets.QMessageBox.Ok)
+        dialog.exec() 
+
+        return False
+
+    folder = self.getCurrentDirectory()
+    saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
+    if len(saveFile)==0:
+        return False
+    if path.splitext(saveFile)[1] !='.py':
+        saveFile = path.splitext(saveFile)[0]+'.py'
+
+    ds = self.DataSetModel.getCurrentDataSet()
+    dataSetName = ds.name
+    
+    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+
+    binning = self.ui.DataSet_binning_comboBox.currentText()
+    
+    HStart = self.ui.Cut1D_HStart_lineEdit.text()
+    KStart = self.ui.Cut1D_KStart_lineEdit.text()
+    LStart = self.ui.Cut1D_LStart_lineEdit.text()
+    HEnd = self.ui.Cut1D_HEnd_lineEdit.text()
+    KEnd = self.ui.Cut1D_KEnd_lineEdit.text()
+    LEnd = self.ui.Cut1D_LEnd_lineEdit.text()
+    width = self.ui.Cut1D_Width_lineEdit.text()
+    minPixel = self.ui.Cut1D_MinPixel_lineEdit.text()
+    EMin = self.ui.Cut1D_EMin_lineEdit.text()
+    EMax = self.ui.Cut1D_EMax_lineEdit.text()
+
+
+
+    title = self.ui.Cut1D_SetTitle_lineEdit.text()
+
+    
+    
+    generatePlotCut1DScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
+                                HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
+                                width=width, minPixel=minPixel, EMin = EMin, EMax=EMax,
+                                title=title)
+
+    return True    
+        
+def generatePlotCut1DScript(saveFile,dataSetName,dataFiles,binning = None, 
+                             HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+                             width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, RLU=True, 
+                             title=''):
+    saveString = []
+    
+    saveString.append(startString())
+    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    
+    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+
+    saveString.append(plotCut1DText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
+               width=width, minPixel=minPixel, EMin = EMin,EMax=EMax, 
+               title=title))
+
+    saveString = '\n'.join(saveString)    
+        
+    with open(saveFile,'w') as file:
+        file.write(saveString)   
+        
+def plotCut1DText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+               width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,
+               title=''):
+
+    plotString = []
+
+    plotString.append('# Plotting a 1D cut through data is done using this code')
+    
+    
+    plotString.append('# First define the positions to be cut through.')
+    
+    plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
+    plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
+    
+    plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+    plotString.append('width = ' + width + ' # 1/AA')
+    plotString.append('minPixel = ' + minPixel + ' # 1/AA')
+    
+    plotString.append('# Define energies')
+    plotString.append('EMin='+EMin)
+    plotString.append('EMax='+EMax)
+    
+    plotString.append('ax,*_ = ' +dataSetName +'.plotCut1D(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)')
+
+
+    if title !='':
+        plotString.append('# Set title of plot')
+        plotString.append('ax.set_title("{}")\n'.format(title))
+
+    plotString.append('plt.show()\n')
+        
+    return '\n'.join(plotString)
+
 def initGenerateScript(guiWindow):
     guiWindow.generateQELineScript = lambda: generateQELineScript(guiWindow)
     guiWindow.generate3DScript = lambda: generate3DScript(guiWindow)
     guiWindow.generateQPlaneScript = lambda: generateQPlaneScript(guiWindow)
+    guiWindow.generateCut1DScript = lambda: generateCut1DScript(guiWindow)
 
 def setupGenerateScript(guiWindow):
     pass
