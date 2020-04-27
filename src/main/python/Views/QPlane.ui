@@ -186,7 +186,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="QPlane_QxWidth_lineEdit">
+      <widget class="QLineEdit" name="QPlane_xBinTolerance_lineEdit">
        <property name="text">
         <string>0.03</string>
        </property>
@@ -214,7 +214,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="QPlane_QyWidth_lineEdit">
+      <widget class="QLineEdit" name="QPlane_yBinTolerance_lineEdit">
        <property name="text">
         <string>0.03</string>
        </property>

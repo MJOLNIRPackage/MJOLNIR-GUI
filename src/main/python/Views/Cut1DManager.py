@@ -34,7 +34,16 @@ def Cut1D_plot_button_funcion(self):
     
     ax,*_ = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)
     self.windows.append(ax.get_figure())
+    self.Cut1D=ax
     return True
+
+def Cut1D_SetTitle_button_function(self):
+    TitleText=self.ui.Cut1D_SetTitle_lineEdit.text()        
+    if hasattr(self, 'Cut1D'):
+        TitleText=self.ui.Cut1D_SetTitle_lineEdit.text()        
+        self.Cut1D.set_title(TitleText)
+        fig = self.Cut1D.get_figure()
+        fig.canvas.draw()
 
 
 Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D.ui"))
@@ -47,6 +56,7 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
 
     def initCut1DManager(self):
         self.guiWindow.Cut1D_plot_button_funcion = lambda: Cut1D_plot_button_funcion(self.guiWindow)
+        self.guiWindow.Cut1D_SetTitle_button_function = lambda: Cut1D_SetTitle_button_function(self.guiWindow)
 
         for key,value in self.__dict__.items():
                 if 'Cut1D' in key:
@@ -54,4 +64,6 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         
     def setup(self):
         self.guiWindow.ui.Cut1D_plot_button.clicked.connect(self.guiWindow.Cut1D_plot_button_funcion)
+        self.guiWindow.ui.Cut1D_SetTitle_button.clicked.connect(self.guiWindow.Cut1D_SetTitle_button_function)
+    
     
