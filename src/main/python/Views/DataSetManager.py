@@ -49,7 +49,9 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
 
     self.DataFileInfoModel = DataFileInfoModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,
     DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,dataFileModel=self.DataFileModel,guiWindow=self)
+    self.setupDataFileInfoModel()
     self.ui.DataSet_fileAttributs_listView.setModel(self.DataFileInfoModel)
+    
 
 def setupDataSet_binning_comboBox(self):
     self.ui.DataSet_binning_comboBox.reset = lambda:DataSet_binning_comboBoxReset(self.ui.DataSet_binning_comboBox)
@@ -184,6 +186,13 @@ def DataSet_binning_comboBoxReset(self):
     for _ in range(values):
         self.removeItem(0)
 
+############### Setup of info panel
+
+def setupDataFileInfoModel(self):
+    
+    self.DataFileInfoModel.infos = ['name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
+    
+
 DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
@@ -211,6 +220,7 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
 
         self.guiWindow.setupDataSet = lambda:setupDataSet(self.guiWindow)
         self.guiWindow.setupDataFile =  lambda:setupDataFile(self.guiWindow)
+        self.guiWindow.setupDataFileInfoModel = lambda:setupDataFileInfoModel(self.guiWindow)
         self.guiWindow.setupDataSet_binning_comboBox = lambda:setupDataSet_binning_comboBox(self.guiWindow)
         self.guiWindow.updateBinningComboBox = lambda: updateBinningComboBox(self.guiWindow)
         self.guiWindow.DataSet_binning_comboBox_Changed = lambda:DataSet_binning_comboBox_Changed(self.guiWindow)

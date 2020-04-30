@@ -299,6 +299,16 @@ class DataFileModel(QtCore.QAbstractListModel):
         guiWindow.updateDataFileLabels()
 
 
+def getAttribute(obj,location):
+    if not '/' in location:
+        return getattr(obj,location)
+    
+    splitLocation = location.split('/')
+    newLocation = '/'.join(splitLocation[1:])
+    newObj = getattr(obj,splitLocation[0])
+    return getAttribute(newObj,newLocation)
+
+
 def formatValueArray(array, formatString = '{:.2f} [{:.2f}  -  {:.2f}]'):
     """Format array to string using mean, min, max"""
     try:
@@ -330,19 +340,27 @@ def formatTextArrayAdder(array):
     Set = set(array) # Set only conains one of each
     return ', '.join([str(s) for s in Set])
 
-def getAttribute(obj,location):
-    if not '/' in location:
-        return getattr(obj,location)
-    
-    splitLocation = location.split('/')
-    newLocation = '/'.join(splitLocation[1:])
-    newObj = getattr(obj,splitLocation[0])
-    return getAttribute(newObj,newLocation)
 
 def formatRaw(array):
     if len(array) == 1:
         return str(array[0])
     return str(array)
+
+
+Info = namedtuple('Info','location baseText formatter')
+name = Info('sample/name','Sample: ',formatTextArray)
+A3 = Info('A3','A3 [deg]: ',formatValueArray)
+A4 = Info('A4','A4 [deg]: ',formatValueArray)
+magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
+temperature = Info('temperature','Temperature [K]: ',formatValueArray)
+scanCommand = Info('scanCommand','Command: ',formatTextArray)
+scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
+comment = Info('comment','Comment: ',formatTextArray)
+binning = Info('binning','Binning: ',formatRaw)
+
+settings = {'name':name, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
+            'scanCommand':scanCommand, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning}
+
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):
@@ -352,20 +370,8 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.DataSet_filenames_listView = DataSet_filenames_listView
         self.guiWindow = guiWindow
+        self.infos = []
 
-        Info = namedtuple('Info','location baseText formatter')
-        name = Info('sample/name','Sample: ',formatTextArray)
-        A3 = Info('A3','A3 [deg]: ',formatValueArray)
-        A4 = Info('A4','A4 [deg]: ',formatValueArray)
-        magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
-        temperature = Info('temperature','Temperature [K]: ',formatValueArray)
-        scanCommand = Info('scanCommand','Command: ',formatTextArray)
-        scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
-        comment = Info('comment','Comment: ',formatTextArray)
-        binning = Info('binning','Binning: ',formatRaw)
-
-        self.infos = [name,A3,A4,magneticField,temperature,scanCommand,scanParameters,comment,binning]
-        
         
     def data(self, index, role):
         if role == Qt.DisplayRole or role == Qt.EditRole:
@@ -385,3 +391,17 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
         
     def rowCount(self,index):
         return len(self.infos)
+
+    @property
+    def infos(self):
+        return self._infos
+
+    @infos.setter
+    def infos(self, newSettings,settings=settings):
+        newSettings = np.array(newSettings)
+        inside = np.array([I in settings.keys() for I in newSettings])
+        if not np.all(inside):
+            outside = np.array(1-inside,dtype=bool)
+            raise AttributeError('Wanted setting(s) {} not found. Allowed are {}'.format(newSettings[outside],settings.keys()))
+        self._infos = [settings[I] for I in newSettings]
+
