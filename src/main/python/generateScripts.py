@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets
 from _tools import ProgressBarDecoratorArguments
 
 from MJOLNIR import _tools
+import _tools as _GUItools
 
 # The general idea is to generate .py code that will load, convert and plot 
 # data using the settings of the gui. Each part of the code to be written is 
@@ -138,11 +139,7 @@ def generate3DScript(self):
     # Check if data has been loaded. Abort if not
     self.stateMachine.run()
     if not self.stateMachine.currentState.name in ['Raw','Converted']:
-        dialog = QtWidgets.QMessageBox()
-        dialog.setIcon(QtWidgets.QMessageBox.Critical)
-        dialog.setText('It is not possible to generate a script without any data loaded.')
-        dialog.addButton(QtWidgets.QMessageBox.Ok)
-        dialog.exec() 
+        _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
         return False
 
     # Save the created script
@@ -267,12 +264,7 @@ def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True,
 def generateQELineScript(self):
     self.stateMachine.run()
     if not self.stateMachine.currentState.name in ['Raw','Converted']:
-        dialog = QtWidgets.QMessageBox()
-        dialog.setIcon(QtWidgets.QMessageBox.Critical)
-        dialog.setText('It is not possible to generate a script without any data loaded.')
-        dialog.addButton(QtWidgets.QMessageBox.Ok)
-        dialog.exec() 
-
+        _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
         return False
 
     folder = self.getCurrentDirectory()
@@ -410,12 +402,7 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
 def generateQPlaneScript(self):
     self.stateMachine.run()
     if not self.stateMachine.currentState.name in ['Raw','Converted']:
-        dialog = QtWidgets.QMessageBox()
-        dialog.setIcon(QtWidgets.QMessageBox.Critical)
-        dialog.setText('It is not possible to generate a script without any data loaded.')
-        dialog.addButton(QtWidgets.QMessageBox.Ok)
-        dialog.exec() 
-
+        _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
         return False
 
     folder = self.getCurrentDirectory()
@@ -533,12 +520,7 @@ def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
 def generateCut1DScript(self):
     self.stateMachine.run()
     if not self.stateMachine.currentState.name in ['Raw','Converted']:
-        dialog = QtWidgets.QMessageBox()
-        dialog.setIcon(QtWidgets.QMessageBox.Critical)
-        dialog.setText('It is not possible to generate a script without any data loaded.')
-        dialog.addButton(QtWidgets.QMessageBox.Ok)
-        dialog.exec() 
-
+        _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
         return False
 
     folder = self.getCurrentDirectory()

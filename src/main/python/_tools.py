@@ -1,6 +1,7 @@
 import pickle as pickle
 import os
 import functools
+from PyQt5 import QtWidgets
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
 
@@ -56,3 +57,10 @@ def updateSetting(settingsFile, name,value):# pragma: no cover
 
 def Exists(settingsFile):# pragma: no cover
     return os.path.isfile(settingsFile)
+
+def dialog(text):
+    dialog = QtWidgets.QMessageBox()
+    dialog.setIcon(QtWidgets.QMessageBox.Critical)
+    dialog.setText(text)
+    dialog.addButton(QtWidgets.QMessageBox.Ok)
+    dialog.exec() 
