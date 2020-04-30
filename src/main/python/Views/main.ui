@@ -176,6 +176,7 @@
     <addaction name="actionGenerate_QPlane_script"/>
     <addaction name="actionGenerate_1d_script"/>
     <addaction name="separator"/>
+    <addaction name="actionSettings"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuMask">
@@ -250,6 +251,11 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

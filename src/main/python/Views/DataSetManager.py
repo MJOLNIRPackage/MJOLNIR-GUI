@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from DataModels import DataSetModel,DataFileModel,DataFileInfoModel
+from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from _tools import ProgressBarDecoratorArguments
 
@@ -192,7 +192,7 @@ def DataSet_binning_comboBoxReset(self):
 
 def setupDataFileInfoModel(self):
     
-    self.DataFileInfoModel.infos = ['name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
+    self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
     
 
 

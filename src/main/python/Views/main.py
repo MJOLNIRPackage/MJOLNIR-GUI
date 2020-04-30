@@ -121,6 +121,8 @@ class Ui_MainWindow(object):
         self.actionAbout.setObjectName("actionAbout")
         self.actionHelp = QtWidgets.QAction(MainWindow)
         self.actionHelp.setObjectName("actionHelp")
+        self.actionSettings = QtWidgets.QAction(MainWindow)
+        self.actionSettings.setObjectName("actionSettings")
         self.menuFile.addAction(self.actionSave_GUI_state)
         self.menuFile.addAction(self.actionLoad_GUI_state)
         self.menuFile.addSeparator()
@@ -129,6 +131,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionGenerate_QPlane_script)
         self.menuFile.addAction(self.actionGenerate_1d_script)
         self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionSettings)
         self.menuFile.addAction(self.actionExit)
         self.menuMask.addAction(self.actionOpen_mask_gui)
         self.menuMask.addAction(self.actionLoad_mask)
@@ -159,4 +162,5 @@ class Ui_MainWindow(object):
         self.actionLoad_mask.setText(_translate("MainWindow", "Load Mask"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionHelp.setText(_translate("MainWindow", "Help"))
+        self.actionSettings.setText(_translate("MainWindow", "Settings"))
 

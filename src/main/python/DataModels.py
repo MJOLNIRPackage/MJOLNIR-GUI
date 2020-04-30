@@ -14,6 +14,7 @@ except ModuleNotFoundError:
 
 from os import path
 from collections import namedtuple
+import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
@@ -358,7 +359,7 @@ scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
 comment = Info('comment','Comment: ',formatTextArray)
 binning = Info('binning','Binning: ',formatRaw)
 
-settings = {'name':name, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
+settings = {'sample/name':name, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
             'scanCommand':scanCommand, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning}
 
 
@@ -370,6 +371,7 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.DataSet_filenames_listView = DataSet_filenames_listView
         self.guiWindow = guiWindow
+        self.possibleSettings = settings
         self.infos = []
 
         
@@ -397,11 +399,30 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
         return self._infos
 
     @infos.setter
-    def infos(self, newSettings,settings=settings):
+    def infos(self, newSettings):
         newSettings = np.array(newSettings)
-        inside = np.array([I in settings.keys() for I in newSettings])
+        inside = np.array([I in self.possibleSettings.keys() for I in newSettings])
         if not np.all(inside):
             outside = np.array(1-inside,dtype=bool)
             raise AttributeError('Wanted setting(s) {} not found. Allowed are {}'.format(newSettings[outside],settings.keys()))
         self._infos = [settings[I] for I in newSettings]
+
+
+    def possibleInfos(self):
+        return [key for key in self.possibleSettings]
+
+    def changeInfos(self):
+        dialog = _tools.CheckBoxDialog(self.possibleSettings,self.infos)
+        
+        if dialog.exec_(): # Execute the dialog
+            self.infos = dialog.newSettings
+            self.layoutChanged.emit()
+        else:
+            return
+
+    def currentInfos(self):
+        return [setting.location for setting in self.infos]
+        
+
+
 
