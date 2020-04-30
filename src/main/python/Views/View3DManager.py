@@ -102,9 +102,12 @@ def View3D_plot_button_function(self):
     self.V.setPlane(1)
     self.V.setPlane(0)
     return True
-
+try:
+    View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+except:
+    View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
 # All of this connects the buttons and their functions to the main window.
-View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+
 class View3DManager(View3DManagerBase, View3DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(View3DManager, self).__init__(parent)

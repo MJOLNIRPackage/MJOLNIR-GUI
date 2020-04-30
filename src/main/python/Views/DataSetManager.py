@@ -193,7 +193,11 @@ def setupDataFileInfoModel(self):
     self.DataFileInfoModel.infos = ['name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
     
 
-DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+
+try:
+    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+except:
+    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(DataSetManager, self).__init__(parent)

@@ -139,8 +139,11 @@ def Raw1D_plot_button_function(self):
     return True
 
 
+try:
+    Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
+except:
+    Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Raw1D.ui"))
 
-Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
 class Raw1DManager(Raw1DManagerBase, Raw1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(Raw1DManager, self).__init__(parent)
