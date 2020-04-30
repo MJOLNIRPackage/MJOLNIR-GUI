@@ -101,6 +101,8 @@ def DataSet_AddFiles_button_function(self):
     self.DataFileModel.add(files,guiWindow=self)
 
     # Find the folder of the data files, using last data file
+    if len(files)==0:
+        return False
     folder = path.dirname(files[-1])
     self.setCurrentDirectory(folder)
 
