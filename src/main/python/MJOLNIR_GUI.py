@@ -205,6 +205,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSettings.setToolTip('Change View Settings') 
         self.ui.actionSettings.setStatusTip(self.ui.actionSettings.toolTip())
         self.ui.actionSettings.triggered.connect(self.DataFileInfoModel.changeInfos)
+
+        
+        self.ui.actionClose_Windows.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/CloseWindows.png')))
+        self.ui.actionClose_Windows.setDisabled(False)
+        self.ui.actionClose_Windows.setToolTip('Close All Plotting Windows') 
+        self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
+        self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
         
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
@@ -265,14 +272,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
 
+        self.closeWindows()
 
-
+    @ProgressBarDecoratorArguments(runningText='Closing Windowa',completedText='Windows Closed')
+    def closeWindows(self):
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
                     pass
+        return True
 
     def about(self):
         dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
