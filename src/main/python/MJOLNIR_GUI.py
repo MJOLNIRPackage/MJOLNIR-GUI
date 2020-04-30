@@ -227,6 +227,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             event.accept()
         elif res == QtWidgets.QMessageBox.No:
             event.accept()
+            return 1
         else:
             event.ignore()
             return 0
@@ -239,12 +240,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         if res == QtWidgets.QMessageBox.Yes:
             event.accept()
+            return 1
         else:
             event.ignore()
             return 0
 
     def closeEvent(self, event):
-        
+
         if self.loadedGuiSettings is None:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
@@ -254,9 +256,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 return
 
         else:
-             if not self.saveSettingsDialog(event): # The dialog is cancelled
+            if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
-        
+
 
 
         if hasattr(self,'windows'):
