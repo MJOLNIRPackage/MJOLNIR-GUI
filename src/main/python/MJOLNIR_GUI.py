@@ -199,6 +199,19 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionLoad_mask.setDisabled(True)
         self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
         self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
+
+        self.ui.actionSettings.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
+        self.ui.actionSettings.setDisabled(False)
+        self.ui.actionSettings.setToolTip('Change View Settings') 
+        self.ui.actionSettings.setStatusTip(self.ui.actionSettings.toolTip())
+        self.ui.actionSettings.triggered.connect(self.DataFileInfoModel.changeInfos)
+
+        
+        self.ui.actionClose_Windows.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/CloseWindows.png')))
+        self.ui.actionClose_Windows.setDisabled(False)
+        self.ui.actionClose_Windows.setToolTip('Close All Plotting Windows') 
+        self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
+        self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
         
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
@@ -259,14 +272,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
 
+        self.closeWindows()
 
-
+    @ProgressBarDecoratorArguments(runningText='Closing Windowa',completedText='Windows Closed')
+    def closeWindows(self):
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
                     pass
+        return True
 
     def about(self):
         dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
@@ -287,11 +303,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
-        saveString,lineEditString,fileDir = self.generateCurrentGuiSettings(True)
+        saveString,lineEditString,fileDir,infos = self.generateCurrentGuiSettings(True)
         
         updateSetting(self.settingsFile,'dataSet',saveString)
         updateSetting(self.settingsFile,'lineEdits',lineEditString)
         updateSetting(self.settingsFile,'fileDir',fileDir)
+        updateSetting(self.settingsFile,'infos',infos)
         return True
 
 
@@ -312,7 +329,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         lineEditString = self.generateCurrentLineEditSettings()
         fileDir = self.getCurrentDirectory()
 
-        return saveString, lineEditString, fileDir
+        infos = self.DataFileInfoModel.currentInfos()
+
+        return saveString, lineEditString, fileDir, infos
 
     def generateCurrentLineEditSettings(self):
         lineEditValueString = {}
@@ -362,8 +381,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             counter+=1
             self.setProgressBarValue(counter)
             
+        DataFileListInfos = loadSetting(self.settingsFile,'infos')
+        if not DataFileListInfos is None:
+            self.DataFileInfoModel.infos = DataFileListInfos
+
         self.loadLineEdits()
         self.DataSetModel.layoutChanged.emit()
+        self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
 

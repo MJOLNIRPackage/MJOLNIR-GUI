@@ -97,8 +97,10 @@ def QELine_SetTitle_button_function(self):
         fig = self.QELine.get_figure()
         fig.canvas.draw()
 
-
-QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
+try:
+    QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
+except:
+    QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QELine.ui"))
 class QELineManager(QELineManagerBase, QELineManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(QELineManager, self).__init__(parent)

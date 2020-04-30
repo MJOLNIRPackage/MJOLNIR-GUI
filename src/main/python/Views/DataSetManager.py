@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from DataModels import DataSetModel,DataFileModel,DataFileInfoModel
+from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
 from MJOLNIR_Data import GuiDataFile,GuiDataSet
 from _tools import ProgressBarDecoratorArguments
 
@@ -101,6 +101,8 @@ def DataSet_AddFiles_button_function(self):
     self.DataFileModel.add(files,guiWindow=self)
 
     # Find the folder of the data files, using last data file
+    if len(files)==0:
+        return False
     folder = path.dirname(files[-1])
     self.setCurrentDirectory(folder)
 
@@ -190,10 +192,14 @@ def DataSet_binning_comboBoxReset(self):
 
 def setupDataFileInfoModel(self):
     
-    self.DataFileInfoModel.infos = ['name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
+    self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
     
 
-DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+
+try:
+    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+except:
+    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(DataSetManager, self).__init__(parent)

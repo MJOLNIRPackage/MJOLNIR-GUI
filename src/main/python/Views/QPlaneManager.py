@@ -67,8 +67,11 @@ def QPlane_SetTitle_button_function(self):
         fig = self.QPlane.get_figure()
         fig.canvas.draw()
     
+try:
+    QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
+except:
+    QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QPlane.ui"))
 
-QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
 class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(QPlaneManager, self).__init__(parent)
