@@ -11,7 +11,8 @@ import numpy as np
 import platform
 
 platform.system()
-if platform == 'Windows':
+
+if platform.system() == 'Windows':
     markerColor = 'lightblue'
 else:
     markerColor = 'blue'
