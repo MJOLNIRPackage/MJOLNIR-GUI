@@ -6,7 +6,7 @@ except:
     pass
 
 
-from MJOLNIR import _tools # Usefull tools useful across MJOLNIR
+from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
