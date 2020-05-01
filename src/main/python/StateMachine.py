@@ -48,7 +48,7 @@ class StateMachine(object):
         self.guiWindow.update()
     
     def forceRun(self,checkFunction=lambda self:True):
-        """Force machine to run unto checkFunction returns True or next state is None"""
+        """Force machine to run until checkFunction returns True or next state is None"""
 
         while not (self.currentState.nextState is None) and (not checkFunction(self)):
             if self.checkTransitionToNextState() == False:
@@ -139,9 +139,6 @@ if __name__ == '__main__':
     df = []
     cf = []
 
-    
-    
-
     def EmptyStateInit(self):
         self.buttons = AllFalseBut(['AddDataset','AddDataFile'],self.buttons,self.buttonNames)
 
@@ -153,7 +150,6 @@ if __name__ == '__main__':
 
     def ConvertedStateInit(self):
         self.buttons = AllTrue(self.buttons)
-
 
 
     def ConvertedRequirement(ds,df,cf):

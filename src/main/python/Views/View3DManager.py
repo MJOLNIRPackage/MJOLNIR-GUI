@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from _tools import ProgressBarDecoratorArguments
-
+import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
@@ -86,22 +86,27 @@ def View3D_plot_button_function(self):
     else:
         log=False        
     
-    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
-    self.windows.append(self.V.ax.get_figure())
+    try:
+        self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
+        self.windows.append(self.V.ax.get_figure())
+        
+        # Select the correct view
+        if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
+            self.View3D_SelectView_QyE_radioButton_function()
+        if self.ui.View3D_SelectView_QyE_radioButton.isChecked():
+            self.View3D_SelectView_QxE_radioButton_function()
+        if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
+            self.View3D_SelectView_QxQy_radioButton_function()
+                    
+        self.View3D_setCAxis_button_function()        
+        self.View3D_SetTitle_button_function()
+        self.V.setPlane(1)
+        self.V.setPlane(0)
+        return True
+    except:
+        _GUItools.dialog(text='View3D plot could not be made. Check the input parameters and try again!')
+        return False        
     
-    # Select the correct view
-    if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
-        self.View3D_SelectView_QyE_radioButton_function()
-    if self.ui.View3D_SelectView_QyE_radioButton.isChecked():
-        self.View3D_SelectView_QxE_radioButton_function()
-    if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
-        self.View3D_SelectView_QxQy_radioButton_function()
-                
-    self.View3D_setCAxis_button_function()        
-    self.View3D_SetTitle_button_function()
-    self.V.setPlane(1)
-    self.V.setPlane(0)
-    return True
 try:
     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
 except:

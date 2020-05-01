@@ -1,5 +1,5 @@
-LALALALA Masser info omkring hjælp kan findes her:
+﻿Try to click some buttons and see what they do. 
 
-mjolnir.readthedocs.io
+For help on MJOLNIR go to
 
-glhf
+https://mjolnir.readthedocs.io/ 

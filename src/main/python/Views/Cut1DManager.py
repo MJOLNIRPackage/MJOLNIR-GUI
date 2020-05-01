@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from _tools import ProgressBarDecoratorArguments
-
+import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets, uic
 import numpy as np
@@ -32,10 +32,14 @@ def Cut1D_plot_button_funcion(self):
     q2 = np.array([HEnd,KEnd,LEnd],dtype=float)
 
     
-    ax,*_ = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)
-    self.windows.append(ax.get_figure())
-    self.Cut1D=ax
-    return True
+    try:
+        ax,*_ = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)
+        self.windows.append(ax.get_figure())
+        self.Cut1D=ax
+        return True
+    except:
+        _GUItools.dialog(text='1D Cut could not be made. Check the limits for the cut and try again!')
+        return False
 
 def Cut1D_SetTitle_button_function(self):
     TitleText=self.ui.Cut1D_SetTitle_lineEdit.text()        
