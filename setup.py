@@ -2,6 +2,7 @@ from setuptools import setup
 import os
 import sys
 import json
+from shutil import copy
 
 _here = os.path.abspath(os.path.dirname(__file__))
 
@@ -30,9 +31,9 @@ setup(
     url='https://github.com/jakob-lass/MJOLNIR-Gui',
     license='MPL-2.0',
     packages=['MJOLNIRGui','MJOLNIRGui/Views'],
-    package_dir={'MJOLNIRGui': 'src/main/python/','MJOLNIRGui/Views': 'src/main/python/Views/'},
+    package_dir={'MJOLNIRGui': 'src/main/python','MJOLNIRGui/Views': 'src/main/python/Views'},
     package_data={'MJOLNIRGui': ['main.py','../resources/base/*.png','../resources/base/*.txt','*.py',
-    '../icons/*.ico','../icons/base/*','../resources/base/Icons/icons/*','../resources/base/Icons/Own/*','../resources/base/Views/*']},
+    '../icons/*.ico','../icons/base/*','../resources/base/Icons/icons/*','../resources/base/Icons/Own/*','../resources/base/Views/*','../../build/settings/base.json']},
     entry_points = {
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.MJOLNIR_GUI:main']
         },
