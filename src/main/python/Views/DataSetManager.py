@@ -110,7 +110,7 @@ def DataSet_AddFiles_button_function(self):
     self.stateMachine.run()
     return True
 
-@ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Convertion Done')
+@ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Conversion Done')
 def DataSet_convertData_button_function(self):    
     #  Should add a check if a data set is selected
     

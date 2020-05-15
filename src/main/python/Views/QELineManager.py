@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 from _tools import ProgressBarDecoratorArguments
-
+import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets, uic
 import numpy as np
@@ -58,28 +58,34 @@ def QELine_plot_button_function(self):
     else:
         constantBins=False              
 
-    # Make plot
-    ax,DataLists,Bins,BinCenters,Offsets = \
-    ds.plotCutQELine(QPoints=QPoints, width=width, \
-                                    minPixel=minPixel, EnergyBins=EnergyBins,\
-                                        rlu=rlu,log=log,constantBins=constantBins)
 
-    # Make some final changes to the plot
-    self.QELine=ax    
-    fig = self.QELine.get_figure()
-    fig.set_size_inches(8,6)
-
-    if self.ui.QELine_Grid_checkBox.isChecked():
-        ax.grid(True)
-    else:
-        ax.grid(False)
+    try:
+        # Make plot
+        ax,DataLists,Bins,BinCenters,Offsets = \
+        ds.plotCutQELine(QPoints=QPoints, width=width, \
+                                        minPixel=minPixel, EnergyBins=EnergyBins,\
+                                            rlu=rlu,log=log,constantBins=constantBins)
     
-    self.QELine_setCAxis_button_function()
+        # Make some final changes to the plot
+        self.QELine=ax    
+        fig = self.QELine.get_figure()
+        fig.set_size_inches(8,6)
+    
+        if self.ui.QELine_Grid_checkBox.isChecked():
+            ax.grid(True)
+        else:
+            ax.grid(False)
+        
+        self.QELine_setCAxis_button_function()
+    
+        self.windows.append(self.QELine.get_figure())
+        self.QELine_SetTitle_button_function()
+    
+        return True
+    except:
+        _GUItools.dialog(text='QELine cut could not be made. Check the limits for the cut and try again!')
+        return False
 
-    self.windows.append(self.QELine.get_figure())
-    self.QELine_SetTitle_button_function()
-
-    return True
 
 
 def QELine_setCAxis_button_function(self):       
