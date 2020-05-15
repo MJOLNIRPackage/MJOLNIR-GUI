@@ -358,10 +358,10 @@ scanCommand = Info('scanCommand','Command: ',formatTextArray)
 scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
 comment = Info('comment','Comment: ',formatTextArray)
 binning = Info('binning','Binning: ',formatRaw)
+Ei = Info('Ei','Ei [meV]: ',formatValueArray)
 
-settings = {'sample/name':name, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
+settings = {'sample/name':name,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
             'scanCommand':scanCommand, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning}
-
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):
