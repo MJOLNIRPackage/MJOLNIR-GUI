@@ -147,57 +147,57 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     
 
     def setupMenu(self): # Set up all QActions and menus
-        self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/cross-button.png')))
+        self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
         self.ui.actionExit.setToolTip('Exit the application') 
         self.ui.actionExit.setStatusTip(self.ui.actionExit.toolTip())
         self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/information-button.png')))
+        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/information-button.png')))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.setStatusTip(self.ui.actionAbout.toolTip())
         self.ui.actionAbout.triggered.connect(self.about)
 
-        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question-button.png')))
+        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
         self.ui.actionHelp.setToolTip('Show Help') 
         self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
         self.ui.actionHelp.triggered.connect(self.help)
 
-        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
+        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
-        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder--arrow.png')))
+        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
-        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
+        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
         self.ui.actionGenerate_View3d_script.setStatusTip(self.ui.actionGenerate_View3d_script.toolTip())
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
-        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
+        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QE.png')))
         self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
         self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
         self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQELineScript)
         
-        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
+        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QP.png')))
         self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
         self.ui.actionGenerate_QPlane_script.setStatusTip(self.ui.actionGenerate_QPlane_script.toolTip())
         self.ui.actionGenerate_QPlane_script.triggered.connect(self.generateQPlaneScript)
         
-        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
+        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-1D.png')))
         self.ui.actionGenerate_1d_script.setToolTip('Generate Cut1D Script') 
         self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
-        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-open.png')))
+        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
         self.ui.actionOpen_mask_gui.setDisabled(True)
         self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui - Not Implemented') 
         self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
         
-        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-load.png')))
+        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-load.png')))
         self.ui.actionLoad_mask.setDisabled(True)
         self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
         self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())

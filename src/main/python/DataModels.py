@@ -156,7 +156,7 @@ class DataFileModel(QtCore.QAbstractListModel):
         self.guiWindow = guiWindow
 
         self.IconDict = defDict()
-        self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/icons/document.png'))
+        self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/document.png'))
         self.IconDict['hdf']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/HDF_logo_16.png'))
         self.IconDict['nxs']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/NXS_logo_16.png'))
         
