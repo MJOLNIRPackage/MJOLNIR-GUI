@@ -37,6 +37,7 @@ try:
     from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 except ModuleNotFoundError:
     sys.path.append('.')
+    
     #from .MJOLNIR_GUI_ui import Ui_MainWindow  
     from .Views.main import Ui_MainWindow
     from .Views.DataSetManager import DataSetManager
@@ -46,6 +47,7 @@ except ModuleNotFoundError:
     from .Views.Cut1DManager import Cut1DManager
     from .Views.Raw1DManager import Raw1DManager
     from .Views.Raw1DManager import Raw1DManager
+    from .Views.collapsibleBox import CollapsibleBox
     from .MJOLNIR_Data import GuiDataFile,GuiDataSet
     from .DataModels import DataSetModel,DataFileModel
     from .StateMachine import StateMachine
@@ -425,3 +427,46 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
+def main():
+    from PyQt5.QtWidgets import QApplication
+    app = QApplication(sys.argv) # Passing command line arguments to app
+
+    class AppContextEmulator(object):
+        def __init__(self,projectDirectory):
+            self.projectDirectory = projectDirectory
+            local_os = sys.platform
+
+            if local_os.lower() == 'linux':
+                local_os = 'linux'
+            elif local_os.lower() == 'win32' or local_os.lower() == 'cygwin':
+                local_os = 'windows'
+            elif local_os.lower() == 'darwin':
+                local_os = 'max'
+            else:
+                local_os = 'linux'
+
+            self.os = local_os
+            self.resourses = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','resources'))
+
+
+        def get_resource(self,path):
+            tryPath = os.path.join(self.resourses,'base',path)
+            
+            if os.path.exists(tryPath):
+                return tryPath
+            else:
+                return os.path.join(self.resourses,self.os,path)
+            
+            
+
+    appEmu = AppContextEmulator(__file__)
+
+    window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
+    window.show()
+
+    app.exec_() 
+
+if __name__ == '__main__':
+    main()
+
+    

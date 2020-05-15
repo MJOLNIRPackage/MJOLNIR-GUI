@@ -6,15 +6,16 @@ import numpy as np
 import sys
 
 try:
-    import MJOLNIR_GUI
-    from MJOLNIR_Data import GuiDataFile
+    from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
 except ModuleNotFoundError:
-    from . import MJOLNIR_GUI
-    from  .MJOLNIR_Data import GuiDataFile
+    from  MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
-import _tools
+try:
+    import MJOLNIRGui._tools
+except ModuleNotFoundError:
+    import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):

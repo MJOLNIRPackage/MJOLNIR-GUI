@@ -1,7 +1,10 @@
 import sys
 sys.path.append('..')
 
-from _tools import ProgressBarDecoratorArguments
+try:
+    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+except ModuleNotFoundError:
+    from _tools import ProgressBarDecoratorArguments
 
 from os import path
 from PyQt5 import QtWidgets, uic
