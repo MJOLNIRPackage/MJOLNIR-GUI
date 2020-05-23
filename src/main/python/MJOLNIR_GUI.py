@@ -324,12 +324,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
-        saveString,lineEditString,fileDir,infos = self.generateCurrentGuiSettings(True)
+        settingsDict = self.generateCurrentGuiSettings(updateProgressBar=True)
         
-        updateSetting(self.settingsFile,'dataSet',saveString)
-        updateSetting(self.settingsFile,'lineEdits',lineEditString)
-        updateSetting(self.settingsFile,'fileDir',fileDir)
-        updateSetting(self.settingsFile,'infos',infos)
+        for key,value in settingsDict.items():
+            updateSetting(self.settingsFile,key,value)
+
         return True
 
 
@@ -352,7 +351,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         infos = self.DataFileInfoModel.currentInfos()
 
-        return saveString, lineEditString, fileDir, infos
+        guiSettings = self.guiSettings()
+        
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
+                      'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+        return returnDict
 
     def generateCurrentLineEditSettings(self):
         lineEditValueString = {}
@@ -406,6 +409,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
+        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        if guiSettings:
+            if not self.theme == guiSettings['theme']:
+                self.changeTheme(guiSettings['theme'])
+
         self.loadLineEdits()
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
@@ -416,6 +424,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadedGuiSettings = self.generateCurrentGuiSettings()
         return True
 
+    def guiSettings(self):
+        settingsDict = {'theme':self.theme}
+        return settingsDict
 
     def loadLineEdits(self):
         lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
