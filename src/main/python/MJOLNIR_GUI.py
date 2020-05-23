@@ -99,8 +99,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             self.theme = loadSetting(self.settingsFile,'theme')
 
-        self.changeTheme(self.theme)
+        
         self.ui.setupUi(self)
+        self.changeTheme(self.theme)
         self.update()
 
         icon = QtGui.QIcon()
@@ -233,6 +234,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
         
+        self.ui.actionChange_Theme.setDisabled(False)
+        self.ui.actionChange_Theme.setToolTip('Dark Theme') 
+        self.ui.actionChange_Theme.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/dark-theme.png')))
+        self.ui.actionChange_Theme.setStatusTip(self.ui.actionChange_Theme.toolTip())
+        self.ui.actionChange_Theme.triggered.connect(lambda: self.changeTheme('dark'))
+
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
 
@@ -461,6 +468,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not name in themes.keys():
             raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
         themes[name](QtWidgets.QApplication.instance())
+        if name == 'dark':
+            newName = 'light'
+        else:
+            newName = 'dark'
+        self.ui.actionChange_Theme.triggered.connect(lambda: self.changeTheme(newName))
+        self.ui.actionChange_Theme.setToolTip('{} Theme'.format(newName.title())) 
+        self.ui.actionChange_Theme.setStatusTip(self.ui.actionChange_Theme.toolTip())
+        self.ui.actionChange_Theme.setText('{} Theme'.format(newName.title()))
+        self.ui.actionChange_Theme.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/{}-theme.png'.format(newName))))
+
 
 
 def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
