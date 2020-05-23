@@ -10,6 +10,8 @@ from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import datetime
+from time import sleep
 
 from os import path
 import os
@@ -85,6 +87,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
     
         self.ui.setupUi(self)
+        self.update()
 
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(self.AppContext.get_resource('Icons/Own/MJOLNIR.png')))
@@ -94,7 +97,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views = []
         ## Set up DataSetManager
         self.ui.dataSetManager = DataSetManager(self.ui.fixedOpen,self)
-        
+        self.update()
         self.views.append(self.ui.dataSetManager)
 
         # Lists of views in shown order
@@ -106,6 +109,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
         # Insert all views
         for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
+            self.update()
             box = CollapsibleBox(name,startState=state)
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
@@ -128,23 +132,23 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
         
-
+        self.update()
         initGenerateScript(self)
 
         for view in self.views: # Run through all views to set them up
             view.setup()
 
         setupGenerateScript(self)
-
+        self.update()
         self.setupMenu()
+        self.update()
         self.setupStateMachine()
+        self.update()
         self.stateMachine.run()
-
+        self.update()
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
-
- 
-    
+        
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
@@ -300,6 +304,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+        
 
     @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
@@ -427,6 +432,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
+
+def updateSplash(splash,originalTime,updateInterval,padding=30):
+    currentTime = datetime.datetime.now()
+    points = int(1000.0*(currentTime-originalTime).total_seconds()/updateInterval)+1
+
+    alignment = QtCore.Qt.AlignBottom #| Qt.AlignHCenter
+    splash.showMessage(padding*' '+'Loading MJOLNIRGui'+'.'*points,color=QtGui.QColor(255,255,255),alignment=alignment)
+    #QTimer.singleShot(1000, updateSplash(splash,points+1) )
+    QtWidgets.QApplication.processEvents()
+
 def main():
     from PyQt5.QtWidgets import QApplication
     app = QApplication(sys.argv) # Passing command line arguments to app
@@ -461,8 +476,26 @@ def main():
 
     appEmu = AppContextEmulator(__file__)
 
+    splash = QtWidgets.QSplashScreen(QtGui.QPixmap(appEmu.get_resource('splash.png')))                                    
+    splash.show()
+
+    timer = QtCore.QTimer() 
+
+    # adding action to timer 
+    updateInterval = 400 # ms
+    originalTime = datetime.datetime.now()
+    updater = lambda:updateSplash(splash,originalTime=originalTime,updateInterval=updateInterval,padding=30)
+    updater()
+    timer.timeout.connect(updater) 
+
+    # update the timer every updateInterval 
+    timer.start(updateInterval)
+    
+
     window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
+    splash.finish(window)
     window.show()
+    timer.stop()
 
     app.exec_() 
 

@@ -1,15 +1,15 @@
 #from fbs_runtime.application_context.PyQt5 import ApplicationContext
 import sys
 try:
-    from MJOLNIR_GUI import MJOLNIRMainWindow
+    from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
 except ModuleNotFoundError:
     sys.path.append('.')
-    from .MJOLNIR_GUI import MJOLNIRMainWindow
+    from .MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     import os
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     
-
-
+from PyQt5 import QtWidgets, QtGui, QtCore
+import datetime
 
 #class AppContext(ApplicationContext):#
 #
@@ -27,13 +27,48 @@ from fbs_runtime.application_context.PyQt5 import ApplicationContext, \
 
 
 class AppContext(ApplicationContext):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.splash = QtWidgets.QSplashScreen(QtGui.QPixmap(self.get_resource('splash.png')))                                    
+        
+        def closeSplash(self,oldClose,timer):
+            print('closing')
+            timer.stop()
+            oldClose(self)
+
+        
+        self.splash.show()
+        
+        self.timer = QtCore.QTimer() 
+        
+        updateInterval = 400 # ms
+        originalTime = datetime.datetime.now()
+        updater = lambda:updateSplash(self.splash,originalTime=originalTime,updateInterval=updateInterval,padding=30)
+        updater()
+        
+        
+        self.timer.timeout.connect(updater) 
+        self.timer.setInterval(updateInterval)
+        self.timer.start()
+        QtWidgets.QApplication.processEvents()
+        # update the timer every updateInterval 
+        #thread.timeout.connect(updater)
+        
+
     def run(self):
+        
+        QtWidgets.QApplication.processEvents()
+        self.splash.finish(self.main_window)
         self.main_window.show()
+        
         return self.app.exec_()
 
     @cached_property
     def main_window(self):
-        return MJOLNIRMainWindow(self)  # Pass context to the window.
+        QtWidgets.QApplication.processEvents()
+        res = MJOLNIRMainWindow(self)
+        self.timer.stop()
+        return res # Pass context to the window.
 
 #if __name__ == '__main__':
 #    ctx = ApplicationContext()
