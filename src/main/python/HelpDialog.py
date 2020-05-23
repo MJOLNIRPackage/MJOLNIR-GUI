@@ -22,3 +22,4 @@ class HelpDialog(QtWidgets.QDialog):
         self.layout.addWidget(self.help_label)
         self.setLayout(self.layout)
         self.setMinimumSize(self.sizeHint())
+        self.resize(self.sizeHint())
