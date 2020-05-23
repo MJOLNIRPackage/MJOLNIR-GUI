@@ -7,6 +7,7 @@ except:
 
 
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
+import _tools as _guitools
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -80,7 +81,7 @@ home = str(Path.home())
 ###### generate allowed themes from qtmodern
 
 from qtmodern import styles
-styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QPalette'] ]
+styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QStyleFactory','QPalette'] ]
 themes = {}
 for name in styleNames:
     themes[name] = getattr(styles,name)
@@ -94,10 +95,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
-        if not loadSetting(self.settingsFile,'theme'):
+        self.views = []
+        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        
+        if not 'theme' in guiSettings:
             self.theme = 'light'
         else:
-            self.theme = loadSetting(self.settingsFile,'theme')
+            self.theme = guiSettings['theme']
 
         
         self.ui.setupUi(self)
@@ -225,7 +229,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSettings.setDisabled(False)
         self.ui.actionSettings.setToolTip('Change View Settings') 
         self.ui.actionSettings.setStatusTip(self.ui.actionSettings.toolTip())
-        self.ui.actionSettings.triggered.connect(self.DataFileInfoModel.changeInfos)
+        self.ui.actionSettings.triggered.connect(self.settingsDialog)
 
         
         self.ui.actionClose_Windows.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/CloseWindows.png')))
@@ -233,12 +237,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setToolTip('Close All Plotting Windows') 
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
-        
-        self.ui.actionChange_Theme.setDisabled(False)
-        self.ui.actionChange_Theme.setToolTip('Dark Theme') 
-        self.ui.actionChange_Theme.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/dark-theme.png')))
-        self.ui.actionChange_Theme.setStatusTip(self.ui.actionChange_Theme.toolTip())
-        self.ui.actionChange_Theme.triggered.connect(lambda: self.changeTheme('dark'))
+
 
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
@@ -467,18 +466,113 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def changeTheme(self,name):
         if not name in themes.keys():
             raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
-        themes[name](QtWidgets.QApplication.instance())
-        if name == 'dark':
-            newName = 'light'
+        app = QtWidgets.QApplication.instance()
+        self.theme = name
+        themes[name](app)
+
+
+    def settingsDialog(self):
+        # Get infos from DataFileInfoModel
+        
+        dataFileInfoModelPossibleSettings,dataFileInfoModelInitial = self.DataFileInfoModel.settingsDialog()
+        # Create a widget holding check boxes for all possible settings
+
+        dFIMLayout = QtWidgets.QVBoxLayout()
+        dFIMTitleLabel = QtWidgets.QLabel(text='Select infos to be shown for selected file(s)')
+        dFIMTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
+        # Add title to layout
+        dFIMLayout.addWidget(dFIMTitleLabel)
+
+        # make check boxes for all settings
+        dFIMcheckBoxes = []
+        for setting in dataFileInfoModelPossibleSettings.values():
+            checkBox = QtWidgets.QCheckBox()
+            dFIMcheckBoxes.append(checkBox)
+            name = setting.location
+            checkBox.setText(name)
+            checkBox.setChecked(setting in dataFileInfoModelInitial)
+            dFIMLayout.addWidget(checkBox)
+
+        # accept function arguments: self (dialog), layout which was passed in
+        def dFIMAcceptFunction(self,layout,possibleSettings=dataFileInfoModelPossibleSettings):
+            self.dMFIASettings = []
+            for idx,setting in enumerate(possibleSettings.values()): # Loop through all the possible settings
+                box = layout.itemAt(idx+1).widget() # Skip 0 as it is a QLabel
+                if box.isChecked():# If checked add the corresponding setting to list of loaded settings
+                    self.dMFIASettings.append(setting.location)
+
+
+        # Create layout for gui settings
+        guiSettingsLayout = QtWidgets.QVBoxLayout()
+        guiSettingsTitleLabel = QtWidgets.QLabel(text='Settings for the Gui')
+        guiSettingsTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
+        guiSettingsLayout.addWidget(guiSettingsTitleLabel)
+
+
+        # Create radiobuttons
+        for theme in themes.keys():
+            radiobutton = QtWidgets.QRadioButton(theme)
+            radiobutton.setChecked(theme == self.theme)
+            radiobutton.theme = theme
+            guiSettingsLayout.addWidget(radiobutton)
+        
+        def guiSettingsAcceptFunction(self,layout):
+            length = layout.count()-1 # first entry is QLabel
+            
+            for idx in range(length):
+                radiobutton = layout.itemAt(idx+1).widget()
+                if radiobutton.isChecked():
+                    theme = radiobutton.theme
+            self.theme = theme
+
+        # settings holds a list of possible settings for all setting fields
+        layouts = [guiSettingsLayout,dFIMLayout]
+        acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
+        dialog = settingsBoxDialog(layouts=layouts,acceptFunctions=acceptFunctions)
+
+        dialog.resize(dialog.sizeHint())
+        
+        
+        
+        if dialog.exec_(): # Execute the dialog
+            self.DataFileInfoModel.infos = dialog.dMFIASettings # update settings
+            self.DataFileInfoModel.layoutChanged.emit()
+            self.changeTheme(dialog.theme)
         else:
-            newName = 'dark'
-        self.ui.actionChange_Theme.triggered.connect(lambda: self.changeTheme(newName))
-        self.ui.actionChange_Theme.setToolTip('{} Theme'.format(newName.title())) 
-        self.ui.actionChange_Theme.setStatusTip(self.ui.actionChange_Theme.toolTip())
-        self.ui.actionChange_Theme.setText('{} Theme'.format(newName.title()))
-        self.ui.actionChange_Theme.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/{}-theme.png'.format(newName))))
+            return
 
+class settingsBoxDialog(QtWidgets.QDialog):
 
+    def __init__(self, layouts, acceptFunctions, *args, **kwargs):
+        super(settingsBoxDialog, self).__init__(*args, **kwargs)
+        
+        self.setWindowTitle("Settings")
+        self.acceptFunctions = acceptFunctions
+        self.layouts = layouts
+
+        self.layout = QtWidgets.QVBoxLayout()
+        
+        for layout in layouts:
+            self.layout.addLayout(layout)
+        
+        
+        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        
+        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+    def accept(self): # the accept button has been pressed
+        for aFunc,layout in zip(self.acceptFunctions,self.layouts):
+            aFunc(self,layout)
+        return super(settingsBoxDialog,self).accept()
+
+    def reject(self):
+        return super(settingsBoxDialog,self).reject()
 
 def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     currentTime = datetime.datetime.now()

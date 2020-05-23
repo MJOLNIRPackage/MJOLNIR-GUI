@@ -412,18 +412,11 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
     def possibleInfos(self):
         return [key for key in self.possibleSettings]
 
-    def changeInfos(self):
-        dialog = _tools.CheckBoxDialog(self.possibleSettings,self.infos)
-        
-        if dialog.exec_(): # Execute the dialog
-            self.infos = dialog.newSettings
-            self.layoutChanged.emit()
-        else:
-            return
 
     def currentInfos(self):
         return [setting.location for setting in self.infos]
         
-
+    def settingsDialog(self):
+        return self.possibleSettings,self.infos
 
 

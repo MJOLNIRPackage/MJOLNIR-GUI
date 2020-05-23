@@ -1,5 +1,5 @@
 from qtpy.QtCore import Qt, QMetaObject, Signal, Slot
-from qtpy.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QToolButton,
+from qtpy.QtWidgets import (QWidget, QDialog, QVBoxLayout, QHBoxLayout, QToolButton,
                             QLabel, QSizePolicy)
 from ._utils import QT_VERSION, PLATFORM, appEmu
 

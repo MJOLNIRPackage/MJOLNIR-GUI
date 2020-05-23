@@ -1,6 +1,6 @@
-from qtpy.QtGui import QPalette, QColor
+from PyQt5.QtGui import QPalette, QColor
 from ._utils import QT_VERSION,appEmu
-
+from PyQt5.QtWidgets import QStyleFactory
 
 _STYLESHEET = appEmu.get_resource('style.qss')
 """ str: Main stylesheet. """

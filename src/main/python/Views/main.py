@@ -137,7 +137,6 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionClose_Windows)
         self.menuFile.addAction(self.actionSettings)
-        self.menuFile.addAction(self.actionChange_Theme)
         self.menuFile.addAction(self.actionExit)
         self.menuMask.addAction(self.actionOpen_mask_gui)
         self.menuMask.addAction(self.actionLoad_mask)

@@ -178,7 +178,6 @@
     <addaction name="separator"/>
     <addaction name="actionClose_Windows"/>
     <addaction name="actionSettings"/>
-    <addaction name="actionChange_Theme"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuMask">
