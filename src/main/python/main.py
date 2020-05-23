@@ -10,7 +10,8 @@ except ModuleNotFoundError:
     
 from PyQt5 import QtWidgets, QtGui, QtCore
 import datetime
-
+import qtmodern.styles
+import qtmodern.windows
 #class AppContext(ApplicationContext):#
 #
 #    def __init__(self, *args, **kwargs):
@@ -31,19 +32,14 @@ class AppContext(ApplicationContext):
         super().__init__(*args,**kwargs)
         self.splash = QtWidgets.QSplashScreen(QtGui.QPixmap(self.get_resource('splash.png')))                                    
         
-        def closeSplash(self,oldClose,timer):
-            print('closing')
-            timer.stop()
-            oldClose(self)
-
-        
         self.splash.show()
         
         self.timer = QtCore.QTimer() 
         
         updateInterval = 400 # ms
         originalTime = datetime.datetime.now()
-        updater = lambda:updateSplash(self.splash,originalTime=originalTime,updateInterval=updateInterval,padding=30)
+        
+        updater = lambda:updateSplash(self.splash,originalTime=originalTime,updateInterval=updateInterval)
         updater()
         
         
@@ -51,8 +47,7 @@ class AppContext(ApplicationContext):
         self.timer.setInterval(updateInterval)
         self.timer.start()
         QtWidgets.QApplication.processEvents()
-        # update the timer every updateInterval 
-        #thread.timeout.connect(updater)
+
         
 
     def run(self):
@@ -67,6 +62,7 @@ class AppContext(ApplicationContext):
     def main_window(self):
         QtWidgets.QApplication.processEvents()
         res = MJOLNIRMainWindow(self)
+        res = qtmodern.windows.ModernWindow(res)
         self.timer.stop()
         return res # Pass context to the window.
 
@@ -78,6 +74,7 @@ class AppContext(ApplicationContext):
 #    sys.exit(exit_code)
 def main():
     appctxt = AppContext()
+    qtmodern.styles.dark(appctxt.app)
     exit_code = appctxt.run()
     sys.exit(exit_code)
 

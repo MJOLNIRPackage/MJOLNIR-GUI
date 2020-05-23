@@ -16,6 +16,8 @@ from time import sleep
 from os import path
 import os
 
+import qtmodern.styles
+import qtmodern.windows
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
@@ -75,6 +77,13 @@ home = str(Path.home())
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
 
+###### generate allowed themes from qtmodern
+
+from qtmodern import styles
+styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QPalette'] ]
+themes = {}
+for name in styleNames:
+    themes[name] = getattr(styles,name)
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
@@ -85,7 +94,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
-    
+        if not loadSetting(self.settingsFile,'theme'):
+            self.theme = 'light'
+        else:
+            self.theme = loadSetting(self.settingsFile,'theme')
+
+        self.changeTheme(self.theme)
         self.ui.setupUi(self)
         self.update()
 
@@ -291,12 +305,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
-        dialog.exec_()
+        dialog = qtmodern.windows.ModernWindow(AboutDialog(self.AppContext.get_resource('About.txt')))
+        dialog.show()
 
     def help(self):
-        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
-        dialog.exec_()
+        dialog = qtmodern.windows.ModernWindow(HelpDialog(self.AppContext.get_resource('Help.txt')))
+        dialog.show()
 
 
     def setupStateMachine(self):
@@ -432,49 +446,28 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
+    def changeTheme(self,name):
+        if not name in themes.keys():
+            raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
+        themes[name](QtWidgets.QApplication.instance())
 
-def updateSplash(splash,originalTime,updateInterval,padding=30):
+
+def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     currentTime = datetime.datetime.now()
     points = int(1000.0*(currentTime-originalTime).total_seconds()/updateInterval)+1
 
-    alignment = QtCore.Qt.AlignBottom #| Qt.AlignHCenter
-    splash.showMessage(padding*' '+'Loading MJOLNIRGui'+'.'*points,color=QtGui.QColor(255,255,255),alignment=alignment)
+    alignment = QtCore.Qt.AlignTop# | QtCore.Qt.AlignHCenter
+    splash.showMessage(padding+'Loading MJOLNIRGui'+'.'*points,color=QtGui.QColor(255,255,255),alignment=alignment)
     #QTimer.singleShot(1000, updateSplash(splash,points+1) )
     QtWidgets.QApplication.processEvents()
 
 def main():
-    from PyQt5.QtWidgets import QApplication
-    app = QApplication(sys.argv) # Passing command line arguments to app
+    import AppContextEmulator
 
-    class AppContextEmulator(object):
-        def __init__(self,projectDirectory):
-            self.projectDirectory = projectDirectory
-            local_os = sys.platform
+    app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
+    qtmodern.styles.dark(app)
 
-            if local_os.lower() == 'linux':
-                local_os = 'linux'
-            elif local_os.lower() == 'win32' or local_os.lower() == 'cygwin':
-                local_os = 'windows'
-            elif local_os.lower() == 'darwin':
-                local_os = 'max'
-            else:
-                local_os = 'linux'
-
-            self.os = local_os
-            self.resourses = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','resources'))
-
-
-        def get_resource(self,path):
-            tryPath = os.path.join(self.resourses,'base',path)
-            
-            if os.path.exists(tryPath):
-                return tryPath
-            else:
-                return os.path.join(self.resourses,self.os,path)
-            
-            
-
-    appEmu = AppContextEmulator(__file__)
+    appEmu = AppContextEmulator.AppContextEmulator(__file__)
 
     splash = QtWidgets.QSplashScreen(QtGui.QPixmap(appEmu.get_resource('splash.png')))                                    
     splash.show()
@@ -484,7 +477,7 @@ def main():
     # adding action to timer 
     updateInterval = 400 # ms
     originalTime = datetime.datetime.now()
-    updater = lambda:updateSplash(splash,originalTime=originalTime,updateInterval=updateInterval,padding=30)
+    updater = lambda:updateSplash(splash,originalTime=originalTime,updateInterval=updateInterval)
     updater()
     timer.timeout.connect(updater) 
 
@@ -493,6 +486,7 @@ def main():
     
 
     window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
+    window = qtmodern.windows.ModernWindow(window)
     splash.finish(window)
     window.show()
     timer.stop()
