@@ -105,7 +105,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         
         self.ui.setupUi(self)
-        self.changeTheme(self.theme)
         self.update()
 
         icon = QtGui.QIcon()
@@ -167,7 +166,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.update()
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
-        
+        self.changeTheme(self.theme)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
@@ -469,6 +468,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         app = QtWidgets.QApplication.instance()
         self.theme = name
         themes[name](app)
+        #palette = app.palette()
+        #print('Palette:',palette)
+        #for view in self.views:
+        #    view.setPalette(palette)
 
 
     def settingsDialog(self):

@@ -3,7 +3,7 @@ import os
 import functools
 from PyQt5 import QtCore,QtWidgets
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel,QApplication
 
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
@@ -68,3 +68,17 @@ def dialog(text):
     dialog.addButton(QtWidgets.QMessageBox.Ok)
     dialog.exec() 
 
+def CenterWidgets(widget, host = None):
+    if (host is None):
+        host = widget.parentWidget()
+
+    if (not host is None):
+        hostRect = host.geometry()
+        widget.move(hostRect.center() - widget.rect().center())
+    
+    else:
+        screenGeometry = QApplication.desktop().screenGeometry()
+        x = (screenGeometry.width() - widget.width()) / 2
+        y = (screenGeometry.height() - widget.height()) / 2
+        widget.move(x, y)
+    

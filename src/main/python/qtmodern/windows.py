@@ -1,8 +1,11 @@
 from qtpy.QtCore import Qt, QMetaObject, Signal, Slot
 from qtpy.QtWidgets import (QWidget, QDialog, QVBoxLayout, QHBoxLayout, QToolButton,
-                            QLabel, QSizePolicy)
+                            QLabel, QSizePolicy,QApplication)
 from ._utils import QT_VERSION, PLATFORM, appEmu
 
+import sys
+sys.path.append('..')
+import _tools
 
 _FL_STYLESHEET = appEmu.get_resource('frameless.qss')
 """ str: Frameless window stylesheet. """
@@ -46,6 +49,7 @@ class ModernDialog(QDialog):
             kwargs['flags'] = Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint | Qt.WindowCloseButtonHint | \
                             Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
         super().__init__(*args,**kwargs)
+        _tools.CenterWidgets(self)
         
 
 

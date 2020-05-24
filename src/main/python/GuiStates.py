@@ -17,6 +17,9 @@ if platform.system() == 'Windows':
 else:
     markerColor = 'blue'
 
+
+normalColor = 'palette(midlight)'
+
 ## enterStateFunction
 def AllEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -30,7 +33,7 @@ def AllEnabled(StateMachine):
         if enable:
             item.setStyleSheet("background-color: {}".format(markerColor))
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet("background-color: {}".format(normalColor))
 
 def ConvertedEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -46,7 +49,7 @@ def ConvertedEnabled(StateMachine):
         if enable:
             item.setStyleSheet("background-color: {}".format(markerColor))
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet("background-color: {}".format(normalColor))
 
 def RawEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -64,7 +67,7 @@ def RawEnabled(StateMachine):
         if enable:
             item.setStyleSheet("background-color: {}".format(markerColor))
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet("background-color: {}".format(normalColor))
 
 
 def PartialEnabled(StateMachine):
@@ -83,7 +86,7 @@ def PartialEnabled(StateMachine):
         if enable:
             item.setStyleSheet("background-color: {}".format(markerColor))
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet("background-color: {}".format(normalColor))
     
 
 
@@ -101,7 +104,7 @@ def EmptyEnabled(StateMachine):
         if enable:
             item.setStyleSheet("background-color: {}".format(markerColor))
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet("background-color: {}".format(normalColor))
     
 
 ## Transition functions
