@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
+from qtmodern.windows import ModernDialog
 
 
-
-class AboutDialog(QtWidgets.QDialog):
+class AboutDialog(ModernDialog):
 
     def __init__(self, aboutFile, *args, **kwargs):
         super(AboutDialog, self).__init__(*args, **kwargs)

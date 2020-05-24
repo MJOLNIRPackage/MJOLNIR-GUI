@@ -541,7 +541,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             return
 
-class settingsBoxDialog(QtWidgets.QDialog):
+class settingsBoxDialog(qtmodern.windows.ModernDialog):
 
     def __init__(self, layouts, acceptFunctions, *args, **kwargs):
         super(settingsBoxDialog, self).__init__(*args, **kwargs)

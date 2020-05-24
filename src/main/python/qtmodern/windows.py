@@ -40,6 +40,90 @@ class WindowDragger(QWidget):
     def mouseDoubleClickEvent(self, event):
         self.doubleClicked.emit()
 
+class ModernDialog(QDialog):
+    def __init__(self,*args,**kwargs):
+        if not 'flags' in kwargs:
+            kwargs['flags'] = Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint | Qt.WindowCloseButtonHint | \
+                            Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
+        super().__init__(*args,**kwargs)
+        
+
+
+    def setupUi(self):
+        # create title bar, content
+
+        self.windowFrame = QWidget(self)
+        self.windowFrame.setObjectName('windowFrame')
+
+        self.vboxFrame = QVBoxLayout(self.windowFrame)
+        self.vboxFrame.setContentsMargins(0, 0, 0, 0)
+
+        self.titleBar = WindowDragger(self, self.windowFrame)
+        self.titleBar.setObjectName('titleBar')
+        self.titleBar.setSizePolicy(QSizePolicy(QSizePolicy.Preferred,
+                                                QSizePolicy.Fixed))
+
+        self.hboxTitle = QHBoxLayout(self.titleBar)
+        self.hboxTitle.setContentsMargins(0, 0, 0, 0)
+        self.hboxTitle.setSpacing(0)
+
+        self.lblTitle = QLabel('Title')
+        self.lblTitle.setObjectName('lblTitle')
+        self.lblTitle.setAlignment(Qt.AlignCenter)
+
+        
+        spButtons = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
+        self.btnMinimize = QToolButton(self.titleBar)
+        self.btnMinimize.setObjectName('btnMinimize')
+        self.btnMinimize.setSizePolicy(spButtons)
+
+        self.btnRestore = QToolButton(self.titleBar)
+        self.btnRestore.setObjectName('btnRestore')
+        self.btnRestore.setSizePolicy(spButtons)
+
+        self.btnMaximize = QToolButton(self.titleBar)
+        self.btnMaximize.setObjectName('btnMaximize')
+        self.btnMaximize.setSizePolicy(spButtons)
+
+        self.btnClose = QToolButton(self.titleBar)
+        self.btnClose.setObjectName('btnClose')
+        self.btnClose.setSizePolicy(spButtons)
+
+        self.vboxFrame.addWidget(self.titleBar)
+
+        self.windowContent = QWidget(self.windowFrame)
+        self.vboxFrame.addWidget(self.windowContent)
+
+        self.vboxWindow.addWidget(self.windowFrame)
+
+        if PLATFORM == "Darwin":
+            self.hboxTitle.addWidget(self.btnClose)
+            self.hboxTitle.addWidget(self.btnMinimize)
+            self.hboxTitle.addWidget(self.btnRestore)
+            self.hboxTitle.addWidget(self.btnMaximize)
+            self.hboxTitle.addWidget(self.lblTitle)
+        else:
+            self.hboxTitle.addWidget(self.lblTitle)
+            self.hboxTitle.addWidget(self.btnMinimize)
+            self.hboxTitle.addWidget(self.btnRestore)
+            self.hboxTitle.addWidget(self.btnMaximize)
+            self.hboxTitle.addWidget(self.btnClose)
+
+        # set window flags
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint | Qt.WindowCloseButtonHint |
+                            Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
+
+        if QT_VERSION >= (5,):
+            self.setAttribute(Qt.WA_TranslucentBackground)
+
+        # set stylesheet
+        with open(_FL_STYLESHEET) as stylesheet:
+            self.setStyleSheet(stylesheet.read())
+
+        # automatically connect slots
+        QMetaObject.connectSlotsByName(self)
+    
 
 class ModernWindow(QWidget):
     """ Modern window.
