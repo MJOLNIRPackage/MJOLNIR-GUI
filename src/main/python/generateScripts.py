@@ -4,10 +4,14 @@ from os import path
 
 from PyQt5 import QtWidgets
 
-from _tools import ProgressBarDecoratorArguments
-
 from MJOLNIR import _tools
-import _tools as _GUItools
+try:
+    import MJOLNIRGui._tools as _GUItools
+    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+except ModuleNotFoundError:
+    import _tools as _GUItools
+    from _tools import ProgressBarDecoratorArguments
+
 
 # The general idea is to generate .py code that will load, convert and plot 
 # data using the settings of the gui. Each part of the code to be written is 

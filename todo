@@ -25,3 +25,31 @@ Shareable folder: https://www.techrepublic.com/article/how-to-set-up-quick-and-e
 Accessing local files: Run Virt Machine Manager and type: sudo virt-viewer --connect=qemu:///session --domain-name win10, in preferences under files choose folder to share
 
 
+Virtual environments used:
+arch (need to install boto3 through pip)
+ubuntu (need to install boto3 through pip)
+fedora (need to install boto3 through pip)
+
+Building for each distribution:
+fbs runvm [name]
+fbs release
+
+Installation guide arch:
+curl -O https://fbs.sh/jakoblass/MJOLNIRGui/public-key.gpg && sudo pacman-key --add public-key.gpg && sudo pacman-key --lsign-key B6CC03BFA225CFFC7D1338CBCCF04E13EECDED58 && rm public-key.gpg
+echo -e '\n[MJOLNIRGui]\nServer = https://fbs.sh/jakoblass/MJOLNIRGui/arch' | sudo tee -a /etc/pacman.conf
+sudo pacman -Syu mjolnirgui
+
+Installation guide ubuntu:
+sudo apt-get install apt-transport-https
+wget -qO - https://fbs.sh/jakoblass/MJOLNIRGui/public-key.gpg | sudo apt-key add -
+echo 'deb [arch=amd64] https://fbs.sh/jakoblass/MJOLNIRGui/deb stable main' | sudo tee /etc/apt/sources.list.d/mjolnirgui.list
+sudo apt-get update
+sudo apt-get install mjolnirgui
+
+Installation guide fedora/CentOS:
+sudo rpm -v --import https://fbs.sh/jakoblass/MJOLNIRGui/public-key.gpg
+sudo dnf config-manager --add-repo https://fbs.sh/jakoblass/MJOLNIRGui/rpm/MJOLNIRGui.repo
+sudo dnf install mjolnirgui
+(On CentOS, replace 'dnf' by 'yum' and 'dnf config-manager' by 'yum-config-manager'.)
+
+

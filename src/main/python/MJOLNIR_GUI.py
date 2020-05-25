@@ -7,13 +7,18 @@ except:
 
 
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
+import _tools as _guitools
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import datetime
+from time import sleep
 
 from os import path
 import os
 
+import qtmodern.styles
+import qtmodern.windows
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
@@ -37,6 +42,7 @@ try:
     from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 except ModuleNotFoundError:
     sys.path.append('.')
+    
     #from .MJOLNIR_GUI_ui import Ui_MainWindow  
     from .Views.main import Ui_MainWindow
     from .Views.DataSetManager import DataSetManager
@@ -46,6 +52,7 @@ except ModuleNotFoundError:
     from .Views.Cut1DManager import Cut1DManager
     from .Views.Raw1DManager import Raw1DManager
     from .Views.Raw1DManager import Raw1DManager
+    from .Views.collapsibleBox import CollapsibleBox
     from .MJOLNIR_Data import GuiDataFile,GuiDataSet
     from .DataModels import DataSetModel,DataFileModel
     from .StateMachine import StateMachine
@@ -71,6 +78,13 @@ home = str(Path.home())
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
 
+###### generate allowed themes from qtmodern
+
+from qtmodern import styles
+styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QStyleFactory','QPalette'] ]
+themes = {}
+for name in styleNames:
+    themes[name] = getattr(styles,name)
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
@@ -81,8 +95,22 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
-    
+        self.views = []
+        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        
+        
+        if guiSettings is None:
+            self.theme = 'light'
+        else:
+            if not 'theme' in guiSettings:
+                self.theme = 'light'
+            else:
+                self.theme = guiSettings['theme']
+                
+
+        
         self.ui.setupUi(self)
+        self.update()
 
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(self.AppContext.get_resource('Icons/Own/MJOLNIR.png')))
@@ -92,7 +120,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views = []
         ## Set up DataSetManager
         self.ui.dataSetManager = DataSetManager(self.ui.fixedOpen,self)
-        
+        self.update()
         self.views.append(self.ui.dataSetManager)
 
         # Lists of views in shown order
@@ -104,6 +132,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
         # Insert all views
         for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
+            self.update()
             box = CollapsibleBox(name,startState=state)
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
@@ -126,76 +155,76 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
         
-
+        self.update()
         initGenerateScript(self)
 
         for view in self.views: # Run through all views to set them up
             view.setup()
 
         setupGenerateScript(self)
-
+        self.update()
         self.setupMenu()
+        self.update()
         self.setupStateMachine()
+        self.update()
         self.stateMachine.run()
-
+        self.update()
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
-
- 
-    
+        self.changeTheme(self.theme)
 
     def setupMenu(self): # Set up all QActions and menus
-        self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/cross-button.png')))
+        self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
         self.ui.actionExit.setToolTip('Exit the application') 
         self.ui.actionExit.setStatusTip(self.ui.actionExit.toolTip())
         self.ui.actionExit.triggered.connect(self.close)
 
-        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/information-button.png')))
+        self.ui.actionAbout.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/information-button.png')))
         self.ui.actionAbout.setToolTip('Show About') 
         self.ui.actionAbout.setStatusTip(self.ui.actionAbout.toolTip())
         self.ui.actionAbout.triggered.connect(self.about)
 
-        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/question-button.png')))
+        self.ui.actionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
         self.ui.actionHelp.setToolTip('Show Help') 
         self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
         self.ui.actionHelp.triggered.connect(self.help)
 
-        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder-save.png')))
+        self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
-        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/folder--arrow.png')))
+        self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
-        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-3D.png')))
+        self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
         self.ui.actionGenerate_View3d_script.setStatusTip(self.ui.actionGenerate_View3d_script.toolTip())
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
-        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QE.png')))
+        self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QE.png')))
         self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
         self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
         self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQELineScript)
         
-        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-QP.png')))
+        self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QP.png')))
         self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
         self.ui.actionGenerate_QPlane_script.setStatusTip(self.ui.actionGenerate_QPlane_script.toolTip())
         self.ui.actionGenerate_QPlane_script.triggered.connect(self.generateQPlaneScript)
         
-        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/script-1D.png')))
+        self.ui.actionGenerate_1d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-1D.png')))
         self.ui.actionGenerate_1d_script.setToolTip('Generate Cut1D Script') 
         self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
-        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-open.png')))
+        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
         self.ui.actionOpen_mask_gui.setDisabled(True)
         self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui - Not Implemented') 
         self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
         
-        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/icons/mask-load.png')))
+        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-load.png')))
         self.ui.actionLoad_mask.setDisabled(True)
         self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
         self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
@@ -204,7 +233,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSettings.setDisabled(False)
         self.ui.actionSettings.setToolTip('Change View Settings') 
         self.ui.actionSettings.setStatusTip(self.ui.actionSettings.toolTip())
-        self.ui.actionSettings.triggered.connect(self.DataFileInfoModel.changeInfos)
+        self.ui.actionSettings.triggered.connect(self.settingsDialog)
 
         
         self.ui.actionClose_Windows.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/CloseWindows.png')))
@@ -212,7 +241,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setToolTip('Close All Plotting Windows') 
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
-        
+
+
     def setProgressBarValue(self,value):
         self.ui.progressBar.setValue(value)
 
@@ -285,12 +315,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
-        dialog.exec_()
+        dialog = qtmodern.windows.ModernWindow(AboutDialog(self.AppContext.get_resource('About.txt')))
+        dialog.show()
 
     def help(self):
-        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
-        dialog.exec_()
+        dialog = qtmodern.windows.ModernWindow(HelpDialog(self.AppContext.get_resource('Help.txt')))
+        dialog.show()
 
 
     def setupStateMachine(self):
@@ -298,17 +328,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+        
 
     @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
-        saveString,lineEditString,fileDir,infos = self.generateCurrentGuiSettings(True)
+        settingsDict = self.generateCurrentGuiSettings(updateProgressBar=True)
         
-        updateSetting(self.settingsFile,'dataSet',saveString)
-        updateSetting(self.settingsFile,'lineEdits',lineEditString)
-        updateSetting(self.settingsFile,'fileDir',fileDir)
-        updateSetting(self.settingsFile,'infos',infos)
+        for key,value in settingsDict.items():
+            updateSetting(self.settingsFile,key,value)
+
         return True
 
 
@@ -331,7 +361,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         infos = self.DataFileInfoModel.currentInfos()
 
-        return saveString, lineEditString, fileDir, infos
+        guiSettings = self.guiSettings()
+        
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
+                      'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+        return returnDict
 
     def generateCurrentLineEditSettings(self):
         lineEditValueString = {}
@@ -385,6 +419,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
+        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        if guiSettings:
+            if not self.theme == guiSettings['theme']:
+                self.changeTheme(guiSettings['theme'])
+
         self.loadLineEdits()
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
@@ -395,6 +434,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadedGuiSettings = self.generateCurrentGuiSettings()
         return True
 
+    def guiSettings(self):
+        settingsDict = {'theme':self.theme}
+        return settingsDict
 
     def loadLineEdits(self):
         lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
@@ -425,3 +467,163 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
+    def changeTheme(self,name):
+        if not name in themes.keys():
+            raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
+        app = QtWidgets.QApplication.instance()
+        self.theme = name
+        themes[name](app)
+        #palette = app.palette()
+        #print('Palette:',palette)
+        #for view in self.views:
+        #    view.setPalette(palette)
+
+
+    def settingsDialog(self):
+        # Get infos from DataFileInfoModel
+        
+        dataFileInfoModelPossibleSettings,dataFileInfoModelInitial = self.DataFileInfoModel.settingsDialog()
+        # Create a widget holding check boxes for all possible settings
+
+        dFIMLayout = QtWidgets.QVBoxLayout()
+        dFIMTitleLabel = QtWidgets.QLabel(text='Select infos to be shown for selected file(s)')
+        dFIMTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
+        # Add title to layout
+        dFIMLayout.addWidget(dFIMTitleLabel)
+
+        # make check boxes for all settings
+        dFIMcheckBoxes = []
+        for setting in dataFileInfoModelPossibleSettings.values():
+            checkBox = QtWidgets.QCheckBox()
+            dFIMcheckBoxes.append(checkBox)
+            name = setting.location
+            checkBox.setText(name)
+            checkBox.setChecked(setting in dataFileInfoModelInitial)
+            dFIMLayout.addWidget(checkBox)
+
+        # accept function arguments: self (dialog), layout which was passed in
+        def dFIMAcceptFunction(self,layout,possibleSettings=dataFileInfoModelPossibleSettings):
+            self.dMFIASettings = []
+            for idx,setting in enumerate(possibleSettings.values()): # Loop through all the possible settings
+                box = layout.itemAt(idx+1).widget() # Skip 0 as it is a QLabel
+                if box.isChecked():# If checked add the corresponding setting to list of loaded settings
+                    self.dMFIASettings.append(setting.location)
+
+
+        # Create layout for gui settings
+        guiSettingsLayout = QtWidgets.QVBoxLayout()
+        guiSettingsTitleLabel = QtWidgets.QLabel(text='Settings for the Gui')
+        guiSettingsTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
+        guiSettingsLayout.addWidget(guiSettingsTitleLabel)
+
+
+        # Create radiobuttons
+        for theme in themes.keys():
+            radiobutton = QtWidgets.QRadioButton(theme)
+            radiobutton.setChecked(theme == self.theme)
+            radiobutton.theme = theme
+            guiSettingsLayout.addWidget(radiobutton)
+        
+        def guiSettingsAcceptFunction(self,layout):
+            length = layout.count()-1 # first entry is QLabel
+            
+            for idx in range(length):
+                radiobutton = layout.itemAt(idx+1).widget()
+                if radiobutton.isChecked():
+                    theme = radiobutton.theme
+            self.theme = theme
+
+        # settings holds a list of possible settings for all setting fields
+        layouts = [guiSettingsLayout,dFIMLayout]
+        acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
+        dialog = settingsBoxDialog(layouts=layouts,acceptFunctions=acceptFunctions)
+
+        dialog.resize(dialog.sizeHint())
+        
+        
+        
+        if dialog.exec_(): # Execute the dialog
+            self.DataFileInfoModel.infos = dialog.dMFIASettings # update settings
+            self.DataFileInfoModel.layoutChanged.emit()
+            self.changeTheme(dialog.theme)
+        else:
+            return
+
+class settingsBoxDialog(qtmodern.windows.ModernDialog):
+
+    def __init__(self, layouts, acceptFunctions, *args, **kwargs):
+        super(settingsBoxDialog, self).__init__(*args, **kwargs)
+        
+        self.setWindowTitle("Settings")
+        self.acceptFunctions = acceptFunctions
+        self.layouts = layouts
+
+        self.layout = QtWidgets.QVBoxLayout()
+        
+        for layout in layouts:
+            self.layout.addLayout(layout)
+        
+        
+        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        
+        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+    def accept(self): # the accept button has been pressed
+        for aFunc,layout in zip(self.acceptFunctions,self.layouts):
+            aFunc(self,layout)
+        return super(settingsBoxDialog,self).accept()
+
+    def reject(self):
+        return super(settingsBoxDialog,self).reject()
+
+def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
+    currentTime = datetime.datetime.now()
+    points = int(1000.0*(currentTime-originalTime).total_seconds()/updateInterval)+1
+
+    alignment = QtCore.Qt.AlignTop# | QtCore.Qt.AlignHCenter
+    splash.showMessage(padding+'Loading MJOLNIRGui'+'.'*points,color=QtGui.QColor(255,255,255),alignment=alignment)
+    #QTimer.singleShot(1000, updateSplash(splash,points+1) )
+    QtWidgets.QApplication.processEvents()
+
+def main():
+    import AppContextEmulator
+
+    app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
+    qtmodern.styles.dark(app)
+
+    appEmu = AppContextEmulator.AppContextEmulator(__file__)
+
+    splash = QtWidgets.QSplashScreen(QtGui.QPixmap(appEmu.get_resource('splash.png')))                                    
+    splash.show()
+
+    timer = QtCore.QTimer() 
+
+    # adding action to timer 
+    updateInterval = 400 # ms
+    originalTime = datetime.datetime.now()
+    updater = lambda:updateSplash(splash,originalTime=originalTime,updateInterval=updateInterval)
+    updater()
+    timer.timeout.connect(updater) 
+
+    # update the timer every updateInterval 
+    timer.start(updateInterval)
+    
+
+    window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
+    window = qtmodern.windows.ModernWindow(window)
+    splash.finish(window)
+    window.show()
+    timer.stop()
+
+    app.exec_() 
+
+if __name__ == '__main__':
+    main()
+
+    

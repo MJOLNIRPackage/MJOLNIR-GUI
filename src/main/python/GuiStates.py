@@ -15,7 +15,10 @@ platform.system()
 if platform.system() == 'Windows':
     markerColor = 'lightblue'
 else:
-    markerColor = 'blue'
+    markerColor = 'palette(Link)'
+
+highlightStyle = "background-color: palette(Link); color: black"
+normalStyle = "background-color: palette(midlight)"
 
 ## enterStateFunction
 def AllEnabled(StateMachine):
@@ -28,9 +31,9 @@ def AllEnabled(StateMachine):
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: {}".format(markerColor))
+            item.setStyleSheet(highlightStyle)
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet(normalStyle)
 
 def ConvertedEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -44,9 +47,9 @@ def ConvertedEnabled(StateMachine):
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: {}".format(markerColor))
+            item.setStyleSheet(highlightStyle)
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet(normalStyle)
 
 def RawEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
@@ -62,9 +65,9 @@ def RawEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_convertData_button','Raw1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: {}".format(markerColor))
+            item.setStyleSheet(highlightStyle)
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet(normalStyle)
 
 
 def PartialEnabled(StateMachine):
@@ -81,9 +84,9 @@ def PartialEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_AddFiles_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: {}".format(markerColor))
+            item.setStyleSheet(highlightStyle)
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet(normalStyle)
     
 
 
@@ -99,9 +102,9 @@ def EmptyEnabled(StateMachine):
     blue = AllFalseBut(['DataSet_NewDataSet_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
-            item.setStyleSheet("background-color: {}".format(markerColor))
+            item.setStyleSheet(highlightStyle)
         else:
-            item.setStyleSheet("background-color: lightgrey")
+            item.setStyleSheet(normalStyle)
     
 
 ## Transition functions

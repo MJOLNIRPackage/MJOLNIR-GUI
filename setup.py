@@ -2,6 +2,7 @@ from setuptools import setup
 import os
 import sys
 import json
+from shutil import copy
 
 _here = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,7 +19,7 @@ if sys.version_info[0] < 3:
 else:
     with open(os.path.join(_here, 'README.md'), encoding='utf-8') as f:
         long_description = f.read()
-pythonPath = os.path.join('lib','python{}.{}'.format(*sys.version_info[:2]),'site-packages','MJOLNIR')
+
 
 setup(
     name=settings['app_name'],
@@ -29,18 +30,15 @@ setup(
     author_email='lass.jakob@gmail.com',
     url='https://github.com/jakob-lass/MJOLNIR-Gui',
     license='MPL-2.0',
-    #data_files = [('src/main/python/',['src/main/python/main.py'])],#os.path.join(pythonPath, 'src','main','resources','base','*')],#,((os.path.join(pythonPath),['MJOLNIR/CalibrationFlatCone.csv'])),((os.path.join(pythonPath),['MJOLNIR/CalibrationMultiFLEXX.csv']))],#,(pythonPath+'/CommandLineScripts/',['MJOLNIR/CommandLineScripts/.settings'])],
-    packages=['MJOLNIRGui'],
-    package_dir={'MJOLNIRGui': '.'},
-    package_data={'MJOLNIRGui': ['MJOLNIRGui/src/main/python/main.py','MJOLNIRGui/src/main/resources/base/*.png','MJOLNIRGui/src/main/resources/base/*.txt','MJOLNIRGui/*.py',
-    'MJOLNIRGui/src/build/settings/base.json','MJOLNIRGui/src/main/icons/*.ico','MJOLNIRGui/src/main/icons/base/*','MJOLNIRGui/src/main/resources/base/Icons/icons/*','MJOLNIRGui/src/main/resources/base/Icons/Own/*']},
-    #scripts=['MJOLNIR/CommandLineScripts/MJOLNIRCalibrationInspector','MJOLNIR/CommandLineScripts/MJOLNIRHistory','MJOLNIR/CommandLineScripts/MJOLNIRConvert',
-    #'MJOLNIR/CommandLineScripts/MJOLNIR3DView'],
+    packages=['MJOLNIRGui','MJOLNIRGui/Views'],
+    package_dir={'MJOLNIRGui': 'src/main/python','MJOLNIRGui/Views': 'src/main/python/Views'},
+    package_data={'MJOLNIRGui': ['main.py','../resources/base/*.png','../resources/base/*.txt','*.py',
+    '../icons/*.ico','../icons/base/*','../resources/base/Icons/icons/*','../resources/base/Icons/Own/*','../resources/base/Views/*','../../build/settings/base.json']},
     entry_points = {
-        "console_scripts": ['MJOLNIRGui = MJOLNIRGui.MJOLNIRGui.main:main']
+        "console_scripts": ['MJOLNIRGui = MJOLNIRGui.MJOLNIR_GUI:main']
         },
     python_requires='>=3.4,<=3.7',
-    install_requires=['fbs','MJOLNIR>=1.1.7','PyQt5'],
+    install_requires=['MJOLNIR>=1.1.7','PyQt5'],
     
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -50,9 +48,6 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'Topic :: Scientific/Engineering :: Visualization',
         'Topic :: Scientific/Engineering :: Information Analysis',
-#        'Programming Language :: Python :: 2.7',
-#        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6']
-#        'Programming Language :: Python :: 3.7'],
     )

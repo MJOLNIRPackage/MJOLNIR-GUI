@@ -6,15 +6,16 @@ import numpy as np
 import sys
 
 try:
-    import MJOLNIR_GUI
-    from MJOLNIR_Data import GuiDataFile
+    from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
 except ModuleNotFoundError:
-    from . import MJOLNIR_GUI
-    from  .MJOLNIR_Data import GuiDataFile
+    from  MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
-import _tools
+try:
+    import MJOLNIRGui._tools
+except ModuleNotFoundError:
+    import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
@@ -155,7 +156,7 @@ class DataFileModel(QtCore.QAbstractListModel):
         self.guiWindow = guiWindow
 
         self.IconDict = defDict()
-        self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/icons/document.png'))
+        self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/document.png'))
         self.IconDict['hdf']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/HDF_logo_16.png'))
         self.IconDict['nxs']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/NXS_logo_16.png'))
         
@@ -358,10 +359,10 @@ scanCommand = Info('scanCommand','Command: ',formatTextArray)
 scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
 comment = Info('comment','Comment: ',formatTextArray)
 binning = Info('binning','Binning: ',formatRaw)
+Ei = Info('Ei','Ei [meV]: ',formatValueArray)
 
-settings = {'sample/name':name, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
+settings = {'sample/name':name,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
             'scanCommand':scanCommand, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning}
-
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):
@@ -411,18 +412,11 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
     def possibleInfos(self):
         return [key for key in self.possibleSettings]
 
-    def changeInfos(self):
-        dialog = _tools.CheckBoxDialog(self.possibleSettings,self.infos)
-        
-        if dialog.exec_(): # Execute the dialog
-            self.infos = dialog.newSettings
-            self.layoutChanged.emit()
-        else:
-            return
 
     def currentInfos(self):
         return [setting.location for setting in self.infos]
         
-
+    def settingsDialog(self):
+        return self.possibleSettings,self.infos
 
 

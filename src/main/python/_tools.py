@@ -3,7 +3,7 @@ import os
 import functools
 from PyQt5 import QtCore,QtWidgets
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel,QApplication
 
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
@@ -68,46 +68,17 @@ def dialog(text):
     dialog.addButton(QtWidgets.QMessageBox.Ok)
     dialog.exec() 
 
+def CenterWidgets(widget, host = None):
+    if (host is None):
+        host = widget.parentWidget()
 
-class CheckBoxDialog(QDialog):
-
-    def __init__(self, possibleSettings, currentSettings, *args, **kwargs):
-        super(CheckBoxDialog, self).__init__(*args, **kwargs)
-        
-        self.setWindowTitle("Settings")
-        self.possibleSettings = possibleSettings
-
-        self.layout = QVBoxLayout()
-
-        self.titleLabel = QLabel(text='Select infos to be shown for selected file(s)')
-        self.titleLabel.setAlignment(QtCore.Qt.AlignCenter)
-
-        self.layout.addWidget(self.titleLabel)
-        self.checkBoxes = []
-        for setting in self.possibleSettings.values():
-            checkBox = QCheckBox()
-            self.checkBoxes.append(checkBox)
-            name = setting.location
-            checkBox.setText(name)
-            checkBox.setChecked(setting in currentSettings)
-            self.layout.addWidget(checkBox)
-        
-        
-        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
-        
-        self.buttonBox = QDialogButtonBox(QBtn)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
-
-        
-        self.layout.addWidget(self.buttonBox)
-        self.setLayout(self.layout)
-
-    def accept(self): # the accept button has been pressed
-        
-        self.newSettings = []
-        for box,setting in zip(self.checkBoxes,self.possibleSettings.values()):
-            if box.isChecked():
-                self.newSettings.append(setting.location)
-
-        super(CheckBoxDialog,self).accept()
+    if (not host is None):
+        hostRect = host.geometry()
+        widget.move(hostRect.center() - widget.rect().center())
+    
+    else:
+        screenGeometry = QApplication.desktop().screenGeometry()
+        x = (screenGeometry.width() - widget.width()) / 2
+        y = (screenGeometry.height() - widget.height()) / 2
+        widget.move(x, y)
+    
