@@ -98,10 +98,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
         
-        if not 'theme' in guiSettings:
+        
+        if guiSettings is None:
             self.theme = 'light'
         else:
-            self.theme = guiSettings['theme']
+            if not 'theme' in guiSettings:
+                self.theme = 'light'
+            else:
+                self.theme = guiSettings['theme']
+                
 
         
         self.ui.setupUi(self)
