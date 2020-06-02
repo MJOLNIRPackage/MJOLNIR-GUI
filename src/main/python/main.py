@@ -4,7 +4,10 @@ try:
     from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
 except ModuleNotFoundError:
     sys.path.append('.')
-    from .MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
+    try:
+        from .MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
+    except ModuleNotFoundError:
+        from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     import os
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     
