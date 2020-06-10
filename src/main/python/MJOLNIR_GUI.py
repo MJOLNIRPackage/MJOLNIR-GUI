@@ -94,6 +94,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
+
+        ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
@@ -200,7 +202,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
-        self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+L"), self)
+        self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
         self.actionLoad_GUI_state_shortcut.activated.connect(self.loadGui)
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
@@ -340,8 +342,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         settingsDict = self.generateCurrentGuiSettings(updateProgressBar=True)
         
+        saveSettings,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')
+        if not saveSettings.split('.')[-1] == 'MJOLNIRGuiSettings':
+            saveSettings+='.MJOLNIRGuiSettings'
+
         for key,value in settingsDict.items():
-            updateSetting(self.settingsFile,key,value)
+            updateSetting(saveSettings,key,value)
 
         return True
 
@@ -394,7 +400,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileModel.updateCurrentDataSetIndex()
             self.update()
         
-        dataSetString = loadSetting(self.settingsFile,'dataSet')
+        # Load saveFile
+        if not hasattr(self,'loadedSettingsFolder'):
+            folder = home
+        else:
+            folder = self.loadedSettingsFolder
+        
+        settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        
+        self.loadedSettingsFolder = os.path.dirname(settingsFile)
+        if settingsFile is None:
+            return False
+        
+
+        dataSetString = loadSetting(settingsFile,'dataSet')
         totalFiles = np.sum([len(dsDict['files'])+1 for dsDict in dataSetString])+1
         # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
@@ -419,16 +438,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             counter+=1
             self.setProgressBarValue(counter)
             
-        DataFileListInfos = loadSetting(self.settingsFile,'infos')
+        DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
-        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        guiSettings = loadSetting(settingsFile,'guiSettings')
         if guiSettings:
             if not self.theme == guiSettings['theme']:
                 self.changeTheme(guiSettings['theme'])
 
-        self.loadLineEdits()
+        self.loadLineEdits(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -442,8 +461,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         settingsDict = {'theme':self.theme}
         return settingsDict
 
-    def loadLineEdits(self):
-        lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
+    def loadLineEdits(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        lineEditValueString = loadSetting(file,'lineEdits')
         if not lineEditValueString is None:
             if isinstance(lineEditValueString,str):
                 print('Please save a new gui state to comply with the new version')
