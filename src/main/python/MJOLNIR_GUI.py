@@ -398,13 +398,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
     def loadGui(self):
-        self.setProgressBarLabelText('Deleating Old Data Sets and Files')
-        while self.DataSetModel.rowCount(None)>0:
-            self.DataSetModel.delete(self.DataSetModel.getCurrentDatasetIndex())
-        else:
-            self.DataSetModel.layoutChanged.emit()
-            self.DataFileModel.updateCurrentDataSetIndex()
-            self.update()
         
         # Load saveFile
         if not hasattr(self,'loadedSettingsFolder'):
@@ -413,12 +406,19 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             folder = self.loadedSettingsFolder
         
         settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
-        
+        self.update()
         self.loadedSettingsFolder = os.path.dirname(settingsFile)
-        if settingsFile is None:
+        
+        if settingsFile is None or settingsFile == '':
             return False
         
-
+        self.setProgressBarLabelText('Deleating Old Data Sets and Files')
+        while self.DataSetModel.rowCount(None)>0:
+            self.DataSetModel.delete(self.DataSetModel.getCurrentDatasetIndex())
+        else:
+            self.DataSetModel.layoutChanged.emit()
+            self.DataFileModel.updateCurrentDataSetIndex()
+            self.update()
         dataSetString = loadSetting(settingsFile,'dataSet')
 
         totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
