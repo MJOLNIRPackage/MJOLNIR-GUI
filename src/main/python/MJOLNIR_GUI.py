@@ -248,9 +248,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
 
+    def getProgressBarValue(self):
+        return self.ui.progressBar.value
 
     def setProgressBarValue(self,value):
+        if not hasattr(self,'ui.progressBar.value'):
+            self.ui.progressBar.value = 0
+        
         self.ui.progressBar.setValue(value)
+        self.ui.progressBar.value = value
 
     def setProgressBarLabelText(self,text):
         if self.current_timer:
@@ -300,7 +306,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
         
-        elif np.all([s1==s2 for s1,s2 in zip(self.loadedGuiSettings,self.generateCurrentGuiSettings())]):
+        elif np.all([s1==s2 for s1,s2 in zip(self.loadedGuiSettings.values(),self.generateCurrentGuiSettings().values())]):
             if not self.quitDialog(event):
                 return
 
@@ -334,6 +340,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
         
 
     @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
@@ -362,7 +369,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             dsDict['files']=localstring
-            
+            dsDict['binning'] = [None if df.type != 'nxs' else df.binning for df in ds]
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -370,7 +377,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
-
         guiSettings = self.guiSettings()
         
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
@@ -414,13 +420,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
 
         dataSetString = loadSetting(settingsFile,'dataSet')
-        totalFiles = np.sum([len(dsDict['files'])+1 for dsDict in dataSetString])+1
+
+        totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
         # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
-        self.setProgressBarLabelText('Loading Data Sets and Files')
+
         for dsDict in dataSetString:
+            self.setProgressBarLabelText('Loading Data Set')
             DSName = dsDict['name']
             files = dsDict['files']
             dfs = None
@@ -434,7 +442,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if DSName == '':
                 continue
             ds = GuiDataSet(name=DSName,dataFiles=dfs)
+            if not np.any([b is None for b in dsDict['binning']]):
+                binnings = dsDict['binning']
+                for df,binning in zip(ds,binnings):
+                    df.binning = binning
+                self.setProgressBarLabelText('Converting Data Set')    
+                ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+            
             self.DataSetModel.append(ds)
+            self.DataSetModel.layoutChanged.emit()
+            self.update()
             counter+=1
             self.setProgressBarValue(counter)
             
