@@ -442,12 +442,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if DSName == '':
                 continue
             ds = GuiDataSet(name=DSName,dataFiles=dfs)
-            if not np.any([b is None for b in dsDict['binning']]):
-                binnings = dsDict['binning']
-                for df,binning in zip(ds,binnings):
-                    df.binning = binning
-                self.setProgressBarLabelText('Converting Data Set')    
-                ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+            if 'binning' in dsDict:
+                if not np.any([b is None for b in dsDict['binning']]):
+                    binnings = dsDict['binning']
+                    for df,binning in zip(ds,binnings):
+                        df.binning = binning
+                    self.setProgressBarLabelText('Converting Data Set')    
+                    ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
             
             self.DataSetModel.append(ds)
             self.DataSetModel.layoutChanged.emit()
