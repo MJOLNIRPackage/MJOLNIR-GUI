@@ -343,13 +343,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         QtWidgets.QApplication.processEvents()
         
 
-    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
+    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved',failedText='Cancelled')
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
         settingsDict = self.generateCurrentGuiSettings(updateProgressBar=True)
-        
-        saveSettings,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')
+        if not hasattr(self,'loadedSettingsFile'):
+            self.loadedSettingsFile = home
+        saveSettings,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.loadedSettingsFile)
+
+        if saveSettings is None or saveSettings == '':
+            return False
+
         if not saveSettings.split('.')[-1] == 'MJOLNIRGuiSettings':
             saveSettings+='.MJOLNIRGuiSettings'
 
@@ -408,6 +413,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
         self.update()
         self.loadedSettingsFolder = os.path.dirname(settingsFile)
+        self.loadedSettingsFile = settingsFile
         
         if settingsFile is None or settingsFile == '':
             return False
@@ -499,6 +505,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return self.ui.DataSet_path_lineEdit.text()
 
     def setCurrentDirectory(self,folder):
+        self.currentFolder = folder
         self.ui.DataSet_path_lineEdit.setText(folder)
         
 
