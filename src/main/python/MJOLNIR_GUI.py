@@ -396,7 +396,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.setCurrentDirectory(fileDir)
 
 
-    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
+    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done',failedText='Cancelled')
     def loadGui(self):
         
         # Load saveFile
@@ -418,7 +418,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             self.DataSetModel.layoutChanged.emit()
             self.DataFileModel.updateCurrentDataSetIndex()
-            self.update()
+        self.update()
         dataSetString = loadSetting(settingsFile,'dataSet')
 
         totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
@@ -436,6 +436,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 dfs = []
                 for dfLocation in files:
                     df = GuiDataFile(dfLocation)
+                    self.update()
                     dfs.append(df)
                     counter+=1
                     self.setProgressBarValue(counter)
@@ -449,6 +450,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                         df.binning = binning
                     self.setProgressBarLabelText('Converting Data Set')    
                     ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+                    self.update()
             
             self.DataSetModel.append(ds)
             self.DataSetModel.layoutChanged.emit()
