@@ -136,7 +136,7 @@ def Raw1D_plot_button_function(self):
         return False
 
     
-    ax = ds.plot1D()
+    ax = ds.plotRaw1D()
     self.windows.append(ax.get_figure())
     return True
 
