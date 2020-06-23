@@ -108,6 +108,91 @@ class DataSetModel(QtCore.QAbstractListModel):
 
 
 
+# class Cut1DModel(QtCore.QAbstractListModel):
+#     def __init__(self, *args, dataCuts1D=None, Cut1D_listView=None, **kwargs):
+#         super(Cut1DModel, self).__init__(*args, **kwargs)
+#         self.dataCuts1D = dataCuts1D or []
+#         self.Cut1D_listView = Cut1D_listView
+        
+#     def data(self, index, role):
+#         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+#             text = self.dataCuts1D[index.row()].name
+#             return text
+        
+#     def getData(self,*args,**kwargs):
+#         return self.data(*args,**kwargs)
+
+#     def rowCount(self, index):
+#         return len(self.dataCuts1D)
+
+#     def append(self,Cut1D):
+#         self.dataCuts1D.append(Cut1D)
+#         self.selectLastCut1D()
+#         self.layoutChanged.emit()
+
+#     def delete(self,index):
+#         try:
+#             del self.dataCuts1D[index.row()]
+#             self.layoutChanged.emit()
+#         except:
+#             pass
+#         QtWidgets.QApplication.processEvents()
+#         index = self.getCurrentCut1DIndex()
+        
+#         if index is None:
+#             self.selectLastDataSet()
+#         else:
+#             if index.row()==self.rowCount(None):
+#                 self.selectLastCut1D()
+
+#     def item(self,index):
+#         if not index is None:
+#             return self.dataCuts1D[index.row()]
+
+#     def setData(self, index, value, role=QtCore.Qt.EditRole):
+#         ds = self.item(index)
+#         if role == QtCore.Qt.EditRole:
+#             ds.name = value
+#             self.dataChanged.emit(index, index)
+#             return True
+            
+#         return False
+
+#     def flags(self,index):
+#         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+
+#     def getCurrentCut1DIndex(self):
+#         indices = self.Cut1D_listView.selectedIndexes()
+        
+#         if len(indices)==0:
+#             return None
+#         else:
+#             index = indices[0]
+#             if index.row()<self.rowCount(None):
+#                 return index
+#             else:
+#                 return None
+
+#     def getCurrentCut1DIndexRow(self):
+#         currentIndex = self.getCurrentCut1DIndex()
+#         if currentIndex is None:
+#             return None
+#         else:
+#             return currentIndex.row()
+
+#     def getCurrentCut1D(self):
+#         index = self.getCurrentCut1DIndex()
+#         return self.item(index)
+
+#     def selectLastCut1D(self):
+#         dataCuts1D = self.rowCount(None)
+#         if dataCuts1D!=0:
+#             index = self.index(self.rowCount(None)-1,0)
+#             self.Cut1D_listView.setCurrentIndex(index)
+
+
+
 ### Conversion from row call to attribute name
 
 class defaultList(list):
