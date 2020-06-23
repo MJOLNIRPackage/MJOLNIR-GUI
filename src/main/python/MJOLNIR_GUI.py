@@ -94,6 +94,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
+
+        ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
@@ -193,11 +195,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
+        self.actionSave_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        self.actionSave_GUI_state_shortcut.activated.connect(self.saveCurrentGui)
 
         self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
+        self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
+        self.actionLoad_GUI_state_shortcut.activated.connect(self.loadGui)
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
@@ -242,9 +248,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
 
+    def getProgressBarValue(self):
+        return self.ui.progressBar.value
 
     def setProgressBarValue(self,value):
+        if not hasattr(self,'ui.progressBar.value'):
+            self.ui.progressBar.value = 0
+        
         self.ui.progressBar.setValue(value)
+        self.ui.progressBar.value = value
 
     def setProgressBarLabelText(self,text):
         if self.current_timer:
@@ -294,7 +306,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
         
-        elif np.all([s1==s2 for s1,s2 in zip(self.loadedGuiSettings,self.generateCurrentGuiSettings())]):
+        elif np.all([s1==s2 for s1,s2 in zip(self.loadedGuiSettings.values(),self.generateCurrentGuiSettings().values())]):
             if not self.quitDialog(event):
                 return
 
@@ -328,16 +340,26 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def update(self):
         QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
         
 
-    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved')
+    @ProgressBarDecoratorArguments(runningText='Saving Gui Settings',completedText='Gui Settings Saved',failedText='Cancelled')
     def saveCurrentGui(self): # save data set and files in format DataSetNAME DataFileLocation DataFileLocation:DataSetNAME
         #DataSet = [self.dataSets[I].name for I in range(self.DataSetModel.rowCount(None))]
         
         settingsDict = self.generateCurrentGuiSettings(updateProgressBar=True)
-        
+        if not hasattr(self,'loadedSettingsFile'):
+            self.loadedSettingsFile = home
+        saveSettings,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.loadedSettingsFile)
+
+        if saveSettings is None or saveSettings == '':
+            return False
+
+        if not saveSettings.split('.')[-1] == 'MJOLNIRGuiSettings':
+            saveSettings+='.MJOLNIRGuiSettings'
+
         for key,value in settingsDict.items():
-            updateSetting(self.settingsFile,key,value)
+            updateSetting(saveSettings,key,value)
 
         return True
 
@@ -352,7 +374,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             dsDict['files']=localstring
-            
+            dsDict['binning'] = [None if df.type != 'nxs' else df.binning for df in ds]
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -360,7 +382,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
-
         guiSettings = self.guiSettings()
         
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
@@ -380,24 +401,40 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.setCurrentDirectory(fileDir)
 
 
-    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done')
+    @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done',failedText='Cancelled')
     def loadGui(self):
+        
+        # Load saveFile
+        if not hasattr(self,'loadedSettingsFolder'):
+            folder = home
+        else:
+            folder = self.loadedSettingsFolder
+        
+        settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        self.update()
+        self.loadedSettingsFolder = os.path.dirname(settingsFile)
+        self.loadedSettingsFile = settingsFile
+        
+        if settingsFile is None or settingsFile == '':
+            return False
+        
         self.setProgressBarLabelText('Deleating Old Data Sets and Files')
         while self.DataSetModel.rowCount(None)>0:
             self.DataSetModel.delete(self.DataSetModel.getCurrentDatasetIndex())
         else:
             self.DataSetModel.layoutChanged.emit()
             self.DataFileModel.updateCurrentDataSetIndex()
-            self.update()
-        
-        dataSetString = loadSetting(self.settingsFile,'dataSet')
-        totalFiles = np.sum([len(dsDict['files'])+1 for dsDict in dataSetString])+1
+        self.update()
+        dataSetString = loadSetting(settingsFile,'dataSet')
+
+        totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
         # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
         counter = 0
 
-        self.setProgressBarLabelText('Loading Data Sets and Files')
+
         for dsDict in dataSetString:
+            self.setProgressBarLabelText('Loading Data Set')
             DSName = dsDict['name']
             files = dsDict['files']
             dfs = None
@@ -405,26 +442,38 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 dfs = []
                 for dfLocation in files:
                     df = GuiDataFile(dfLocation)
+                    self.update()
                     dfs.append(df)
                     counter+=1
                     self.setProgressBarValue(counter)
             if DSName == '':
                 continue
             ds = GuiDataSet(name=DSName,dataFiles=dfs)
+            if 'binning' in dsDict:
+                if not np.any([b is None for b in dsDict['binning']]):
+                    binnings = dsDict['binning']
+                    for df,binning in zip(ds,binnings):
+                        df.binning = binning
+                    self.setProgressBarLabelText('Converting Data Set')    
+                    ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+                    self.update()
+            
             self.DataSetModel.append(ds)
+            self.DataSetModel.layoutChanged.emit()
+            self.update()
             counter+=1
             self.setProgressBarValue(counter)
             
-        DataFileListInfos = loadSetting(self.settingsFile,'infos')
+        DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
-        guiSettings = loadSetting(self.settingsFile,'guiSettings')
+        guiSettings = loadSetting(settingsFile,'guiSettings')
         if guiSettings:
             if not self.theme == guiSettings['theme']:
                 self.changeTheme(guiSettings['theme'])
 
-        self.loadLineEdits()
+        self.loadLineEdits(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -438,8 +487,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         settingsDict = {'theme':self.theme}
         return settingsDict
 
-    def loadLineEdits(self):
-        lineEditValueString = loadSetting(self.settingsFile,'lineEdits')
+    def loadLineEdits(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        lineEditValueString = loadSetting(file,'lineEdits')
         if not lineEditValueString is None:
             if isinstance(lineEditValueString,str):
                 print('Please save a new gui state to comply with the new version')
@@ -454,6 +505,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return self.ui.DataSet_path_lineEdit.text()
 
     def setCurrentDirectory(self,folder):
+        self.currentFolder = folder
         self.ui.DataSet_path_lineEdit.setText(folder)
         
 

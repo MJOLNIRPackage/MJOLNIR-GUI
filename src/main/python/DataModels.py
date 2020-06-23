@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 
 import numpy as np
 import sys
+import warnings
 
 try:
     from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
@@ -356,13 +357,18 @@ A4 = Info('A4','A4 [deg]: ',formatValueArray)
 magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
 temperature = Info('temperature','Temperature [K]: ',formatValueArray)
 scanCommand = Info('scanCommand','Command: ',formatTextArray)
+scanSteps = Info('scanSteps','Scan steps: ',formatRaw)
 scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
 comment = Info('comment','Comment: ',formatTextArray)
 binning = Info('binning','Binning: ',formatRaw)
 Ei = Info('Ei','Ei [meV]: ',formatValueArray)
+countingTime = Info('Time', 'Scan step time [s]: ',formatValueArray)
+startTime = Info('startTime', 'Start time: ', formatTextArrayAdder)
+endTime = Info('endTime', 'End time: ', formatTextArrayAdder)
 
 settings = {'sample/name':name,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
-            'scanCommand':scanCommand, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning}
+            'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning,
+            'Time':countingTime,'startTime':startTime, 'endTime':endTime}
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):
@@ -402,11 +408,11 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
     @infos.setter
     def infos(self, newSettings):
         newSettings = np.array(newSettings)
-        inside = np.array([I in self.possibleSettings.keys() for I in newSettings])
+        inside = np.array([I in self.possibleSettings.keys() for I in newSettings],dtype=bool)
         if not np.all(inside):
             outside = np.array(1-inside,dtype=bool)
-            raise AttributeError('Wanted setting(s) {} not found. Allowed are {}'.format(newSettings[outside],settings.keys()))
-        self._infos = [settings[I] for I in newSettings]
+            warnings.warn('Wanted setting(s) {} not found. Allowed are {}'.format(newSettings[outside],settings.keys()))
+        self._infos = [settings[I] for I in newSettings[inside]]
 
 
     def possibleInfos(self):

@@ -10,19 +10,20 @@ class GuiDataSet(DataSet.DataSet):
     def setData(self,column,value):
         if column == 0: self.name = value
         
-    def convertDataFile(self,dataFiles=None,guiWindow=None):
+    def convertDataFile(self,dataFiles=None,guiWindow=None,setProgressBarMaximum=True):
         
         dataFiles = list(self)
-        if not guiWindow is None:
+        if not guiWindow is None and setProgressBarMaximum:
             guiWindow.setProgressBarMaximum(len(dataFiles)+1)
 
         convertedFiles = []
-        for i,rawfile in enumerate(dataFiles):
+        for _,rawfile in enumerate(dataFiles):
             convFile = rawfile.convert()
                 
             convertedFiles.append(convFile)
             if not guiWindow is None:
-                guiWindow.setProgressBarValue(i+1)
+                currentI = guiWindow.getProgressBarValue()
+                guiWindow.setProgressBarValue(currentI+1)
             
         self._convertedFiles = []
         self.convertedFiles = convertedFiles    

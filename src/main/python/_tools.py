@@ -18,7 +18,11 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
             else:
                 args = args[1:]
             self.update()
-            returnval = func(self,*args,**kwargs)
+            try:
+                returnval = func(self,*args,**kwargs)
+            except Exception as e:
+                returnval = False
+                dialog('An exception occured while running {} with error message:\n{}'.format(func.__name__,str(e)))
 
             self.setProgressBarMaximum(100)
             if returnval is not None:
