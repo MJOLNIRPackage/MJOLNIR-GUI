@@ -54,9 +54,9 @@ def Cut1D_SetTitle_button_function(self):
         fig.canvas.draw()
 
 try:
-    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D.ui"))
+    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
 except:
-    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D.ui"))
+    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
 class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(Cut1DManager, self).__init__(parent)
