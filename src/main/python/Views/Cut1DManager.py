@@ -18,6 +18,7 @@ import numpy as np
 
 def Cut1D_Delete1D_button_function(self):
     self.Cut1DModel.delete(self.ui.Cut1D_listView.selectedIndexes())
+    self.update1DCutLabels()
     self.Cut1DModel.layoutChanged.emit()
     self.stateMachine.run()
 
@@ -45,7 +46,11 @@ def selected1DCutChanged(self,*args,**kwargs):
 
 
 def update1DCutLabels(self):
-    print('Woop Woop ^^ You found me!')
+    cuts = self.Cut1DModel.rowCount()
+    if cuts == 0:
+        self.ui.Cut1D_Delete1D_button.setEnabled(False)
+    else:
+        self.ui.Cut1D_Delete1D_button.setEnabled(True)
 
 def extractCutParameters(self):
     HStart = self.ui.Cut1D_HStart_lineEdit.text()
@@ -105,7 +110,7 @@ def Cut1D_plot_button_function(self):
         if cutQ: # If cut along Q, 
             ax,ufitObject = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False,ufit=True)
         else: # else along E
-            ax,ufitObject = ds.plotCut1DE(self,EMin,EMax,q1,rlu=True,width=width, minPixel = minPixel)#,ufit=True)
+            ax,ufitObject = ds.plotCut1DE(E1=EMin,E2=EMax,q=q1,rlu=True,width=width, minPixel = minPixel,ufit=True)
         
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
