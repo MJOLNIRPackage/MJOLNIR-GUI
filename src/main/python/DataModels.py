@@ -122,7 +122,7 @@ class Cut1DModel(QtCore.QAbstractListModel):
     def getData(self,*args,**kwargs):
         return self.data(*args,**kwargs)
 
-    def rowCount(self, index):
+    def rowCount(self, index=None):
         return len(self.dataCuts1D)
 
     def append(self,Cut1D):
