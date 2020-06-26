@@ -280,8 +280,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         if res == QtWidgets.QMessageBox.Save:
             self.saveCurrentGui()
+            self.closeWindows()
             event.accept()
         elif res == QtWidgets.QMessageBox.No:
+            self.closeWindows()
             event.accept()
             return 1
         else:
@@ -295,6 +297,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         
         if res == QtWidgets.QMessageBox.Yes:
+            self.closeWindows()
             event.accept()
             return 1
         else:
