@@ -174,6 +174,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
         self.changeTheme(self.theme)
+        self.ui.menubar.setNativeMenuBar(False)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))

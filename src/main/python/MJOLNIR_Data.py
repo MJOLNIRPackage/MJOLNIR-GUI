@@ -57,3 +57,10 @@ class GuiDataFile(DataFile.DataFile):
         convertedFile = GuiDataFile(super(GuiDataFile, df).convert(binning = df.binning))
         
         return convertedFile
+
+class Gui1DCutObject(object):
+    def __init__(self,name,uFitDataset=None):
+        self.name = name
+        self.uFitDataset = uFitDataset
+
+    

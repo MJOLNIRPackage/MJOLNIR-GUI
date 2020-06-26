@@ -44,7 +44,7 @@ def ConvertedEnabled(StateMachine):
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
         item.setEnabled(enable)
 
-    blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button'],enabled,names)
+    blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button','Cut1D_Generate1D_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
         if enable:
             item.setStyleSheet(highlightStyle)
