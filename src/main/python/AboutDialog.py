@@ -13,6 +13,7 @@ class AboutDialog(QtWidgets.QDialog):
             text = '\n'.join([line.replace('\n','') for line in f.readlines()])
 
         self.about_label = QtWidgets.QLabel(text=text)
+        self.about_label.setWordWrap(True)
         self.about_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse|QtCore.Qt.TextSelectableByKeyboard)
         
         self.about_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)

@@ -14,6 +14,7 @@ class HelpDialog(QtWidgets.QDialog):
             text = '\n'.join([line.replace('\n','') for line in f.readlines()])
 
         self.help_label = QtWidgets.QLabel(text=text)
+        self.help_label.setWordWrap(True)
         self.help_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse|QtCore.Qt.TextSelectableByKeyboard)
         
         self.help_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
