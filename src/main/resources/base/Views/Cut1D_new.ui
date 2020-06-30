@@ -153,7 +153,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
-          <string>Energy</string>
+          <string>Energy [meV]</string>
          </property>
         </widget>
        </item>
@@ -224,7 +224,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Q width</string>
+          <string>Q width [1/AA]</string>
          </property>
         </widget>
        </item>
@@ -241,7 +241,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>Min Pixel</string>
+          <string>Min Pixel [1/AA]</string>
          </property>
         </widget>
        </item>
