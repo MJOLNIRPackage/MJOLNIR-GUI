@@ -85,7 +85,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-
+        self.version = self.AppContext.build_settings['version']   
         ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
@@ -321,7 +321,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version)
         dialog.exec_()
 
     def help(self):

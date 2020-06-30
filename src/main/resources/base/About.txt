@@ -1,4 +1,4 @@
-MJOLNIR_Gui Version 0.0.1
+MJOLNIR_Gui Version {}
 
 MJOLNIR_Gui is a developed GUI application dedicated
 to the MJOLNIR package. It is meant to provide an interface to 
