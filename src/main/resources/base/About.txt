@@ -7,9 +7,6 @@ many of the features found in the software suite.
 Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons 
 Attribution 3.0 License. See https://p.yusukekamiyamane.com/
 
-Styles are under MIT copyright:
-Copyright (c) 2017 Gerard Marull-Paretas <gerardmarull@gmail.com>
-
 The graphical user interface has been developed by
 Jakob Lass
 Henrik Jacobsen

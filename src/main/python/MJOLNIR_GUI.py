@@ -17,8 +17,6 @@ from time import sleep
 from os import path
 import os
 
-import qtmodern.styles
-import qtmodern.windows
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
@@ -78,13 +76,6 @@ home = str(Path.home())
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
 
-###### generate allowed themes from qtmodern
-
-from qtmodern import styles
-styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QStyleFactory','QPalette'] ]
-themes = {}
-for name in styleNames:
-    themes[name] = getattr(styles,name)
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
@@ -101,13 +92,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
         
         
-        if guiSettings is None:
-            self.theme = 'light'
-        else:
-            if not 'theme' in guiSettings:
-                self.theme = 'light'
-            else:
-                self.theme = guiSettings['theme']
+        #if guiSettings is None:
+        #    self.theme = 'light'
+        #else:
+        #    if not 'theme' in guiSettings:
+        #        self.theme = 'light'
+        #    else:
+        #        self.theme = guiSettings['theme']
                 
 
         
@@ -173,7 +164,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.update()
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
-        self.changeTheme(self.theme)
         self.ui.menubar.setNativeMenuBar(False)
 
     def setupMenu(self): # Set up all QActions and menus
@@ -331,12 +321,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = qtmodern.windows.ModernWindow(AboutDialog(self.AppContext.get_resource('About.txt')))
-        dialog.show()
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'))
+        dialog.exec_()
 
     def help(self):
-        dialog = qtmodern.windows.ModernWindow(HelpDialog(self.AppContext.get_resource('Help.txt')))
-        dialog.show()
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog.exec_()
 
 
     def setupStateMachine(self):
@@ -473,9 +463,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileInfoModel.infos = DataFileListInfos
 
         guiSettings = loadSetting(settingsFile,'guiSettings')
-        if guiSettings:
-            if not self.theme == guiSettings['theme']:
-                self.changeTheme(guiSettings['theme'])
 
         self.loadLineEdits(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
@@ -488,7 +475,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def guiSettings(self):
-        settingsDict = {'theme':self.theme}
+        settingsDict = {}
         return settingsDict
 
     def loadLineEdits(self,file=None):
@@ -568,27 +555,14 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         # Create layout for gui settings
         guiSettingsLayout = QtWidgets.QVBoxLayout()
-        guiSettingsTitleLabel = QtWidgets.QLabel(text='Settings for the Gui')
-        guiSettingsTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        guiSettingsLayout.addWidget(guiSettingsTitleLabel)
-
+ 
 
         # Create radiobuttons
-        for theme in themes.keys():
-            radiobutton = QtWidgets.QRadioButton(theme)
-            radiobutton.setChecked(theme == self.theme)
-            radiobutton.theme = theme
-            guiSettingsLayout.addWidget(radiobutton)
         
         def guiSettingsAcceptFunction(self,layout):
             length = layout.count()-1 # first entry is QLabel
             
-            for idx in range(length):
-                radiobutton = layout.itemAt(idx+1).widget()
-                if radiobutton.isChecked():
-                    theme = radiobutton.theme
-            self.theme = theme
-
+ 
         # settings holds a list of possible settings for all setting fields
         layouts = [guiSettingsLayout,dFIMLayout]
         acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
@@ -601,11 +575,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if dialog.exec_(): # Execute the dialog
             self.DataFileInfoModel.infos = dialog.dMFIASettings # update settings
             self.DataFileInfoModel.layoutChanged.emit()
-            self.changeTheme(dialog.theme)
         else:
             return
 
-class settingsBoxDialog(qtmodern.windows.ModernDialog):
+class settingsBoxDialog(QtWidgets.QDialog):
 
     def __init__(self, layouts, acceptFunctions, *args, **kwargs):
         super(settingsBoxDialog, self).__init__(*args, **kwargs)

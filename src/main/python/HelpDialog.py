@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from qtmodern.windows import ModernDialog
+#from qtmodern.windows import ModernDialog
 
 
-class HelpDialog(ModernDialog):
+class HelpDialog(QtWidgets.QDialog):
 
     def __init__(self, helpFile, *args, **kwargs):
         super(HelpDialog, self).__init__(*args, **kwargs)
