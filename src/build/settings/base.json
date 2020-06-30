@@ -4,5 +4,6 @@
     "main_module": "src/main/python/main.py",
     "version": "0.0.7",
     "gpg_key": "B6CC03BFA225CFFC7D1338CBCCF04E13EECDED58",
-    "gpg_name": "Jakob Lass"
+    "gpg_name": "Jakob Lass",
+    "hidden_imports": ["pkg_resources.py2_warn"]
 }
