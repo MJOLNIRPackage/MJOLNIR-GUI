@@ -6,7 +6,7 @@ try:
     import MJOLNIRGui._tools as _GUItools
     from MJOLNIRGui.DataModels import Cut1DModel
     from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
-except ModuleNotFoundError:
+except ImportError:
     from DataModels import Cut1DModel
     from MJOLNIR_Data import Gui1DCutObject
     from _tools import ProgressBarDecoratorArguments

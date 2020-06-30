@@ -3,7 +3,7 @@ sys.path.append('..')
 
 try:
     from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-except ModuleNotFoundError:
+except ImportError:
     from _tools import ProgressBarDecoratorArguments
 
 from os import path

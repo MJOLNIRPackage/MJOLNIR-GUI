@@ -8,7 +8,7 @@ from MJOLNIR import _tools
 try:
     import MJOLNIRGui._tools as _GUItools
     from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-except ModuleNotFoundError:
+except ImportError:
     import _tools as _GUItools
     from _tools import ProgressBarDecoratorArguments
 

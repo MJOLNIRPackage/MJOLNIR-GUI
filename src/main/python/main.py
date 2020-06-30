@@ -2,11 +2,11 @@
 import sys
 try:
     from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
-except ModuleNotFoundError:
+except ImportError:
     sys.path.append('.')
     try:
         from .MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
-    except ModuleNotFoundError:
+    except ImportError:
         from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     import os
     os.chdir(os.path.abspath(os.path.dirname(__file__)))

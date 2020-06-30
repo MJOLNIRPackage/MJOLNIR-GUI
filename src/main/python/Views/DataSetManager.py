@@ -5,7 +5,7 @@ try:
     from MJOLNIRGui.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-except ModuleNotFoundError:
+except ImportError:
     from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from _tools import ProgressBarDecoratorArguments

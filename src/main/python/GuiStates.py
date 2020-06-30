@@ -1,7 +1,7 @@
 import sys
 try:
     from StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
-except ModuleNotFoundError:
+except ImportError:
     from .StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
 
 

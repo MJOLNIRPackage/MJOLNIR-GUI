@@ -8,14 +8,14 @@ import warnings
 
 try:
     from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
-except ModuleNotFoundError:
+except ImportError:
     from  MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
 try:
     import MJOLNIRGui._tools
-except ModuleNotFoundError:
+except ImportError:
     import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
