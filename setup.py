@@ -37,8 +37,8 @@ setup(
     entry_points = {
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.MJOLNIR_GUI:main']
         },
-    python_requires='>=3.4,<=3.7',
-    install_requires=['MJOLNIR>=1.1.7','PyQt5'],
+    python_requires='>=3.5,<=3.7',
+    install_requires=['MJOLNIR>=1.1.10','PyQt5'],
     
     classifiers=[
         'Development Status :: 3 - Alpha',
