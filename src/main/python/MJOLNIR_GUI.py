@@ -124,9 +124,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         # Find correct layout to insert views
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
         # Insert all views
+        self.boxContainers = []
         for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
             self.update()
             box = CollapsibleBox(name,startState=state)
+            self.boxContainers.append(box)
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
 
@@ -469,6 +471,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
+        self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
         self.loadRadioButtons(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
@@ -481,8 +484,24 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def guiSettings(self):
-        settingsDict = {}
+        boxStates = [b.state for b in self.boxContainers]
+        settingsDict = {'boxStates':boxStates}
         return settingsDict
+        
+    def loadGuiSettings(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        guiSettings = loadSetting(file,'guiSettings')
+        boxStates = guiSettings['boxStates']
+        
+        if not boxStates is None:
+            for box,value in zip(self.boxContainers,boxStates):
+                try:
+                    if box.state != value:
+                        box.on_pressed()
+                except AttributeError:
+                    pass
+
 
     def loadLineEdits(self,file=None):
         if file is None:
