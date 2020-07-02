@@ -365,8 +365,12 @@ class DataFileModel(QtCore.QAbstractListModel):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
 
-    def delete(self):
-        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+    def delete(self,idx=None):
+        print(idx)
+        if idx is None:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        else:
+            ds = self.dataSetModel.item(idx)
         indices = np.array(self.getCurrentDatafileIndexRows())
         if np.all([row<len(ds) for row in indices]):
             for idx in indices:
