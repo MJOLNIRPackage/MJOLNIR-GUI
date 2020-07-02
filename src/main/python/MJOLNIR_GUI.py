@@ -146,8 +146,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
         self.blockItems.append(self.ui.DataSet_binning_comboBox)
 
-        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
-        
+        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all lineedits
+        self.radioButtons = [getattr(self.ui,item) for item in self.ui.__dict__ if '_radioButton' in item] # Collect all radiobuttons
+
         self.update()
         initGenerateScript(self)
 
@@ -354,7 +355,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         for key,value in settingsDict.items():
             updateSetting(saveSettings,key,value)
-
+        self.loadedGuiSettings = self.generateCurrentGuiSettings()
         return True
 
 
@@ -373,12 +374,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if updateProgressBar: self.setProgressBarValue((i+1))
 
         lineEditString = self.generateCurrentLineEditSettings()
+        radioButtonString = self.generateCurrentRadioButtonSettings()
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
-        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,
                       'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
         return returnDict
 
@@ -388,6 +390,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             lineEditValueString[item.objectName()] = item.text()
         return lineEditValueString
 
+    def generateCurrentRadioButtonSettings(self):
+        radioButtonString = {}
+        for item in self.radioButtons:
+            radioButtonString[item.objectName()] = item.isChecked()
+        return radioButtonString
 
     def loadFolder(self):
         fileDir = loadSetting(self.settingsFile,'fileDir')
@@ -462,9 +469,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
-        guiSettings = loadSetting(settingsFile,'guiSettings')
-
         self.loadLineEdits(file=settingsFile)
+        self.loadRadioButtons(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -489,6 +495,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             for item,value in lineEditValueString.items():
                 try:
                     getattr(self.ui,item).setText(value)
+                except AttributeError:
+                    pass
+
+    def loadRadioButtons(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        radioButtonString = loadSetting(file,'radioButtons')
+        if not radioButtonString is None:
+            if isinstance(radioButtonString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in radioButtonString.items():
+                try:
+                    getattr(self.ui,item).setChecked(value)
                 except AttributeError:
                     pass
 
