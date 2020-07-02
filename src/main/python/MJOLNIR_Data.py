@@ -62,5 +62,8 @@ class Gui1DCutObject(object):
     def __init__(self,name,uFitDataset=None):
         self.name = name
         self.uFitDataset = uFitDataset
+    
+    def plot(self,*args,**kwargs):
+        return self.uFitDataset.plot(*args,**kwargs)
 
     
