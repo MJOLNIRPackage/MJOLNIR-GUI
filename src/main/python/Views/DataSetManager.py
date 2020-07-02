@@ -12,7 +12,7 @@ except ImportError:
 
 
 from os import path
-from PyQt5 import QtWidgets,uic
+from PyQt5 import QtWidgets,uic, QtCore, QtGui
 import numpy as np
 
 def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
@@ -40,6 +40,28 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     
     self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
 
+    def deleteFunction(self,gui,idx):
+        gui.DataSetModel.delete(idx[0])
+        self.DataFileModel.layoutChanged.emit()
+        self.stateMachine.run()
+
+    def contextMenu(view,event,gui):
+        # Generate a context menu that opens on right click
+        position = event.globalPos()
+        idx = view.selectedIndexes()
+        if len(idx)!=0:
+            if event.type() == QtCore.QEvent.ContextMenu:
+                menu = QtWidgets.QMenu()
+                delete = QtWidgets.QAction('Delete')
+                delete.setToolTip('Delete DataSet') 
+                delete.setStatusTip(delete.toolTip())
+                delete.triggered.connect(lambda: deleteFunction(self,gui,idx))
+
+                menu.addAction(delete)
+                return menu.exec_(position)
+
+    self.ui.DataSet_DataSets_listView.contextMenuEvent = lambda event: contextMenu(self.ui.DataSet_DataSets_listView,event,self)
+
 def setupDataFile(self): # Set up main features for Gui regarding the datafile widgets
     self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,guiWindow=self)
     self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
@@ -57,6 +79,23 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,dataFileModel=self.DataFileModel,guiWindow=self)
     self.setupDataFileInfoModel()
     self.ui.DataSet_fileAttributs_listView.setModel(self.DataFileInfoModel)
+
+    def contextMenuDataFiles(view,event,gui):
+        # Generate a context menu that opens on right click
+        position = event.globalPos()
+        idx = view.selectedIndexes()
+        if len(idx)!=0:
+            if event.type() == QtCore.QEvent.ContextMenu:
+                menu = QtWidgets.QMenu()
+                delete = QtWidgets.QAction('Delete')
+                delete.setToolTip('Delete DataSet') 
+                delete.setStatusTip(delete.toolTip())
+                delete.triggered.connect(self.DataSet_DeleteFiles_button_function)
+
+                menu.addAction(delete)
+                return menu.exec_(position)
+
+    self.ui.DataSet_filenames_listView.contextMenuEvent = lambda event: contextMenuDataFiles(self.ui.DataSet_filenames_listView,event,self)
     
 
 def setupDataSet_binning_comboBox(self):
