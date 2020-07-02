@@ -374,6 +374,30 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>QELine_CAxisMax_lineEdit</tabstop>
+  <tabstop>QELine_CAxisMin_lineEdit</tabstop>
+  <tabstop>QELine_setCAxis_button</tabstop>
+  <tabstop>QELine_Grid_checkBox</tabstop>
+  <tabstop>QELine_LogScale_checkBox</tabstop>
+  <tabstop>QELine_ConstantBins_checkBox</tabstop>
+  <tabstop>QELine_SetTitle_lineEdit</tabstop>
+  <tabstop>QELine_SetTitle_button</tabstop>
+  <tabstop>QELine_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>QELine_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>QELine_HStart_lineEdit</tabstop>
+  <tabstop>QELine_KStart_lineEdit</tabstop>
+  <tabstop>QELine_LStart_lineEdit</tabstop>
+  <tabstop>QELine_HEnd_lineEdit</tabstop>
+  <tabstop>QELine_KEnd_lineEdit</tabstop>
+  <tabstop>QELine_LEnd_lineEdit</tabstop>
+  <tabstop>QELine_Width_lineEdit</tabstop>
+  <tabstop>QELine_MinPixel_lineEdit</tabstop>
+  <tabstop>QELine_EMax_lineEdit</tabstop>
+  <tabstop>QELine_EMin_lineEdit</tabstop>
+  <tabstop>QELine_NPoints_lineEdit</tabstop>
+  <tabstop>QELine_plot_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

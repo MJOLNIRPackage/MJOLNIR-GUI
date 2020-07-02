@@ -337,6 +337,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>View3D_CAxisMax_lineEdit</tabstop>
+  <tabstop>View3D_CAxisMin_lineEdit</tabstop>
+  <tabstop>View3D_setCAxis_button</tabstop>
+  <tabstop>View3D_SelectView_QxE_radioButton</tabstop>
+  <tabstop>View3D_SelectView_QyE_radioButton</tabstop>
+  <tabstop>View3D_SelectView_QxQy_radioButton</tabstop>
+  <tabstop>View3D_Grid_checkBox</tabstop>
+  <tabstop>View3D_LogScale_checkBox</tabstop>
+  <tabstop>View3D_SetTitle_lineEdit</tabstop>
+  <tabstop>View3D_SetTitle_button</tabstop>
+  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_QXBin_lineEdit</tabstop>
+  <tabstop>View3D_QYBin_lineEdit</tabstop>
+  <tabstop>View3D_EBin_lineEdit</tabstop>
+  <tabstop>View3D_plot_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
