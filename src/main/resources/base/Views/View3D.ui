@@ -263,7 +263,7 @@
        <item row="1" column="1">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Qy</string>
+          <string>Qy [1/AA]</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -273,7 +273,7 @@
        <item row="1" column="2">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>E</string>
+          <string>E [meV]</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -297,7 +297,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Qx</string>
+          <string>Qx [1/AA]</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -337,10 +337,28 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>View3D_CAxisMax_lineEdit</tabstop>
+  <tabstop>View3D_CAxisMin_lineEdit</tabstop>
+  <tabstop>View3D_setCAxis_button</tabstop>
+  <tabstop>View3D_SelectView_QxE_radioButton</tabstop>
+  <tabstop>View3D_SelectView_QyE_radioButton</tabstop>
+  <tabstop>View3D_SelectView_QxQy_radioButton</tabstop>
+  <tabstop>View3D_Grid_checkBox</tabstop>
+  <tabstop>View3D_LogScale_checkBox</tabstop>
+  <tabstop>View3D_SetTitle_lineEdit</tabstop>
+  <tabstop>View3D_SetTitle_button</tabstop>
+  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_QXBin_lineEdit</tabstop>
+  <tabstop>View3D_QYBin_lineEdit</tabstop>
+  <tabstop>View3D_EBin_lineEdit</tabstop>
+  <tabstop>View3D_plot_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

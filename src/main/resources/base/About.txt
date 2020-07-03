@@ -1,4 +1,4 @@
-MJOLNIR_Gui Version 0.0.1
+MJOLNIR_Gui Version {}
 
 MJOLNIR_Gui is a developed GUI application dedicated
 to the MJOLNIR package. It is meant to provide an interface to 
@@ -6,9 +6,6 @@ many of the features found in the software suite.
 
 Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons 
 Attribution 3.0 License. See https://p.yusukekamiyamane.com/
-
-Styles are under MIT copyright:
-Copyright (c) 2017 Gerard Marull-Paretas <gerardmarull@gmail.com>
 
 The graphical user interface has been developed by
 Jakob Lass

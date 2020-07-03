@@ -17,8 +17,6 @@ from time import sleep
 from os import path
 import os
 
-import qtmodern.styles
-import qtmodern.windows
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
@@ -78,13 +76,6 @@ home = str(Path.home())
 #Headlines so far are:
 #DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
 
-###### generate allowed themes from qtmodern
-
-from qtmodern import styles
-styleNames = [att for att in dir(styles) if (hasattr(getattr(styles,att),'__call__') and att[0]!='_') and not att in ['QColor','QStyleFactory','QPalette'] ]
-themes = {}
-for name in styleNames:
-    themes[name] = getattr(styles,name)
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
@@ -94,20 +85,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-
+        self.version = self.AppContext.build_settings['version']   
         ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
         
         
-        if guiSettings is None:
-            self.theme = 'light'
-        else:
-            if not 'theme' in guiSettings:
-                self.theme = 'light'
-            else:
-                self.theme = guiSettings['theme']
+        #if guiSettings is None:
+        #    self.theme = 'light'
+        #else:
+        #    if not 'theme' in guiSettings:
+        #        self.theme = 'light'
+        #    else:
+        #        self.theme = guiSettings['theme']
                 
 
         
@@ -133,9 +124,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         # Find correct layout to insert views
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
         # Insert all views
+        self.boxContainers = []
         for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
             self.update()
             box = CollapsibleBox(name,startState=state)
+            self.boxContainers.append(box)
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
 
@@ -155,8 +148,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.blockItems = [getattr(self.ui,item) for item in self.ui.__dict__ if '_button' in item[-7:]] # Collect all items to block on calls
         self.blockItems.append(self.ui.DataSet_binning_comboBox)
 
-        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all items to block on calls
-        
+        self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all lineedits
+        self.radioButtons = [getattr(self.ui,item) for item in self.ui.__dict__ if '_radioButton' in item] # Collect all radiobuttons
+
         self.update()
         initGenerateScript(self)
 
@@ -173,7 +167,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.update()
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
-        self.changeTheme(self.theme)
         self.ui.menubar.setNativeMenuBar(False)
 
     def setupMenu(self): # Set up all QActions and menus
@@ -280,8 +273,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         if res == QtWidgets.QMessageBox.Save:
             self.saveCurrentGui()
+            self.closeWindows()
             event.accept()
         elif res == QtWidgets.QMessageBox.No:
+            self.closeWindows()
             event.accept()
             return 1
         else:
@@ -295,6 +290,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                     QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         
         if res == QtWidgets.QMessageBox.Yes:
+            self.closeWindows()
             event.accept()
             return 1
         else:
@@ -328,12 +324,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = qtmodern.windows.ModernWindow(AboutDialog(self.AppContext.get_resource('About.txt')))
-        dialog.show()
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version)
+        dialog.exec_()
 
     def help(self):
-        dialog = qtmodern.windows.ModernWindow(HelpDialog(self.AppContext.get_resource('Help.txt')))
-        dialog.show()
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog.exec_()
 
 
     def setupStateMachine(self):
@@ -361,7 +357,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         for key,value in settingsDict.items():
             updateSetting(saveSettings,key,value)
-
+        self.loadedGuiSettings = self.generateCurrentGuiSettings()
         return True
 
 
@@ -380,12 +376,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if updateProgressBar: self.setProgressBarValue((i+1))
 
         lineEditString = self.generateCurrentLineEditSettings()
+        radioButtonString = self.generateCurrentRadioButtonSettings()
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
-        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,
                       'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
         return returnDict
 
@@ -395,6 +392,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             lineEditValueString[item.objectName()] = item.text()
         return lineEditValueString
 
+    def generateCurrentRadioButtonSettings(self):
+        radioButtonString = {}
+        for item in self.radioButtons:
+            radioButtonString[item.objectName()] = item.isChecked()
+        return radioButtonString
 
     def loadFolder(self):
         fileDir = loadSetting(self.settingsFile,'fileDir')
@@ -469,12 +471,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
 
-        guiSettings = loadSetting(settingsFile,'guiSettings')
-        if guiSettings:
-            if not self.theme == guiSettings['theme']:
-                self.changeTheme(guiSettings['theme'])
-
+        self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
+        self.loadRadioButtons(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -485,8 +484,24 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def guiSettings(self):
-        settingsDict = {'theme':self.theme}
+        boxStates = [b.state for b in self.boxContainers]
+        settingsDict = {'boxStates':boxStates}
         return settingsDict
+        
+    def loadGuiSettings(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        guiSettings = loadSetting(file,'guiSettings')
+        boxStates = guiSettings['boxStates']
+        
+        if not boxStates is None:
+            for box,value in zip(self.boxContainers,boxStates):
+                try:
+                    if box.state != value:
+                        box.on_pressed()
+                except AttributeError:
+                    pass
+
 
     def loadLineEdits(self,file=None):
         if file is None:
@@ -499,6 +514,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             for item,value in lineEditValueString.items():
                 try:
                     getattr(self.ui,item).setText(value)
+                except AttributeError:
+                    pass
+
+    def loadRadioButtons(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        radioButtonString = loadSetting(file,'radioButtons')
+        if not radioButtonString is None:
+            if isinstance(radioButtonString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in radioButtonString.items():
+                try:
+                    getattr(self.ui,item).setChecked(value)
                 except AttributeError:
                     pass
 
@@ -565,27 +594,14 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         # Create layout for gui settings
         guiSettingsLayout = QtWidgets.QVBoxLayout()
-        guiSettingsTitleLabel = QtWidgets.QLabel(text='Settings for the Gui')
-        guiSettingsTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        guiSettingsLayout.addWidget(guiSettingsTitleLabel)
-
+ 
 
         # Create radiobuttons
-        for theme in themes.keys():
-            radiobutton = QtWidgets.QRadioButton(theme)
-            radiobutton.setChecked(theme == self.theme)
-            radiobutton.theme = theme
-            guiSettingsLayout.addWidget(radiobutton)
         
         def guiSettingsAcceptFunction(self,layout):
             length = layout.count()-1 # first entry is QLabel
             
-            for idx in range(length):
-                radiobutton = layout.itemAt(idx+1).widget()
-                if radiobutton.isChecked():
-                    theme = radiobutton.theme
-            self.theme = theme
-
+ 
         # settings holds a list of possible settings for all setting fields
         layouts = [guiSettingsLayout,dFIMLayout]
         acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
@@ -598,11 +614,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if dialog.exec_(): # Execute the dialog
             self.DataFileInfoModel.infos = dialog.dMFIASettings # update settings
             self.DataFileInfoModel.layoutChanged.emit()
-            self.changeTheme(dialog.theme)
         else:
             return
 
-class settingsBoxDialog(qtmodern.windows.ModernDialog):
+class settingsBoxDialog(QtWidgets.QDialog):
 
     def __init__(self, layouts, acceptFunctions, *args, **kwargs):
         super(settingsBoxDialog, self).__init__(*args, **kwargs)

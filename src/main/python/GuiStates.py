@@ -1,7 +1,7 @@
 import sys
 try:
     from StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
-except ModuleNotFoundError:
+except ImportError:
     from .StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
 
 
@@ -38,7 +38,7 @@ def AllEnabled(StateMachine):
 def ConvertedEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
     enabled = np.ones(len(names))
-    enabledNames = ['Raw1D_fit_button','Cut1D_fit_button']
+    enabledNames = ['Raw1D_fit_button']
     
     enabled = AllTrueBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):

@@ -1,8 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from qtmodern.windows import ModernDialog
+#from qtmodern.windows import ModernDialog
 
 
-class HelpDialog(ModernDialog):
+class HelpDialog(QtWidgets.QDialog):
 
     def __init__(self, helpFile, *args, **kwargs):
         super(HelpDialog, self).__init__(*args, **kwargs)
@@ -14,6 +14,7 @@ class HelpDialog(ModernDialog):
             text = '\n'.join([line.replace('\n','') for line in f.readlines()])
 
         self.help_label = QtWidgets.QLabel(text=text)
+        self.help_label.setWordWrap(True)
         self.help_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse|QtCore.Qt.TextSelectableByKeyboard)
         
         self.help_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)

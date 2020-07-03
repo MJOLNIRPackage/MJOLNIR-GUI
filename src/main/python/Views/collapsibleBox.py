@@ -13,6 +13,7 @@ class CollapsibleBox(QtWidgets.QWidget):
         self.toggle_button.setToolButtonStyle(
             QtCore.Qt.ToolButtonTextBesideIcon
         )
+        self.state = self.startState
         if self.startState:
             self.toggle_button.setArrowType(QtCore.Qt.DownArrow)
         else:
@@ -45,6 +46,7 @@ class CollapsibleBox(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_pressed(self):
+        self.state = not self.state
         checked = self.toggle_button.isChecked()
         self.toggle_button.setArrowType(
             QtCore.Qt.DownArrow if not checked else QtCore.Qt.RightArrow

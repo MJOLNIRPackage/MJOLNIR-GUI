@@ -4,7 +4,7 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-except ModuleNotFoundError:
+except ImportError:
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from _tools import ProgressBarDecoratorArguments
 

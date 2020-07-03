@@ -174,14 +174,14 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Energy Min</string>
+        <string>Energy Min [meV]</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_9">
        <property name="text">
-        <string>Energy Max</string>
+        <string>Energy Max [meV]</string>
        </property>
       </widget>
      </item>
@@ -248,6 +248,22 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>QPlane_CAxisMax_lineEdit</tabstop>
+  <tabstop>QPlane_CAxisMin_lineEdit</tabstop>
+  <tabstop>QPlane_setCAxis_button</tabstop>
+  <tabstop>QPlane_Grid_checkBox</tabstop>
+  <tabstop>QPlane_LogScale_checkBox</tabstop>
+  <tabstop>QPlane_SetTitle_lineEdit</tabstop>
+  <tabstop>QPlane_SetTitle_button</tabstop>
+  <tabstop>QPlane_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>QPlane_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>QPlane_EMax_lineEdit</tabstop>
+  <tabstop>QPlane_EMin_lineEdit</tabstop>
+  <tabstop>QPlane_xBinTolerance_lineEdit</tabstop>
+  <tabstop>QPlane_yBinTolerance_lineEdit</tabstop>
+  <tabstop>QPlane_plot_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

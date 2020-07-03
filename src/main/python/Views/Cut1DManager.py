@@ -6,18 +6,21 @@ try:
     import MJOLNIRGui._tools as _GUItools
     from MJOLNIRGui.DataModels import Cut1DModel
     from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
-except ModuleNotFoundError:
+except ImportError:
     from DataModels import Cut1DModel
     from MJOLNIR_Data import Gui1DCutObject
     from _tools import ProgressBarDecoratorArguments
     import _tools as _GUItools
 from os import path
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
-
+from ufit.gui.session import UfitSession
+from ufit.gui.scanitem import ScanDataItem
+import matplotlib.pyplot as plt
 
 def Cut1D_Delete1D_button_function(self):
     self.Cut1DModel.delete(self.ui.Cut1D_listView.selectedIndexes())
+    self.update1DCutLabels()
     self.Cut1DModel.layoutChanged.emit()
     self.stateMachine.run()
 
@@ -39,13 +42,40 @@ def setupCut1D(self):
     
     self.ui.Cut1D_listView.doubleClicked.connect(self.Cut1D_DoubleClick_Selection_function)
 
+    def contextMenu(view,event,gui):
+        # Generate a context menu that opens on right click
+        position = event.globalPos()
+        idx = view.selectedIndexes()
+        if len(idx)!=0:
+            items = [gui.Cut1DModel.item(i) for i in idx]
+            if event.type() == QtCore.QEvent.ContextMenu:
+                menu = QtWidgets.QMenu()
+                plot = QtWidgets.QAction('Plot')
+                plot.setToolTip('Plot cut(s)') 
+                plot.setStatusTip(plot.toolTip())
+                plot.triggered.connect(lambda: [self.plotItem(it) for it in items])
+
+                delete = QtWidgets.QAction('Delete')
+                delete.setToolTip('Delete cut(s)') 
+                delete.setStatusTip(delete.toolTip())
+                delete.triggered.connect(lambda: gui.Cut1DModel.delete(idx))
+
+                menu.addAction(plot)
+                menu.addAction(delete)
+                return menu.exec_(position)
+
+    self.ui.Cut1D_listView.contextMenuEvent = lambda event: contextMenu(self.ui.Cut1D_listView,event,self)
 
 def selected1DCutChanged(self,*args,**kwargs):
     self.update1DCutLabels()
 
 
 def update1DCutLabels(self):
-    print('Woop Woop ^^ You found me!')
+    cuts = self.Cut1DModel.rowCount()
+    if cuts == 0:
+        self.ui.Cut1D_Delete1D_button.setEnabled(False)
+    else:
+        self.ui.Cut1D_Delete1D_button.setEnabled(True)
 
 def extractCutParameters(self):
     HStart = self.ui.Cut1D_HStart_lineEdit.text()
@@ -62,13 +92,17 @@ def extractCutParameters(self):
     minPixel = float(self.ui.Cut1D_MinPixel_lineEdit.text())
 
     ds = self.DataSetModel.getCurrentDataSet()
-
-    q1 = np.array([HStart,KStart,LStart],dtype=float)
-    q2 = np.array([HEnd,KEnd,LEnd],dtype=float)
+    rlu = self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked()
+    if rlu:
+        q1 = np.array([HStart,KStart,LStart],dtype=float)
+        q2 = np.array([HEnd,KEnd,LEnd],dtype=float)
+    else:
+        q1 = np.array([HStart,KStart],dtype=float)
+        q2 = np.array([HEnd,KEnd],dtype=float)
 
     cutQ = self.ui.Cut1D_SelectCut_Q_radioButton.isChecked()
 
-    return ds,q1,q2,width,minPixel,EMax,EMin,cutQ
+    return ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
 
 def checker(q1,q2,width,minPixel,EMax,EMin,cutQ):
     """Checker for 1DCuts. Returns False is an error is detected."""
@@ -94,7 +128,7 @@ def Cut1D_plot_button_function(self):
     if not self.stateMachine.requireStateByName('Converted'):
         return False
 
-    ds,q1,q2,width,minPixel,EMax,EMin,cutQ = extractCutParameters(self)
+    ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
     
     # Check if cut is allowed
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
@@ -103,9 +137,9 @@ def Cut1D_plot_button_function(self):
     #try:
     if True:
         if cutQ: # If cut along Q, 
-            ax,ufitObject = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False,ufit=True)
+            ax,ufitObject = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=True)
         else: # else along E
-            ax,ufitObject = ds.plotCut1DE(self,EMin,EMax,q1,rlu=True,width=width, minPixel = minPixel)#,ufit=True)
+            ax,ufitObject = ds.plotCut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=True)
         
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
@@ -125,15 +159,15 @@ def Cut1D_Generate1D_button_function(self):
     if not self.stateMachine.requireStateByName('Converted'):
         return False
 
-    ds,q1,q2,width,minPixel,EMax,EMin,cutQ = extractCutParameters(self)
+    ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
         return False
     #try:
     if True:
         if cutQ:
-            ufitObject = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False,ufit=True)
+            ufitObject = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=True)
         else: # else along E
-            ufitObject = ds.cut1DE(self,EMin,EMax,q1,rlu=True,width=width, minPixel = minPixel,ufit=True)
+            ufitObject = ds.cut1DE(self,EMin,EMax,q1,rlu=rlu,width=width, minPixel = minPixel,ufit=True)
         
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
@@ -154,6 +188,55 @@ def Cut1D_SetTitle_button_function(self):
         fig = self.Cut1D.get_figure()
         fig.canvas.draw()
 
+
+def Cut1D_toggle_units_function(self):
+    if self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked(): # changed to RLU
+        # Change titles
+        self.ui.Cut1D_Hlabel.setText('H')
+        self.ui.Cut1D_Klabel.setText('K')
+        self.ui.Cut1D_Llabel.setText('L')
+        self.ui.Cut1D_LStart_lineEdit.setEnabled(True)
+        self.ui.Cut1D_LEnd_lineEdit.setEnabled(True)
+    else: # Changing to AA
+        self.ui.Cut1D_Hlabel.setText('Qx')
+        self.ui.Cut1D_Klabel.setText('Qy')
+        self.ui.Cut1D_Llabel.setText('N/A')
+        self.ui.Cut1D_LStart_lineEdit.setEnabled(False)
+        self.ui.Cut1D_LEnd_lineEdit.setEnabled(False)
+
+
+@ProgressBarDecoratorArguments(runningText='Saving to file',completedText='Saving Done')
+def Cut1D_Save_To_uFit(self):
+    if self.Cut1DModel.rowCount() == 0:
+        return
+
+    datasets = self.Cut1DModel.dataCuts1D
+    for data in datasets:
+        data.uFitDataset.meta['title'] = data.name
+    
+    saveFile,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.loadedSettingsFile)
+
+    session = UfitSession()
+    session.add_items([ScanDataItem(data.uFitDataset) for data in datasets])
+
+    if saveFile is None or saveFile == '':
+        return False
+
+    if not saveFile.split('.')[-1] == 'ufit':
+        saveFile+='.ufit'
+
+    session.set_filename(saveFile)
+    session.save()
+
+
+def plotItem(self,item):
+    #plot the selected Gui1DCutObject into a new window
+    fig = plt.figure()
+    ax = fig.gca()
+    item.plot(axes=ax)
+    fig.tight_layout()
+    self.windows.append(fig)
+
 try:
     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
 except:
@@ -170,6 +253,11 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.Cut1D_Generate1D_button_function = lambda: Cut1D_Generate1D_button_function(self.guiWindow)
         self.guiWindow.Cut1D_SetTitle_button_function = lambda: Cut1D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.setupCut1D = lambda: setupCut1D(self.guiWindow)
+        self.guiWindow.Cut1D_toggle_units_function = lambda: Cut1D_toggle_units_function(self.guiWindow)
+        self.guiWindow.Cut1D_Save_To_uFit = lambda: Cut1D_Save_To_uFit(self.guiWindow)
+
+        self.guiWindow.plotItem = lambda item: plotItem(self.guiWindow,item)
+
         
         self.guiWindow.Cut1D_DoubleClick_Selection_function = lambda index:Cut1D_DoubleClick_Selection_function(self.guiWindow,index)
         self.guiWindow.Delete1D_button_function = lambda:Cut1D_Delete1D_button_function(self.guiWindow)
@@ -181,5 +269,7 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         
     def setup(self):
         self.guiWindow.setupCut1D()
+        self.guiWindow.ui.Cut1D_SelectUnits_RLU_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_units_function)
+        self.guiWindow.ui.Cut1D_fit_button.clicked.connect(self.guiWindow.Cut1D_Save_To_uFit)
     
     

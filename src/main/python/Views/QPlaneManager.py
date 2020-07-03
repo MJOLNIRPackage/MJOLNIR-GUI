@@ -3,7 +3,7 @@ sys.path.append('..')
 
 try:
     from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-except ModuleNotFoundError:
+except ImportError:
     from _tools import ProgressBarDecoratorArguments
 
 from os import path
@@ -19,7 +19,7 @@ def QPlane_plot_button_function(self):
         self.DataSet_convertData_button_function()        
     
     # Check various plot settings
-    if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked():
+    if self.ui.QPlane_SelectUnits_RLU_radioButton.isChecked():
         rlu=True
     else:
         rlu=False        

@@ -2,19 +2,18 @@
 import sys
 try:
     from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
-except ModuleNotFoundError:
+except ImportError:
     sys.path.append('.')
     try:
         from .MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
-    except ModuleNotFoundError:
+    except ImportError:
         from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     import os
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     
 from PyQt5 import QtWidgets, QtGui, QtCore
 import datetime
-import qtmodern.styles
-import qtmodern.windows
+
 #class AppContext(ApplicationContext):#
 #
 #    def __init__(self, *args, **kwargs):
@@ -65,7 +64,6 @@ class AppContext(ApplicationContext):
     def main_window(self):
         QtWidgets.QApplication.processEvents()
         res = MJOLNIRMainWindow(self)
-        res = qtmodern.windows.ModernWindow(res)
         self.timer.stop()
         return res # Pass context to the window.
 
@@ -77,7 +75,6 @@ class AppContext(ApplicationContext):
 #    sys.exit(exit_code)
 def main():
     appctxt = AppContext()
-    qtmodern.styles.dark(appctxt.app)
     exit_code = appctxt.run()
     sys.exit(exit_code)
 

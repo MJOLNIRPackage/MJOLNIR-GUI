@@ -6,16 +6,18 @@ import numpy as np
 import sys
 import warnings
 
+from MJOLNIR import _tools as M_tools
+
 try:
     from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
-except ModuleNotFoundError:
+except ImportError:
     from  MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
 try:
     import MJOLNIRGui._tools
-except ModuleNotFoundError:
+except ImportError:
     import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
@@ -122,7 +124,7 @@ class Cut1DModel(QtCore.QAbstractListModel):
     def getData(self,*args,**kwargs):
         return self.data(*args,**kwargs)
 
-    def rowCount(self, index):
+    def rowCount(self, index=None):
         return len(self.dataCuts1D)
 
     def append(self,Cut1D):
@@ -363,8 +365,12 @@ class DataFileModel(QtCore.QAbstractListModel):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
 
-    def delete(self):
-        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+    def delete(self,idx=None):
+        print(idx)
+        if idx is None:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        else:
+            ds = self.dataSetModel.item(idx)
         indices = np.array(self.getCurrentDatafileIndexRows())
         if np.all([row<len(ds) for row in indices]):
             for idx in indices:
@@ -432,6 +438,20 @@ def formatTextArrayAdder(array):
     return ', '.join([str(s) for s in Set])
 
 
+def formatVector(array):
+    a = np.array(array,dtype=float)
+    if len(a.shape)==1: # only one input
+        return M_tools.generateLabel(a)
+    else:
+        if a.shape[1]>1: # more than one array
+            if np.all([np.equal(a[0],x) for x in a[1:]]): # all equal to a[0]
+                return M_tools.generateLabel(a[0])
+            else:
+                return 'N/A'
+        else:
+            return M_tools.generateLabel(a)
+
+
 def formatRaw(array):
     if len(array) == 1:
         return str(array[0])
@@ -440,6 +460,8 @@ def formatRaw(array):
 
 Info = namedtuple('Info','location baseText formatter')
 name = Info('sample/name','Sample: ',formatTextArray)
+projectionVector1 = Info('sample/projectionVector1','Projection 1: ',formatVector)
+projectionVector2 = Info('sample/projectionVector2','Projection 2: ',formatVector)
 A3 = Info('A3','A3 [deg]: ',formatValueArray)
 A4 = Info('A4','A4 [deg]: ',formatValueArray)
 magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
@@ -454,7 +476,7 @@ countingTime = Info('Time', 'Scan step time [s]: ',formatValueArray)
 startTime = Info('startTime', 'Start time: ', formatTextArrayAdder)
 endTime = Info('endTime', 'End time: ', formatTextArrayAdder)
 
-settings = {'sample/name':name,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
+settings = {'sample/name':name,'sample/projectionVector1':projectionVector1,'sample/projectionVector2':projectionVector2,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
             'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning,
             'Time':countingTime,'startTime':startTime, 'endTime':endTime}
 
