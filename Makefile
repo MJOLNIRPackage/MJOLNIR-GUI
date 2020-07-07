@@ -6,7 +6,6 @@ distribution:
 wheel:
 	python setup.py sdist
 
-version = $(shell python cut.py $(shell ls -t dist/* | head -1))
 
 upload:
 	twine upload $(shell ls -t dist/* | head -1) -r testpypi
@@ -14,7 +13,6 @@ upload:
 
 
 version: 
-	echo 'Creating version $(version)'
 	python Update.py $(version)
 
 #	git add 'src/build/settings/base.json
