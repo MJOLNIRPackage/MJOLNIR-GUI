@@ -8,27 +8,27 @@ Created on Thu Jan 10 10:31:10 2019
 
 import sys,os,json
 
-version = sys.argv[1]
-
 # update to new version in base.json
 settingsFile = os.path.join('src','build','settings','base.json')
+
+
 
 with open(settingsFile) as jsonFile:
     settings = json.load(jsonFile)
 
+if len(sys.argv)>1:
+    version = sys.argv[1]
+else:
+    currentVersion = settings['version'].split('.')
+    updatedVersion = [x if i<len(currentVersion)-1 else str(int(x)+1) for i,x in enumerate(currentVersion)]
+    version = '.'.join(updatedVersion)
+
+print('Updating version from {} to {}'.format(settings['version'],version))
+
+
 settings['version'] = version
 
-aboutFile = os.path.join('src','main','resources','base','About.txt')
-with open(aboutFile) as file:
-    Lines = []
-    lines = file.readlines()
-    for line in lines:
-        if line.find('MJOLNIR_Gui Version ')!=-1:
-            line = 'MJOLNIR_Gui Version '+version+'\n'
-        Lines.append(line)
+with open(settingsFile,'w') as jsonFile:
+    json.dump(settings,jsonFile,indent=4)
+    
 
-
-data = ''.join(Lines)
-with open(aboutFile,'w') as f:
-	f.write(data)
-            

@@ -214,8 +214,14 @@ def Cut1D_Save_To_uFit(self):
     for data in datasets:
         data.uFitDataset.meta['title'] = data.name
     
-    saveFile,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.loadedSettingsFile)
+    if not hasattr(self,'ufitsaveFile'):
+        folder = path.dirname(self.loadedSettingsFile)
+        fileName = path.join(folder,datasets[0].uFitDataset.meta['title']+'.ufit')
+        self.ufitsaveFile = fileName
+    
+    saveFile,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.ufitsaveFile)
 
+    self.ufitsaveFile = saveFile
     session = UfitSession()
     session.add_items([ScanDataItem(data.uFitDataset) for data in datasets])
 

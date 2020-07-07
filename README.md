@@ -1,5 +1,5 @@
 # MJOLNIR-GUI
-This is a graphical interface for the MJOLNIR: https://github.com/Jakob-Lass/MJOLNIR/, which deals with multiplexing inelastic neutron spectrometers. MJOLNIRGui is meant to introduce the scripting software in a user-friendly way and to give access to data-overview methods either during an experiment or when inspecting data files.
+This is a graphical interface for the MJOLNIR: https://github.com/MJOLNIRPackage/MJOLNIR/, which deals with multiplexing inelastic neutron spectrometers. MJOLNIRGui is meant to introduce the scripting software in a user-friendly way and to give access to data-overview methods either during an experiment or when inspecting data files.
 
 
 
@@ -29,7 +29,7 @@ pip install MJOLNIR PyQt5 PyQt5-sip fbs ufit qtpy
 Then change directory to a dedicated folder in which the MJOLNIRGui repository will be cloned
 ```shell
 cd path
-git clone https://github.com/henrikjacobsenfys/MJOLNIR-GUI.git
+git clone https://github.com/MJOLNIRPackage/MJOLNIR-GUI.git
 cd MJOLNIR-Gui
 ```
 
