@@ -3,6 +3,6 @@
     "author": "Jakob Lass and Henrik Jacobsen",
     "main_module": "src/main/python/main.py",
     "version": "0.7.0",
-    "gpg_key": "B6CC03BFA225CFFC7D1338CBCCF04E13EECDED58",
-    "gpg_name": "Jakob Lass"
+    "gpg_key": "2646E901D80C90A7A0B2F93D8073E9C5A7B51078",
+    "gpg_name": "MJOLNIRPackage"
 }
