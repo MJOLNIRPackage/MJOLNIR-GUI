@@ -18,17 +18,7 @@ with open(settingsFile) as jsonFile:
 
 settings['version'] = version
 
-aboutFile = os.path.join('src','main','resources','base','About.txt')
-with open(aboutFile) as file:
-    Lines = []
-    lines = file.readlines()
-    for line in lines:
-        if line.find('MJOLNIR_Gui Version ')!=-1:
-            line = 'MJOLNIR_Gui Version '+version+'\n'
-        Lines.append(line)
+with open(settingsFile,'w') as jsonFile:
+    json.dump(settings,jsonFile,indent=4)
+    
 
-
-data = ''.join(Lines)
-with open(aboutFile,'w') as f:
-	f.write(data)
-            
