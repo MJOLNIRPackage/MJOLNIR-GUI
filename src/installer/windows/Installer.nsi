@@ -48,7 +48,7 @@ FunctionEnd
     !define MUI_FINISHPAGE_NOAUTOCLOSE
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_CHECKED
-    !define MUI_FINISHPAGE_TEXT 'Thank you for installing MJOLNIRGui. If you like the MJOLNIR $\r$\nsoftware, please cite it appropriately: ...'
+    !define MUI_FINISHPAGE_TEXT 'Thank you for installing MJOLNIRGui. If you like the MJOLNIR $\r$\nsoftware, please cite it using the DOI and article found at https://www.psi.ch/en/sinq/camea/data-treatment'
     !define MUI_FINISHPAGE_RUN_TEXT "Run MJOLNIRGui"
     !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH

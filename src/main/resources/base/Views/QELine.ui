@@ -30,7 +30,7 @@
          <item row="1" column="1">
           <widget class="QLineEdit" name="QELine_CAxisMax_lineEdit">
            <property name="text">
-            <string>5e-6</string>
+            <string>1e-5</string>
            </property>
           </widget>
          </item>
@@ -177,7 +177,7 @@
      <item row="4" column="1">
       <widget class="QLineEdit" name="QELine_Width_lineEdit">
        <property name="text">
-        <string>0.2</string>
+        <string>0.1</string>
        </property>
       </widget>
      </item>
@@ -315,7 +315,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="QELine_NPoints_lineEdit">
        <property name="text">
-        <string>101</string>
+        <string>40</string>
        </property>
       </widget>
      </item>
@@ -343,14 +343,14 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="QELine_EMax_lineEdit">
        <property name="text">
-        <string>10</string>
+        <string>7</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="QELine_EMin_lineEdit">
        <property name="text">
-        <string>0</string>
+        <string>3</string>
        </property>
       </widget>
      </item>

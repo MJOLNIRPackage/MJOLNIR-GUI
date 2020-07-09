@@ -1,6 +1,8 @@
 # MJOLNIR-GUI
-This is a graphical interface for the MJOLNIR: https://github.com/MJOLNIRPackage/MJOLNIR/, which deals with multiplexing inelastic neutron spectrometers. MJOLNIRGui is meant to introduce the scripting software in a user-friendly way and to give access to data-overview methods either during an experiment or when inspecting data files.
+This is a graphical interface for the MJOLNIR: https://github.com/MJOLNIRPackage/MJOLNIR/, which deals with multiplexing inelastic neutron spectrometers. MJOLNIRGui is meant to introduce the scripting software in a user-friendly way and to give access to data-overview methods either during an experiment or when inspecting data files. Further information can be found at https://www.psi.ch/en/sinq/camea/data-treatment.
 
+## Citing this package
+If you use this software for data treatment, please do cite it using its doi and the article found at https://www.psi.ch/en/sinq/camea/data-treatment.
 
 
 ## Installation from Terminal (Linux/MacOS)

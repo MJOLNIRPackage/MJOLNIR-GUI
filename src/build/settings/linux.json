@@ -1,6 +1,6 @@
 {
     "categories": "Education;",
-    "description": "Graphical user interface for the MJOLNIR. Despite not providing all of the capabilities of the MJOLNIR software package, some main features are found.",
+    "description": "Graphical user interface for the MJOLNIR software. Documentation and further information can be found at https://www.psi.ch/en/sinq/camea/data-treatment. Please do cite this package with the DOI and article found at the website.",
     "author_email": "lass.jakob@gmail.dk",
     "url": "https://github.com/Jakob-Lass/MJOLNIR/"
 }
