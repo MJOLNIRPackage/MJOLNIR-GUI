@@ -58,7 +58,7 @@
      <item>
       <widget class="QLineEdit" name="DataSet_path_lineEdit">
        <property name="text">
-        <string>/home/lass/CAMEAData</string>
+        <string>/path/to/data</string>
        </property>
       </widget>
      </item>
