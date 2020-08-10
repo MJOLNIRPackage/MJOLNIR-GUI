@@ -10,7 +10,7 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
-
+from MJOLNIR.Data import Viewer3D
 
 # Handles all functionality related to the View3D box. Each button has its own 
 # definition, which should be pretty selfexplanatory.
@@ -22,7 +22,7 @@ def View3D_setCAxis_button_function(self):
     CAxisMin=float(self.ui.View3D_CAxisMin_lineEdit.text())
     CAxisMax=float(self.ui.View3D_CAxisMax_lineEdit.text())
             
-    self.V.caxis=(CAxisMin,CAxisMax)
+    self.V.set_clim(CAxisMin,CAxisMax)
 
 def View3D_SelectView_QxE_radioButton_function(self):
     if hasattr(self, 'V'):
@@ -50,14 +50,17 @@ def View3D_SelectView_QxQy_radioButton_function(self):
     
 def View3D_SetTitle_button_function(self):        
     if hasattr(self, 'V'):
-        TitleText=self.ui.View3D_SetTitle_lineEdit.text()        
-        self.V.ax.set_title(TitleText)
-        
-        # Get the value of the slider right now, then change it around a bit and put it back to where it was, to render properly
-        currentSliderValue=self.V.Energy_slider.val
-        self.V.Energy_slider.set_val(0)
-        self.V.Energy_slider.set_val(1)
-        self.V.Energy_slider.set_val(currentSliderValue)
+        TitleText=self.ui.View3D_SetTitle_lineEdit.text()
+        if isinstance(self.V,Viewer3D.Viewer3D):
+            self.V.ax.set_title(TitleText)
+            
+            # Get the value of the slider right now, then change it around a bit and put it back to where it was, to render properly
+            currentSliderValue=self.V.Energy_slider.val
+            self.V.Energy_slider.set_val(0)
+            self.V.Energy_slider.set_val(1)
+            self.V.Energy_slider.set_val(currentSliderValue)
+        else:
+            self.V.parent().window().setWindowTitle(TitleText)
                 
 @ProgressBarDecoratorArguments(runningText='Generating View3D',completedText='View3D Generated')                    
 def View3D_plot_button_function(self):
@@ -90,10 +93,20 @@ def View3D_plot_button_function(self):
     else:
         log=False        
     
-    try:
-        self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log)
-        self.windows.append(self.V.ax.get_figure())
+    if self.ui.View3D_Mode_Viewer3D_radioButton.isChecked():
+        customSlicer = False
+    else:
+        customSlicer = True
+
+    #try:
+    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer)
+
+    if customSlicer:
+        self.windows.append(self.V.parent())
         
+    else:
+        self.windows.append(self.V.ax.get_figure())
+    
         # Select the correct view
         if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
             self.View3D_SelectView_QyE_radioButton_function()
@@ -101,16 +114,43 @@ def View3D_plot_button_function(self):
             self.View3D_SelectView_QxE_radioButton_function()
         if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
             self.View3D_SelectView_QxQy_radioButton_function()
-                    
-        self.View3D_setCAxis_button_function()        
+
         self.View3D_SetTitle_button_function()
         self.V.setPlane(1)
         self.V.setPlane(0)
-        return True
-    except:
-        _GUItools.dialog(text='View3D plot could not be made. Check the input parameters and try again!')
-        return False        
+
+    self.View3D_setCAxis_button_function()      
     
+    
+    return True
+    #except:
+    #    _GUItools.dialog(text='View3D plot could not be made. Check the input parameters and try again!')
+    #    return False        
+    
+def View3D_toggle_mode_function(self):
+    if self.ui.View3D_Mode_Viewer3D_radioButton.isChecked(): # changed to Viewer3D
+        # Change titles
+        self.ui.View3D_SelectView_QxQy_radioButton.setEnabled(True)
+        self.ui.View3D_SelectView_QxE_radioButton.setEnabled(True)
+        self.ui.View3D_SelectView_QyE_radioButton.setEnabled(True)
+        self.ui.View3D_Grid_checkBox.setEnabled(True)
+        self.ui.View3D_LogScale_checkBox.setEnabled(True)
+
+        self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(True)
+        self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(True)
+
+    else: # Changing to AA
+        self.ui.View3D_SelectView_QxQy_radioButton.setEnabled(False)
+        self.ui.View3D_SelectView_QxE_radioButton.setEnabled(False)
+        self.ui.View3D_SelectView_QyE_radioButton.setEnabled(False)
+        self.ui.View3D_Grid_checkBox.setEnabled(False)
+        self.ui.View3D_LogScale_checkBox.setEnabled(False)
+
+        self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(False)
+        self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
+        
+        
+
 try:
     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
 except:
@@ -131,6 +171,7 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.View3D_SelectView_QxQy_radioButton_function = lambda:View3D_SelectView_QxQy_radioButton_function(self.guiWindow)
         self.guiWindow.View3D_SetTitle_button_function = lambda:View3D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.View3D_plot_button_function = lambda:View3D_plot_button_function(self.guiWindow)
+        self.guiWindow.View3D_toggle_mode_function = lambda: View3D_toggle_mode_function(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'View3D' in key:
@@ -145,3 +186,4 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)
+        self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
