@@ -2,7 +2,7 @@
     "app_name": "MJOLNIRGui",
     "author": "Jakob Lass and Henrik Jacobsen",
     "main_module": "src/main/python/main.py",
-    "version": "0.0.18",
-    "gpg_key": "2646E901D80C90A7A0B2F93D8073E9C5A7B51078",
+    "version": "0.0.19",
+    "gpg_key": "045B8EA10E9DFEA2757FD613709C3104BC498E0B",
     "gpg_name": "MJOLNIRPackage"
 }

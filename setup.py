@@ -35,6 +35,7 @@ setup(
     version=settings['version'],
     description=('Neutron Scattering software suite.'),
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author=settings['author'],
     author_email=settings['author_email'],
     url=settings['url'],

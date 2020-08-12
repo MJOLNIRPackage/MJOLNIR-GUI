@@ -2,6 +2,8 @@ distribution:
 	fbs freeze
 	fbs installer
 
+releasedistribution:
+	fbs release $(version)
 
 wheel:
 	python preparePIP.py
@@ -11,7 +13,15 @@ wheel:
 
 upload:
 	twine upload $(shell ls -t dist/* | head -2) -r pypiMJOLNIRPackage
+	fbs upload
 
 
 version: 
 	python Update.py $(version)
+
+release:
+	make wheel
+	make distribution
+	make upload
+
+
