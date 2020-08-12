@@ -2,8 +2,8 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-    import MJOLNIRGui._tools as _GUItools
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
     from _tools import ProgressBarDecoratorArguments
     import _tools as _GUItools
@@ -154,7 +154,10 @@ def View3D_toggle_mode_function(self):
 try:
     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
 except:
-    View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
+    try:
+        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
+    except:
+        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
 # All of this connects the buttons and their functions to the main window.
 
 class View3DManager(View3DManagerBase, View3DManagerForm):

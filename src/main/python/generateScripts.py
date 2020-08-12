@@ -6,8 +6,8 @@ from PyQt5 import QtWidgets
 
 from MJOLNIR import _tools
 try:
-    import MJOLNIRGui._tools as _GUItools
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+    import MJOLNIRGui.src.main.python._tools as _GUItools
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
 except ImportError:
     import _tools as _GUItools
     from _tools import ProgressBarDecoratorArguments

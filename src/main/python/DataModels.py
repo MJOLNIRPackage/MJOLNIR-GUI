@@ -9,14 +9,14 @@ import warnings
 from MJOLNIR import _tools as M_tools
 
 try:
-    from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile
 except ImportError:
     from  MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
 try:
-    import MJOLNIRGui._tools
+    import MJOLNIRGui.src.main.python._tools
 except ImportError:
     import _tools
 

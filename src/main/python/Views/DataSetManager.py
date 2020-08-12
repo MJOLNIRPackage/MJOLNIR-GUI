@@ -2,9 +2,9 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
-    from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
 except ImportError:
     from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
@@ -242,9 +242,19 @@ def setupDataFileInfoModel(self):
 
 
 try:
+    # needed when freezing app
     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+    
 except:
-    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+    try:
+        # needed when running app local through fbs
+        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+        
+    except:
+        # needed when running app after pip install
+        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
+        
+        
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(DataSetManager, self).__init__(parent)

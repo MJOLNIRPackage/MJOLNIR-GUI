@@ -2,8 +2,8 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-    import MJOLNIRGui._tools as _GUItools
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
     from _tools import ProgressBarDecoratorArguments
     import _tools as _GUItools
@@ -126,7 +126,10 @@ def QELine_SetTitle_button_function(self):
 try:
     QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
 except:
-    QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QELine.ui"))
+    try:
+        QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QELine.ui"))
+    except:
+        QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"QELine.ui"))
 class QELineManager(QELineManagerBase, QELineManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(QELineManager, self).__init__(parent)

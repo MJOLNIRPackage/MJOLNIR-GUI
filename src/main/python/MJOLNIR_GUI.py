@@ -7,7 +7,10 @@ except:
 
 
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
-import _tools as _guitools
+try:
+    import _tools as _guitools
+except ImportError:
+    import MJOLNIRGui.src.main.python._tools as _guitools
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -22,6 +25,7 @@ plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
     #from MJOLNIR_GUI_ui import Ui_MainWindow  
+    
     from Views.main import Ui_MainWindow
     from Views.DataSetManager import DataSetManager
     from Views.View3DManager import View3DManager
@@ -38,27 +42,28 @@ try:
     from HelpDialog import HelpDialog
     from generateScripts import initGenerateScript,setupGenerateScript
     from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
+    
 except ModuleNotFoundError:
     sys.path.append('.')
     
     #from .MJOLNIR_GUI_ui import Ui_MainWindow  
-    from .Views.main import Ui_MainWindow
-    from .Views.DataSetManager import DataSetManager
-    from .Views.View3DManager import View3DManager
-    from .Views.QELineManager import QELineManager
-    from .Views.QPlaneManager import QPlaneManager
-    from .Views.Cut1DManager import Cut1DManager
-    from .Views.Raw1DManager import Raw1DManager
-    from .Views.Raw1DManager import Raw1DManager
-    from .Views.collapsibleBox import CollapsibleBox
-    from .MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from .DataModels import DataSetModel,DataFileModel
-    from .StateMachine import StateMachine
-    from .GuiStates import empty,partial,raw,converted
-    from .AboutDialog import AboutDialog
-    from .HelpDialog import HelpDialog
-    from .generateScripts import initGenerateScript,setupGenerateScript
-    from ._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python.Views.main import Ui_MainWindow
+    from MJOLNIRGui.src.main.python.Views.DataSetManager import DataSetManager
+    from MJOLNIRGui.src.main.python.Views.View3DManager import View3DManager
+    from MJOLNIRGui.src.main.python.Views.QELineManager import QELineManager
+    from MJOLNIRGui.src.main.python.Views.QPlaneManager import QPlaneManager
+    from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
+    from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
+    from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
+    from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
+    from MJOLNIRGui.src.main.python.StateMachine import StateMachine
+    from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
+    from MJOLNIRGui.src.main.python.AboutDialog import AboutDialog
+    from MJOLNIRGui.src.main.python.HelpDialog import HelpDialog
+    from MJOLNIRGui.src.main.python.generateScripts import initGenerateScript,setupGenerateScript
+    from MJOLNIRGui.src.main.python._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 
 import sys
 

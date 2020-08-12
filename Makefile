@@ -4,20 +4,14 @@ distribution:
 
 
 wheel:
-	python setup.py sdist
+	python preparePIP.py
+	python setup.py sdist 
+	python setup.py bdist_wheel
 
 
 upload:
-	twine upload $(shell ls -t dist/* | head -1) -r testpypi
-	twine upload $(shell ls -t dist/* | head -1) -r pypi
+	twine upload $(shell ls -t dist/* | head -2) -r pypiMJOLNIRPackage
 
 
 version: 
 	python Update.py $(version)
-
-#	git add 'src/build/settings/base.json
-#	git commit -m 'Update version'
-#	git tag -a $(version) -m \'$(version)\'
-#	make wheel
-#	git push
-#	git push --tags
