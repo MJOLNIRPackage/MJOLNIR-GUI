@@ -366,7 +366,6 @@ class DataFileModel(QtCore.QAbstractListModel):
 
 
     def delete(self,idx=None):
-        print(idx)
         if idx is None:
             ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         else:
