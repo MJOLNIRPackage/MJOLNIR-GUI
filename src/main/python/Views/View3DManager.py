@@ -134,7 +134,6 @@ def View3D_toggle_mode_function(self):
         self.ui.View3D_SelectView_QxE_radioButton.setEnabled(True)
         self.ui.View3D_SelectView_QyE_radioButton.setEnabled(True)
         self.ui.View3D_Grid_checkBox.setEnabled(True)
-        self.ui.View3D_LogScale_checkBox.setEnabled(True)
 
         self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(True)
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(True)
@@ -144,7 +143,6 @@ def View3D_toggle_mode_function(self):
         self.ui.View3D_SelectView_QxE_radioButton.setEnabled(False)
         self.ui.View3D_SelectView_QyE_radioButton.setEnabled(False)
         self.ui.View3D_Grid_checkBox.setEnabled(False)
-        self.ui.View3D_LogScale_checkBox.setEnabled(False)
 
         self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(False)
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
