@@ -535,6 +535,10 @@ def generateCut1DScript(self):
         _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
         return False
 
+    if self.Cut1DModel.rowCount() == 0:
+        _GUItools.dialog(text='It is not possible to generate a script without any cuts performed. Please make a cut using the "Generate 1D cut" or Plot 1D cut" buttons.')
+        return False
+
     folder = self.getCurrentDirectory()
     saveFile = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',folder,"Python (*.py)")[0]
     if len(saveFile)==0:
@@ -549,80 +553,127 @@ def generateCut1DScript(self):
 
     binning = self.ui.DataSet_binning_comboBox.currentText()
     
-    HStart = self.ui.Cut1D_HStart_lineEdit.text()
-    KStart = self.ui.Cut1D_KStart_lineEdit.text()
-    LStart = self.ui.Cut1D_LStart_lineEdit.text()
-    HEnd = self.ui.Cut1D_HEnd_lineEdit.text()
-    KEnd = self.ui.Cut1D_KEnd_lineEdit.text()
-    LEnd = self.ui.Cut1D_LEnd_lineEdit.text()
-    width = self.ui.Cut1D_Width_lineEdit.text()
-    minPixel = self.ui.Cut1D_MinPixel_lineEdit.text()
-    EMin = self.ui.Cut1D_EMin_lineEdit.text()
-    EMax = self.ui.Cut1D_EMax_lineEdit.text()
-
-
-
-    title = self.ui.Cut1D_SetTitle_lineEdit.text()
-
-    
-    
-    generatePlotCut1DScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
-                                HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
-                                width=width, minPixel=minPixel, EMin = EMin, EMax=EMax,
-                                title=title)
-
-    return True    
-        
-def generatePlotCut1DScript(saveFile,dataSetName,dataFiles,binning = None, 
-                             HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
-                             width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, RLU=True, 
-                             title=''):
     saveString = []
-    
     saveString.append(startString())
+    saveString.append('\n\n')
     saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
     saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
 
-    saveString.append(plotCut1DText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
-               width=width, minPixel=minPixel, EMin = EMin,EMax=EMax, 
-               title=title))
-
-    saveString = '\n'.join(saveString)    
+    if self.Cut1DModel.rowCount() == 1:
+        cut = self.Cut1DModel.dataCuts1D[0]
+        saveString.append(plotCut1DTextSingle(dataSetName,cut))
+    else:
         
+        for cut in self.Cut1DModel.dataCuts1D:
+            method = cut.method
+            params = {}
+            for param in cut.parameters:
+                if param == 'method':
+                    continue
+                val = getattr(cut,param)
+                if isinstance(val,(list,np.ndarray)):
+                    val = '['+','.join([str(x) for x in val])+']'
+                params[param] = val
+            
+            name = cut.name.replace(' ','_').replace('.','_').replace(',','_')
+
+            if method.find('plot')>-1:
+                returnValues = ','.join([name+'_'+x for x in ['ax','data','bins']])
+            else:
+                returnValues = ','.join([name+'_'+x for x in ['data','bins']])
+            line = returnValues+' = '+dataSetName+'.'+method+'('
+            line += ', '.join([param+' = ' + str(value) for param,value in params.items()])+')\n'
+            saveString.append(line)
+            
+        
+    saveString.append('\n\n#If a ufit object is needed, add "ufit=True" to the above method calls and change "_data" and "_bins" to "_ufit".')
     with open(saveFile,'w') as file:
-        file.write(saveString)   
+        file.write(''.join(saveString))
+    return True    
         
-def plotCut1DText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
-               width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,
-               title=''):
+        
+def plotCut1DTextSingle(dataSetName, cut):
+    if cut.method.find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
+        q = cut.q
+        EMin,EMax = cut.E1,cut.E2
+        rlu,width = cut.rlu,cut.width
+        minPixel = cut.minPixel
+        constantBins = cut.constantBins
+        ufit = True
+        method = cut.method
 
-    plotString = []
+        
+        plotString = []
 
-    plotString.append('# Plotting a 1D cut through data is done using this code')
-    
-    
-    plotString.append('# First define the positions to be cut through.')
-    
-    plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
-    plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
-    
-    plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
-    plotString.append('width = ' + width + ' # 1/AA')
-    plotString.append('minPixel = ' + minPixel + ' # 1/AA')
-    
-    plotString.append('# Define energies')
-    plotString.append('EMin='+EMin)
-    plotString.append('EMax='+EMax)
-    
-    plotString.append('ax,*_ = ' +dataSetName +'.plotCut1D(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=False)')
+        plotString.append('# Plotting a 1D cut for constant q through data is done using this code')
+        plotString.append('# First define the positions to be cut through.')
+        
+        plotString.append('Q = np.array(['+','.join([str(x) for x in q])+ '])')
+        
+        plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+        plotString.append('width = ' + str(width) + ' # 1/AA')
+        plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
+        plotString.append('rlu = ' + str(rlu))
+        plotString.append('constantBins = ' + str(constantBins))
 
+        plotString.append('# Define energies')
+        plotString.append('EMin='+str(EMin))
+        plotString.append('EMax='+str(EMax))
+        if cut.method.find('plot')>-1:
+            returnPars = 'ax,'
+        else:
+            returnPars = ''
+        if ufit:
+            returnPars+='cut'
+        else:
+            returnPars+='data,bins'
+        plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(EMin=EMin,EMax=EMax,q=Q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
+        
+    else:
+        q1,q2 = cut.q1, cut.q2
+        EMin,EMax = cut.Emin,cut.Emax
+        rlu,width = cut.rlu,cut.width
+        minPixel = cut.minPixel
+        constantBins = cut.constantBins
+        ufit = True
+        method = cut.method
 
-    if title !='':
+        plotString = []
+
+        plotString.append('# Plotting a 1D cut through data is done using this code')
+        
+        
+        plotString.append('# First define the positions to be cut through.')
+        
+        plotString.append('Q1 = np.array(['+','.join([str(x) for x in q1])+ '])')
+        plotString.append('Q2 = np.array(['+','.join([str(x) for x in q2])+ '])')
+        
+        plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+        plotString.append('width = ' + str(width) + ' # 1/AA')
+        plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
+        plotString.append('rlu = ' + str(rlu))
+        plotString.append('constantBins = ' + str(constantBins))
+
+        plotString.append('# Define energies')
+        plotString.append('EMin='+str(EMin))
+        plotString.append('EMax='+str(EMax))
+
+        if cut.method.find('plot')>-1:
+            returnPars = 'ax,'
+        else:
+            returnPars = ''
+        if ufit:
+            returnPars+='cut'
+        else:
+            returnPars+='data,bins'
+        plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
+
+    if cut.method.find('plot')>-1:
+        title = cut.name
         plotString.append('# Set title of plot')
         plotString.append('ax.set_title("{}")\n'.format(title))
 
-    plotString.append('plt.show()\n')
+        plotString.append('plt.show()\n')
         
     return '\n'.join(plotString)
 
