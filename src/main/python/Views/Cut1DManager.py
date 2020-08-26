@@ -14,8 +14,8 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
-# from ufit.gui.session import UfitSession
-# from ufit.gui.scanitem import ScanDataItem
+from ufit.gui.session import UfitSession
+from ufit.gui.scanitem import ScanDataItem
 import matplotlib.pyplot as plt
 
 def Cut1D_Delete1D_button_function(self):
@@ -237,17 +237,17 @@ def Cut1D_Save_To_uFit(self):
     saveFile,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.ufitsaveFile)
 
     self.ufitsaveFile = saveFile
-    #session = UfitSession()
-    #session.add_items([ScanDataItem(data.uFitDataset) for data in datasets])
+    session = UfitSession()
+    session.add_items([ScanDataItem(data.uFitDataset) for data in datasets])
 
-    #if saveFile is None or saveFile == '':
-    #    return False
+    if saveFile is None or saveFile == '':
+        return False
 
-    #if not saveFile.split('.')[-1] == 'ufit':
-    #    saveFile+='.ufit'
+    if not saveFile.split('.')[-1] == 'ufit':
+        saveFile+='.ufit'
 
-    #session.set_filename(saveFile)
-    #session.save()
+    session.set_filename(saveFile)
+    session.save()
 
 
 def plotItem(self,item):
