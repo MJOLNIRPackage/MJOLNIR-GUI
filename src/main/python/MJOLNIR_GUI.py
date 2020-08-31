@@ -181,7 +181,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     """QToolButton::right-arrow {
     image: url("""+self.AppContext.get_resource('right.png')+""");
 }"""
-        self.setStyleSheet(correctedArrows)
+
+        self.setStyleSheet(self.styleSheet()+correctedArrows)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
