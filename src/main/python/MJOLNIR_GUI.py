@@ -173,6 +173,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
         self.ui.menubar.setNativeMenuBar(False)
+        
+        ## Update image of arrows to correct style on mack
+        correctedArrows = """QToolButton::down-arrow {
+    image: url("""+self.AppContext.get_resource('down.png')+""");
+}"""+\
+    """QToolButton::right-arrow {
+    image: url("""+self.AppContext.get_resource('right.png')+""");
+}"""
+        self.setStyleSheet(correctedArrows)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
