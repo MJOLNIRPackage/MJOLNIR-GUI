@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from MJOLNIR.Data import DataSet,DataFile
+from MJOLNIR.Data import DataSet,DataFile,Mask
 
 class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None,name='No Name', **kwargs):
@@ -67,3 +67,8 @@ class Gui1DCutObject(object):
         return self.uFitDataset.plot(*args,**kwargs)
 
     
+class GuiMask(object):
+    def __init__(self,name,mask=None):
+
+        self.name = name
+        self.mask = mask
