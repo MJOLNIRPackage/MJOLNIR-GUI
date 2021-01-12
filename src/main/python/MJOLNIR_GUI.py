@@ -20,6 +20,7 @@ from time import sleep
 from os import path
 import os
 
+from MJOLNIR.Data import Mask
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
@@ -32,9 +33,10 @@ try:
     from Views.QELineManager import QELineManager
     from Views.QPlaneManager import QPlaneManager
     from Views.Cut1DManager import Cut1DManager
+    from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
     from Views.collapsibleBox import CollapsibleBox
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
     from GuiStates import empty,partial,raw,converted
@@ -53,10 +55,11 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.QELineManager import QELineManager
     from MJOLNIRGui.src.main.python.Views.QPlaneManager import QPlaneManager
     from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
+    from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
     from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
@@ -122,9 +125,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views.append(self.ui.dataSetManager)
 
         # Lists of views in shown order
-        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data']
-        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D]
-        self.startState = [True,False,False,False,True] # If not collapsed
+        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking']
+        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager,MaskManager]#[View3D,View3D,View3D,Cut1D,Raw1D]
+        self.startState = [True,False,False,False,True,False] # If not collapsed
 
         # Find correct layout to insert views
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
@@ -632,6 +635,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             return
 
+    def maskingDialog(self,objInfo):
+        dialog = maskingDialog(objInfo)
+
+        if dialog.exec_(): # Execute the dialog
+            return dialog.mask
+        else:
+            return None
+
+
+
 class settingsBoxDialog(QtWidgets.QDialog):
 
     def __init__(self, layouts, acceptFunctions, *args, **kwargs):
@@ -664,6 +677,165 @@ class settingsBoxDialog(QtWidgets.QDialog):
 
     def reject(self):
         return super(settingsBoxDialog,self).reject()
+
+
+
+
+class maskingDialog(QtWidgets.QDialog):
+    coordinates = ['h','k','l','energy','qx','qy','A3','A4']
+
+    def __init__(self, maskInfoObject, *args, **kwargs):
+        super(maskingDialog, self).__init__(*args, **kwargs)
+        
+        self.setWindowTitle("Masking")
+        
+        #self.layout = QtWidgets.QVBoxLayout()
+        #print(maskInfoObject)
+        self.maskInfoObject = maskInfoObject  
+
+        self.verticalLayout = QtWidgets.QVBoxLayout(self)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.mainLayout = QtWidgets.QVBoxLayout()
+        self.mainLayout.setObjectName("mainLayout")
+        self.titleLayout = QtWidgets.QHBoxLayout()
+        self.titleLayout.setObjectName("titleLayout")
+        self.maskTypeComboBox = QtWidgets.QComboBox(self)
+        self.maskTypeComboBox.setObjectName("maskTypeComboBox")
+        self.maskTypeComboBox.addItem("")
+        self.maskTypeComboBox.addItem("")
+        self.titleLayout.addWidget(self.maskTypeComboBox)
+        self.maskNameEdit = QtWidgets.QLineEdit(self)
+        self.maskNameEdit.setObjectName("maskNameEdit")
+        self.titleLayout.addWidget(self.maskNameEdit)
+        self.mainLayout.addLayout(self.titleLayout)
+        self.inputLayoutOverview = QtWidgets.QHBoxLayout()
+        self.inputLayoutOverview.setObjectName("inputLayoutOverview")
+
+        self.cornerLayout = QtWidgets.QGridLayout()
+        self.cornerLayout.setObjectName("cornerLayout")
+
+        self.coordinateLabel = QtWidgets.QLabel(self)
+        self.coordinateLabel.setObjectName("coordinateLabel")
+        self.inputLayoutOverview.addWidget(self.coordinateLabel)
+        
+        self.mainLayout.addLayout(self.inputLayoutOverview)
+        self.mainLayout.addLayout(self.cornerLayout)
+        
+        self.verticalLayout.addLayout(self.mainLayout)
+
+        self.initiateComboBox()
+        
+        
+        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        
+        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        
+
+        
+        self.verticalLayout.addWidget(self.buttonBox)
+        self.setLayout(self.verticalLayout)
+
+        self._changingBoxes = False
+
+    def maskSelectionChanged(self,text):
+        if text == '':
+            return
+        currentInfoParameters = self.maskInfoObject[text]
+        self.clearInputLayout() # Clear layout
+        self.clearCornerLayout()
+
+        dimensionality = currentInfoParameters[0][2]
+        
+        self.coordinateLabel = QtWidgets.QLabel('Coordinates: ')
+        self.inputLayoutOverview.addWidget(self.coordinateLabel)
+        self.coordinateComboBoxes = []
+        for i in range(dimensionality):
+            box = QtWidgets.QComboBox(self)
+            box.setObjectName("coordinateBox"+str(i))
+            self.inputLayoutOverview.addWidget(box)
+            for coord in self.coordinates:
+                box.addItem(coord)
+
+            #box.currentTextChanged.connect(lambda text: self.coordinateSelectonChanged(i,text))
+            
+            self.coordinateComboBoxes.append(box)
+        self.labels = [item[0] for item in currentInfoParameters]
+        
+        self.inputFields = []
+        for i,label in enumerate(self.labels):
+            localLabel = QtWidgets.QLabel(label)
+            self.cornerLayout.addWidget(localLabel,i,0)
+            for j,Type in enumerate(currentInfoParameters[i][1]):
+                if Type in [float,int]:
+                    inputField = QtWidgets.QLineEdit('')
+                elif Type is bool:
+                    inputField = QtWidgets.QCheckBox()
+                else:
+                    raise AttributeError()
+                self.cornerLayout.addWidget(inputField,i,j+1)
+                self.inputFields.append(inputField)
+
+        
+        
+    def coordinateSelectonChanged(self,id,text):
+        if self._changingBoxes or text == '': # If already changing the boxes through updating of items
+            return
+        print('Id {} changed to {}'.format(id,text))
+        self._changingBoxes = True # Start changing the boxes
+        totalCoordinates = self.coordinates.copy()
+        currentCoordinates = [box.currentText() for box in self.coordinateComboBoxes]
+        for box,prevCoord,ownCoord in zip(self.coordinateComboBoxes[1:],currentCoordinates,currentCoordinates[1:]):
+            box.clear()
+            totalCoordinates.remove(prevCoord)
+            box.addItems(totalCoordinates)
+
+        self._changingBoxes = False
+            
+        
+
+    def clearInputLayout(self):
+        for i in reversed(range(self.inputLayoutOverview.count())): 
+            self.inputLayoutOverview.itemAt(i).widget().setParent(None)
+    
+    def clearCornerLayout(self):
+        for i in reversed(range(self.cornerLayout.count())): 
+            self.cornerLayout.itemAt(i).widget().setParent(None)
+
+    def accept(self): # the accept button has been pressed
+        coordinates = [box.currentText() for box in self.coordinateComboBoxes]
+        MaskType = getattr(Mask,self.maskTypeComboBox.currentText())
+        
+        inputFields = {}
+        for label,field in zip(self.labels, self.inputFields):
+            value = field.text()
+            if value == '':
+                continue
+            else:
+                inputFields[label] = float(value)
+
+        mask = MaskType(**inputFields,coordinates=coordinates)
+
+        maskName = self.maskNameEdit.text()
+        self.mask = GuiMask(maskName,mask)
+        return super(maskingDialog,self).accept()
+
+    def reject(self):
+        return super(maskingDialog,self).reject()
+
+    def initiateComboBox(self):
+        self.maskTypeComboBox.currentTextChanged.connect(self.maskSelectionChanged)
+        self.maskTypeComboBox.clear()  # Needed to clear empty input
+        names = self.maskInfoObject.keys()
+        for name in names:
+            self.maskTypeComboBox.addItem(name)
+
+        
+            
+        
+
+
 
 def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     currentTime = datetime.datetime.now()

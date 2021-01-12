@@ -198,6 +198,102 @@ class Cut1DModel(QtCore.QAbstractListModel):
 
 
 
+class MaskModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, masks=None, Mask_listView=None, **kwargs):
+        super(MaskModel, self).__init__(*args, **kwargs)
+        self.masks = masks or []
+        self.Mask_listView = Mask_listView
+        
+        
+    def data(self, index, role):
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            text = self.masks[index.row()].name
+            return text
+        
+    def getData(self,*args,**kwargs):
+        return self.data(*args,**kwargs)
+
+    def rowCount(self, index=None):
+        return len(self.masks)
+
+    def append(self,Mask):
+        self.masks.append(Mask)
+        self.selectLastMask()
+        self.layoutChanged.emit()
+
+    def delete(self,index):
+        indices = [ind.row() for ind in index] # Extract numeric index, sort decending
+        indices.sort(reverse=True)
+        for ind in indices:
+            del self.masks[ind]
+            self.layoutChanged.emit()
+
+
+        QtWidgets.QApplication.processEvents()
+        index = self.getCurrentMaskIndex()
+       
+        if index is None:
+            self.selectLastMask()
+        else:
+            if index.row()==self.rowCount(None):
+                self.selectLastMask()
+
+    def item(self,index):   
+        if not index is None:
+            #print('Index',index)
+            try:
+                return self.masks[index.row()]
+            except AttributeError:
+                pass
+            index = np.asarray(index)
+            if len(index) == 0:
+                return None
+            indices = np.array([x.row() for x in index],dtype=int)
+            return np.asarray(self.masks)[indices]
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        mask = self.item(index)
+        if role == QtCore.Qt.EditRole:
+            mask.name = value
+            self.dataChanged.emit(index, index)
+            return True
+           
+        return False
+
+    def flags(self,index):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+    def getCurrentMaskIndex(self):
+        indices = self.Mask_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            index = indices[0]
+            if index.row()<self.rowCount(None):
+                return index
+            else:
+                return None
+
+    def getCurrentMaskIndexRow(self):
+        currentIndex = self.getCurrentMaskIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return currentIndex.row()
+
+    def getMask(self):
+        index = self.getCurrentMaskIndex()
+        return self.item(index)
+
+    def selectLastMask(self):
+        mask = self.rowCount(None)
+        if mask!=0:
+            index = self.index(self.rowCount(None)-1,0)
+            self.Mask_listView.setCurrentIndex(index)
+
+
+
 ### Conversion from row call to attribute name
 
 class defaultList(list):
