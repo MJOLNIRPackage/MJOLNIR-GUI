@@ -17,7 +17,7 @@ if platform.system() == 'Windows':
 else:
     markerColor = 'palette(Link)'
 
-highlightStyle = "background-color: palette(Link); color: black"
+highlightStyle = "background-color: palette(Link); color: white"
 normalStyle = "background-color: palette(midlight)"
 
 ## enterStateFunction
