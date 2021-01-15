@@ -298,3 +298,13 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataFile() # Setup datafiles      
         self.guiWindow.setupRaw1DCutSpinBoxes()
         self.guiWindow.setupDataSet_binning_comboBox()
+
+        self.guiWindow.mask_changed.connect(self.testCall)
+
+    @QtCore.pyqtSlot()
+    def testCall(self):
+        mask = self.guiWindow.maskingManager.getMasks()
+        print('There was a change to the masking and I received a signal with the new mask ',mask)
+        currentDS = self.guiWindow.DataSetModel.getCurrentDataSet()
+        if not currentDS is None:
+            currentDS.mask = mask

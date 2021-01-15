@@ -199,11 +199,26 @@ class Cut1DModel(QtCore.QAbstractListModel):
 
 
 class MaskModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, masks=None, Mask_listView=None, **kwargs):
+    def __init__(self, *args, masks=None, Mask_listView=None, guiWindow=None, **kwargs):
         super(MaskModel, self).__init__(*args, **kwargs)
         self.masks = masks or []
         self.Mask_listView = Mask_listView
-        
+        self._combinedMask = None
+        self.guiWindow = guiWindow
+
+    @property
+    def combinedMask(self):
+        return self._combinedMask
+
+    @combinedMask.getter
+    def combinedMask(self):
+        return self._combinedMask
+
+    @combinedMask.setter
+    def combinedMask(self,value):
+        if not value is self._combinedMask:
+            self._combinedMask = value
+            self.guiWindow.mask_changed.emit()
         
     def data(self, index, role):
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
