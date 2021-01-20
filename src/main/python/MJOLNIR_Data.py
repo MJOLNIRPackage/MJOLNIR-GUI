@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 from MJOLNIR.Data import DataSet,DataFile,Mask
+import numpy as np
 
 class GuiDataSet(DataSet.DataSet):
     def __init__(self,dataFiles=None,name='No Name', **kwargs):
@@ -39,9 +40,32 @@ class GuiDataSet(DataSet.DataSet):
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
+        binning = 1
+        calibrationIndex = list(self.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
+        
+        if self.instrument == 'CAMEA':
+            EPrDetector = 8 
+            detectors = 104
+        elif self.type == 'MultiFLEXX':
+            EPrDetector = 5
+            detectors = 31
+        elif self.type == 'FlatCone':
+            EPrDetector = 1
+            detectors = 31
+        else:
+
+            totalDetectors = np.array(self.instrumentCalibrations[calibrationIndex][0].shape[:-1])
+            if np.mod(totalDetectors,31)==0: # either MultiFLEXX or FlatCone
+                EPrDetector = int(totalDetectors/31)
+                detectors = 31
+            else: # CAMEA
+                EPrDetector = 8 
+                detectors = 104
+        
+        self.maxDetectorSelection = detectors
+        self.maxAnalyzerSelection = EPrDetector
         self.detectorSelectionOriginal = self.detectorSelection
         self.analyzerSelectionOriginal = self.analyzerSelection
-
 
     def setData(self,column,value):
         if column == 0: self.name = value

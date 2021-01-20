@@ -48,6 +48,8 @@ def updateRaw1DCutSpinBoxes(self,dfs=None):
 
     self.ui.Raw1D_Analyzer_spinBox.setEnabled(True)
     self.ui.Raw1D_Detector_spinBox.setEnabled(True)
+    self.ui.Raw1D_Analyzer_spinBox.setMaximum(df.maxAnalyzerSelection-1)
+    self.ui.Raw1D_Detector_spinBox.setMaximum(df.maxDetectorSelection-1)
     self.ui.Raw1D_Analyzer_spinBox.setValue(df.analyzerSelection)
     self.ui.Raw1D_Detector_spinBox.setValue(df.detectorSelection)
     self.updateRaw1DCutLabels(dfs)
@@ -65,19 +67,31 @@ def updateRaw1DCutLabels(self,dfs=None):
 
     self.ui.Raw1D_Analyzer_Original_label.setText('Original {}'.format(df.analyzerSelectionOriginal))
     self.ui.Raw1D_Detector_Original_label.setText('Original {}'.format(df.detectorSelectionOriginal))
+
+    binning = 1
+    calibrationIndex = list(df.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
     
     if df.instrument == 'CAMEA':
         EPrDetector = 8 
         detectors = 104
     elif df.type == 'MultiFLEXX':
-        EPrDetector = 1
+        EPrDetector = 5
         detectors = 31
     elif df.type == 'FlatCone':
         EPrDetector = 1
         detectors = 31
-
-    binning = 1
-    calibrationIndex = list(df.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
+    else:
+        totalDetectors = np.array(df.instrumentCalibrations[calibrationIndex][0].shape[:-1])
+        if len(totalDetectors) == 2:
+            detectors,EPrDetector = totalDetectors
+        else:
+            if np.mod(totalDetectors,31)==0: # either MultiFLEXX or FlatCone
+                EPrDetector = int(totalDetectors/31)
+                detectors = 31
+            else: # CAMEA
+                EPrDetector = 8 
+                detectors = 104
+    
     instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
     
     
