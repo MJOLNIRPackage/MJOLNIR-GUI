@@ -60,4 +60,6 @@ def main():
     sys.exit(exit_code)
 
 if __name__ == '__main__':
+    import os
+    os.environ["QT_LOGGING_RULES"] = "*.debug=false"
     main()
