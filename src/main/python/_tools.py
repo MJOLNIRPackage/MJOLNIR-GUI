@@ -22,7 +22,8 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
                 returnval = func(self,*args,**kwargs)
             except Exception:
                 err = traceback.format_exc()
-                errText = 'MJOLNIRGui encountered an error with the following error message:\n\n{}\n\n'.format(str(err))+\
+                state = self.stateMachine.currentState.name
+                errText = 'MJOLNIRGui encountered an error with the following error message:\n\n{}\nMJOLNIRGui was in:{}\n\n'.format(str(err),state)+\
                     'If this is a recurring error, that you believe should be fixed, please  feel free to copy the message and '+\
                     'send it in an email to "MJOLNIRPackage@gmail.com".'
                 
