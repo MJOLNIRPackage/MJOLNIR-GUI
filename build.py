@@ -4,7 +4,7 @@ from fbs.builtin_commands import freeze,clean
 import fbs.cmdline
 from shutil import copyfile
 
-import os
+import os,sys
 import MJOLNIR
 
 @command
@@ -21,8 +21,12 @@ def customFreeze(debug=False):
     for f in [MJOLNIR.__flatConeNormalization__,MJOLNIR.__multiFLEXXNormalization__]:
         copyfile(f, os.path.join(newFolder,os.path.split(f)[1]))
     
-
-    print("Done. You can now run `target\MJOLNIRGui\MJOLNIRGui.exe`. If that\ndoesn't work, see https://build-system.fman.io/troubleshooting.")
+    operatingSystem = sys.platform
+    if operatingSystem == sys.platform == 'win32':
+        location = os.path.join('target','MJOLNIRGui','MJOLNIRGui.exe')
+    else:
+        location = os.path.join('target','MJOLNIRGui','MJOLNIRGui')
+    print("Done. You can now run `{}`. If that\ndoesn't work, see https://build-system.fman.io/troubleshooting.".format(location))
 
 
 
