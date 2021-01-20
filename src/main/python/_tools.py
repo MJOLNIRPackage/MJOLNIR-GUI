@@ -1,5 +1,5 @@
 import pickle as pickle
-import os
+import os,traceback
 import functools
 from PyQt5 import QtCore,QtWidgets
 
@@ -20,9 +20,14 @@ def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed
             self.update()
             try:
                 returnval = func(self,*args,**kwargs)
-            except Exception as e:
+            except Exception:
+                err = traceback.format_exc()
+                errText = 'MJOLNIRGui encountered an error with the following error message:\n\n{}\n\n'.format(str(err))+\
+                    'If this is a recurring error, that you believe should be fixed, please  feel free to copy the message and '+\
+                    'send it in an email to "MJOLNIRPackage@gmail.com".'
+                
+                dialog(errText)
                 returnval = False
-                dialog('An exception occured while running {} with error message:\n{}'.format(func.__name__,str(e)))
 
             self.setProgressBarMaximum(100)
             if returnval is not None:
@@ -67,6 +72,7 @@ def Exists(settingsFile):# pragma: no cover
 
 def dialog(text):
     dialog = QtWidgets.QMessageBox()
+    dialog.setStyleSheet("messagebox-text-interaction-flags: 5")
     dialog.setIcon(QtWidgets.QMessageBox.Critical)
     dialog.setText(text)
     dialog.addButton(QtWidgets.QMessageBox.Ok)
