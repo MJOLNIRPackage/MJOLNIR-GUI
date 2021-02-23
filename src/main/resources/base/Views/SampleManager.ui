@@ -50,7 +50,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="sampleFormulaLineEdit">
+           <widget class="QLineEdit" name="SampleManager_sampleFormula_lineEdit">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -72,7 +72,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="sampleFormFactorDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_SampleFormFactor_spinBox">
               <property name="decimals">
                <number>3</number>
               </property>
@@ -100,7 +100,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="sampleMassDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_SampleMass_spinBox">
               <property name="decimals">
                <number>4</number>
               </property>
@@ -124,7 +124,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="sampleUnitsPerCellDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_SampleUnitsPerCell_spinBox">
               <property name="decimals">
                <number>1</number>
               </property>
@@ -149,7 +149,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="sampleDebyeWallerFactorDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_SampleDebyeWallerFactor_spinBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -179,7 +179,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="sampleFormFactorDoubleSpinBox_2">
+             <widget class="QDoubleSpinBox" name="SampleManager_SampleFormFactor_spinBox">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -251,15 +251,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="normalizationSampleFormulaLineEdit">
+           <widget class="QLineEdit" name="SampleManager_NormalizationSampleFormula_lineEdit">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="text">
-             <string>V</string>
             </property>
             <property name="placeholderText">
              <string>V</string>
@@ -276,7 +273,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSampleGFactorDoubleSpinBox_2">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSampleGFactor_spinBox">
               <property name="decimals">
                <number>3</number>
               </property>
@@ -304,7 +301,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSampleMassDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSampleMass_spinBox">
               <property name="decimals">
                <number>4</number>
               </property>
@@ -328,7 +325,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSampleUnitsPerCellDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSampleUnitsPerCell_spinBox">
               <property name="decimals">
                <number>1</number>
               </property>
@@ -349,7 +346,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="unitsPerCellDoubleSpinBox_6">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationUnitsPerCell_spinBox">
               <property name="decimals">
                <number>0</number>
               </property>
@@ -380,7 +377,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSampleDebyeWallerFactorMassDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSampleDebyeWallerFactorMass_spinBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -410,7 +407,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSamleFormFactorDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSamleFormFactor_spinBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -437,7 +434,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="normalizationSampleSigmaIncDoubleSpinBox">
+             <widget class="QDoubleSpinBox" name="SampleManager_NormalizationSampleSigmaInc_spinBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
