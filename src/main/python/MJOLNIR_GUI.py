@@ -240,7 +240,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
         self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
-        self.ui.actionOpen_mask_gui.setDisabled(False)
+        self.ui.actionOpen_mask_gui.setDisabled(True)
         self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
         self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
         self.ui.actionOpen_mask_gui.triggered.connect(self.maskingManager.setWindowVisible)

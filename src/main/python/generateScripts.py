@@ -305,6 +305,7 @@ def generateQELineScript(self):
     EMax = self.ui.QELine_EMax_lineEdit.text()
     NPoints = self.ui.QELine_NPoints_lineEdit.text()
 
+    constantBins = self.ui.QELine_ConstantBins_checkBox.isChecked()
 
     CAxisMin = self.ui.QELine_CAxisMin_lineEdit.text()
     CAxisMax = self.ui.QELine_CAxisMax_lineEdit.text()
@@ -320,7 +321,7 @@ def generateQELineScript(self):
     generatePlotQELineScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
                                 HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
                                 width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
-                                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title)
+                                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins)
 
     return True    
 
@@ -328,7 +329,7 @@ def generateQELineScript(self):
 def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
                              HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                              width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
-                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False):
     saveString = []
     
     saveString.append(startString())
@@ -338,7 +339,7 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
 
     saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
                width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
-                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title))
+                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins))
 
     saveString = '\n'.join(saveString)    
         
@@ -348,7 +349,7 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
 
 def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
-                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+                CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False):
 
     plotString = []
 
@@ -362,7 +363,12 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
     else:
         logArgument = ''
 
-    args = rluArgument+logArgument
+    if constantBins == True:
+        constantBinsArgument = ', constantBins = True'
+    else:
+        constantBinsArgument = ''
+
+    args = rluArgument+logArgument+constantBinsArgument
 
     plotString.append('# Plotting a cut through data in Q and E is done using this code')
     
@@ -515,7 +521,7 @@ def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
     plotString.append('ax.set_clim(' + CAxisMin + ',' + CAxisMax +')')
 
     if grid == True:
-        plotString.append('ax.grid(True,zorder=0,c=\'k\') ')
+        plotString.append('ax.grid(True,zorder=0) ')
 
 
     if title !='':
