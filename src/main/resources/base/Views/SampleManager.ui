@@ -455,6 +455,13 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="SampleManager_ApplyNormalization_button">
+        <property name="text">
+        <string>Apply Normalization</string>
+        </property>
+    </widget>
+    </item>
   </layout>
  </widget>
  <resources/>
