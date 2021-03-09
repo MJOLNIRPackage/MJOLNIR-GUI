@@ -35,6 +35,7 @@ try:
     from Views.Cut1DManager import Cut1DManager
     from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
+    #from Views.NormalizationManager import NormalizationManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -57,7 +58,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
     from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
-    from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
+    #from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -87,6 +88,7 @@ home = str(Path.home())
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     mask_changed = QtCore.pyqtSignal()
+    state_changed = QtCore.pyqtSignal(str,str,name='stateChanged')
     def __init__(self,AppContext):
 
         super(MJOLNIRMainWindow, self).__init__()
@@ -125,9 +127,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views.append(self.ui.dataSetManager)
 
         # Lists of views in shown order
-        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking']
-        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D]
-        self.startState = [True,False,False,False,True,False] # If not collapsed
+        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
+        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D] # NormalizationManager
+        self.startState = [True,False,False,False,True,False] # If not collapsed #False
 
         # Find correct layout to insert views
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
@@ -141,6 +143,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             lay = QtWidgets.QVBoxLayout()
 
             widget = Type(guiWindow=self)
+            #if Type == NormalizationManager: # Get a reference to the sample manager directly in self
+            #    self.normalizationManager = widget
             self.views.append(widget)
             lay.addWidget(widget)
            
@@ -160,6 +164,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all lineedits
         self.radioButtons = [getattr(self.ui,item) for item in self.ui.__dict__ if '_radioButton' in item] # Collect all radiobuttons
+        self.spinBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_spinBox' in item[-8:]] # Collect all spinboxes
+        self.checkBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_checkBox' in item[-9:]] # Collect all checkboxes
 
         self.update()
         initGenerateScript(self)
@@ -399,13 +405,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         lineEditString = self.generateCurrentLineEditSettings()
         radioButtonString = self.generateCurrentRadioButtonSettings()
+        spinBoxString = self.generateCurrentSpinBoxSettings()
+        checkBoxString = self.generateCurrentcheckBoxSettings()
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
-        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,
-                      'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -413,6 +421,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         for item in self.lineEdits:
             lineEditValueString[item.objectName()] = item.text()
         return lineEditValueString
+
+    def generateCurrentSpinBoxSettings(self):
+        spinBoxValueString = {}
+        for item in self.spinBoxes:
+            spinBoxValueString[item.objectName()] = item.value()
+        return spinBoxValueString
+
+    def generateCurrentcheckBoxSettings(self):
+        chechValueString = {}
+        for item in self.checkBoxes:
+            chechValueString[item.objectName()] = item.isChecked()
+        return chechValueString
 
     def generateCurrentRadioButtonSettings(self):
         radioButtonString = {}
@@ -496,6 +516,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
         self.loadRadioButtons(file=settingsFile)
+        # self.loadSpinBoxes(file=settingsFile)
+        # self.loadCheckBoxes(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -552,6 +574,35 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     getattr(self.ui,item).setChecked(value)
                 except AttributeError:
                     pass
+
+    def loadSpinBoxes(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        spinBoxValueString = loadSetting(file,'spinBoxes')
+        if not spinBoxValueString is None:
+            if isinstance(spinBoxValueString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in spinBoxValueString.items():
+                try:
+                    getattr(self.ui,item).setValue(value)
+                except AttributeError:
+                    pass
+    
+    def loadCheckBoxes(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        checkBoxString = loadSetting(file,'checkBoxes')
+        if not checkBoxString is None:
+            if isinstance(checkBoxString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in checkBoxString.items():
+                try:
+                    getattr(self.ui,item).setChecked(value)
+                except AttributeError:
+                    pass
+
 
     def getCurrentDirectory(self):
         return self.ui.DataSet_path_lineEdit.text()

@@ -84,6 +84,7 @@ class StateMachine(object):
         
     def transition(self):
         if self.checkTransitionToNextState():
+            self.guiWindow.state_changed.emit(self.currentState.name,self.currentState.nextState.name)
             nextState = self.currentState.nextState
             if nextState is not None:
                 self.currentState = nextState
