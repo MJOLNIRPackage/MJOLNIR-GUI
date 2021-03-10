@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Absolut Normalization Tool</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
     <widget class="QPushButton" name="NormalizationManager_applyNormalization_btn">
       <property name="text">
-      <string>Apply Normalization</string>
+      <string>Copy to Clipboard</string>
       </property>
       <property name="enabled">
         <bool>false</bool>

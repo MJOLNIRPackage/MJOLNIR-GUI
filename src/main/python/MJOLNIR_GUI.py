@@ -35,7 +35,7 @@ try:
     from Views.Cut1DManager import Cut1DManager
     from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
-    #from Views.NormalizationManager import NormalizationManager
+    from Views.NormalizationManager import NormalizationManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -58,7 +58,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
     from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
-    #from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
+    from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -270,6 +270,31 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
 
+
+        self.ui.actionNormalizationWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/ruler.png')))
+        self.ui.actionNormalizationWidget.setDisabled(False)
+        self.ui.actionNormalizationWidget.setToolTip('Generate a script to normalize data absolutely') 
+        self.ui.actionNormalizationWidget.setStatusTip(self.ui.actionNormalizationWidget.toolTip())
+        self.ui.actionNormalizationWidget.triggered.connect(self.absolutNormalizationTool)
+
+        self.ui.actionMolecularWeight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
+        self.ui.actionMolecularWeight.setDisabled(False)
+        self.ui.actionMolecularWeight.setToolTip('Calculate Molecular Mass from Chemical Formula') 
+        self.ui.actionMolecularWeight.setStatusTip(self.ui.actionMolecularWeight.toolTip())
+        self.ui.actionMolecularWeight.triggered.connect(self.molarMassTool)
+
+        self.ui.actionNeutronCalculations.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/calculator.png')))
+        self.ui.actionNeutronCalculations.setDisabled(False)
+        self.ui.actionNeutronCalculations.setToolTip('Calculate standard neutron quantities') 
+        self.ui.actionNeutronCalculations.setStatusTip(self.ui.actionNeutronCalculations.toolTip())
+        self.ui.actionNeutronCalculations.triggered.connect(self.neutronCalculationTool)
+
+        self.ui.actionElectronicLogbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionElectronicLogbook.setDisabled(False)
+        self.ui.actionElectronicLogbook.setToolTip('Generate Electronic Logbook from files') 
+        self.ui.actionElectronicLogbook.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
+        self.ui.actionElectronicLogbook.triggered.connect(self.electronicLogbookTool)
+
     def getProgressBarValue(self):
         return self.ui.progressBar.value
 
@@ -341,14 +366,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.closeWindows()
 
-    @ProgressBarDecoratorArguments(runningText='Closing Windowa',completedText='Windows Closed')
+    @ProgressBarDecoratorArguments(runningText='Closing Windows',completedText='Windows Closed')
     def closeWindows(self):
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
-                    pass
+                    try:
+                        window.close()
+                    except:
+                        pass
         return True
 
     def about(self):
@@ -689,9 +717,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileInfoModel.layoutChanged.emit()
         else:
             return
+            
+    def molarMassTool(self):
+        print('Not Implemeted yet molarMassTool')
 
+    def neutronCalculationTool(self):
+        print('Not Implemeted yet neutronCalculationTool')
 
+    def absolutNormalizationTool(self):
+        absolutNormalizationWindow = NormalizationManager(parent=None)
+        self.windows.append(absolutNormalizationWindow)
+        absolutNormalizationWindow.show()
 
+    def electronicLogbookTool(self):
+        print('Not Implemeted yet electronicLogbookTool')
 
 class settingsBoxDialog(QtWidgets.QDialog):
 

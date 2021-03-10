@@ -194,9 +194,19 @@
     <addaction name="actionAbout"/>
     <addaction name="actionHelp"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionMolecularWeight"/>
+    <addaction name="actionNeutronCalculations"/>
+    <addaction name="actionNormalizationWidget"/>
+    <addaction name="actionElectronicLogbook"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_GUI_state">
