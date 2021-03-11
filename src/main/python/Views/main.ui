@@ -198,6 +198,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionPredictionWidget"/>
     <addaction name="actionMolecularWeight"/>
     <addaction name="actionNeutronCalculations"/>
     <addaction name="actionNormalizationWidget"/>
