@@ -77,7 +77,7 @@
          <x>0</x>
          <y>0</y>
          <width>798</width>
-         <height>851</height>
+         <height>860</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -161,7 +161,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -200,12 +200,12 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_GUI_state">
    <property name="text">
-    <string>Save GUI state</string>
+    <string>Save GUI state    Ctrl+S</string>
    </property>
   </action>
   <action name="actionLoad_GUI_state">
    <property name="text">
-    <string>Load GUI state</string>
+    <string>Load GUI state    Ctrl+L</string>
    </property>
   </action>
   <action name="actionGenerate_View3d_script">
@@ -250,7 +250,7 @@
   </action>
   <action name="actionHelp">
    <property name="text">
-    <string>Help</string>
+    <string>Help    Ctrl+H</string>
    </property>
   </action>
   <action name="actionChange_Theme">

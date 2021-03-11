@@ -36,6 +36,7 @@ try:
     from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
     from Views.NormalizationManager import NormalizationManager
+    from Views.PredictionToolManager import PredictionToolManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -59,6 +60,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
     from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
+    from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -276,6 +278,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionNormalizationWidget.setToolTip('Generate a script to normalize data absolutely') 
         self.ui.actionNormalizationWidget.setStatusTip(self.ui.actionNormalizationWidget.toolTip())
         self.ui.actionNormalizationWidget.triggered.connect(self.absolutNormalizationTool)
+
+        self.ui.actionPredictionWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/predict.png')))
+        self.ui.actionPredictionWidget.setDisabled(False)
+        self.ui.actionPredictionWidget.setToolTip('Predict scan coverage') 
+        self.ui.actionPredictionWidget.setStatusTip(self.ui.actionPredictionWidget.toolTip())
+        self.ui.actionPredictionWidget.triggered.connect(self.predictionTool)
 
         self.ui.actionMolecularWeight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
         self.ui.actionMolecularWeight.setDisabled(False)
@@ -728,6 +736,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         absolutNormalizationWindow = NormalizationManager(parent=None)
         self.windows.append(absolutNormalizationWindow)
         absolutNormalizationWindow.show()
+
+    def predictionTool(self):
+        predictionToolWindow = PredictionToolManager(parent=None,guiWindow=self)
+        self.windows.append(predictionToolWindow)
+        predictionToolWindow.show()
 
     def electronicLogbookTool(self):
         print('Not Implemeted yet electronicLogbookTool')
