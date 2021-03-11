@@ -7,8 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>890</width>
-    <height>500</height>
+    <height>547</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
    <string>Prediction Tool</string>
@@ -48,6 +51,9 @@
             <property name="maximum">
              <double>999.990000000000009</double>
             </property>
+            <property name="minimum">
+             <double>0.0001</double>
+            </property>
             <property name="stepType">
              <enum>QAbstractSpinBox::DefaultStepType</enum>
             </property>
@@ -78,6 +84,9 @@
             <property name="value">
              <double>90.000000000000000</double>
             </property>
+            <property name="minimum">
+             <double>0.01</double>
+            </property>
            </widget>
           </item>
          </layout>
@@ -105,6 +114,9 @@
             </property>
             <property name="maximum">
              <double>999.990000000000009</double>
+            </property>
+            <property name="minimum">
+             <double>0.0001</double>
             </property>
             <property name="stepType">
              <enum>QAbstractSpinBox::DefaultStepType</enum>
@@ -136,6 +148,9 @@
             <property name="value">
              <double>90.000000000000000</double>
             </property>
+            <property name="minimum">
+             <double>0.01</double>
+            </property>
            </widget>
           </item>
          </layout>
@@ -157,12 +172,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="cell_c_lineEdit">
+           <widget class="QDoubleSpinBox" name="cell_c_spinBox">
             <property name="decimals">
              <number>4</number>
             </property>
             <property name="maximum">
              <double>999.990000000000009</double>
+            </property>
+            <property name="minimum">
+             <double>0.0001</double>
             </property>
             <property name="stepType">
              <enum>QAbstractSpinBox::DefaultStepType</enum>
@@ -193,6 +211,9 @@
             </property>
             <property name="value">
              <double>90.000000000000000</double>
+            </property>
+            <property name="minimum">
+             <double>0.01</double>
             </property>
            </widget>
           </item>
@@ -855,6 +876,34 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cell_a_spinBox</tabstop>
+  <tabstop>cell_b_spinBox</tabstop>
+  <tabstop>cell_c_spinBox</tabstop>
+  <tabstop>cell_alpha_spinBox</tabstop>
+  <tabstop>cell_beta_spinBox</tabstop>
+  <tabstop>cell_gamma_spinBox</tabstop>
+  <tabstop>alignment1_ei_spinBox</tabstop>
+  <tabstop>alignment1_ef_spinBox</tabstop>
+  <tabstop>alignment1_h_spinBox</tabstop>
+  <tabstop>alignment1_k_spinBox</tabstop>
+  <tabstop>alignment1_l_spinBox</tabstop>
+  <tabstop>alignment1_a3_spinBox</tabstop>
+  <tabstop>alignment1_a4_spinBox</tabstop>
+  <tabstop>alignment2_ei_spinBox</tabstop>
+  <tabstop>alignment2_ef_spinBox</tabstop>
+  <tabstop>alignment2_h_spinBox</tabstop>
+  <tabstop>alignment2_k_spinBox</tabstop>
+  <tabstop>alignment2_l_spinBox</tabstop>
+  <tabstop>alignment2_a3_spinBox</tabstop>
+  <tabstop>alignment2_a4_spinBox</tabstop>
+  <tabstop>scan_a3Start_spinBox</tabstop>
+  <tabstop>scan_a3Stop_spinBox</tabstop>
+  <tabstop>scan_a3Steps_spinBox</tabstop>
+  <tabstop>scan_ei_spinBox</tabstop>
+  <tabstop>scan_a4_lineEdit</tabstop>
+  <tabstop>scan_plot_checkBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
