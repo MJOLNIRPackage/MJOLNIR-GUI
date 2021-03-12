@@ -200,5 +200,5 @@ class Ui_MainWindow(object):
         self.actionNormalizationWidget.setText(_translate("MainWindow","Generate Normalization"))
         self.actionPredictionWidget.setText(_translate("MainWindow","Prediction Tool"))
         self.actionMolecularWeight.setText(_translate("MainWindow","Calculate Molar Weight"))
-        self.actionNeutronCalculations.setText(_translate("MainWindow","Netruon Calculations"))
+        self.actionNeutronCalculations.setText(_translate("MainWindow","Neutron Calculations"))
         self.actionElectronicLogbook.setText(_translate("MainWindow","Electronic Logbook"))
