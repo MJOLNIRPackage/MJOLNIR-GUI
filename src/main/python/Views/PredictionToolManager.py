@@ -113,7 +113,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         r = self.getAlignment(alignment=alignment)
 
         Cell = calcCell(cell)
-        B = calculateBMatrix(Cell,)
+        B = calculateBMatrix(Cell)
 
         # H,K,L,Ei,Ef
         qe = np.concatenate([r[:3],r[-2:]])

@@ -37,6 +37,7 @@ try:
     from Views.Raw1DManager import Raw1DManager
     from Views.NormalizationManager import NormalizationManager
     from Views.PredictionToolManager import PredictionToolManager
+    from Views.CalculatorManager import CalculatorManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -61,6 +62,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
     from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
     from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
+    from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -730,7 +732,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         print('Not Implemeted yet molarMassTool')
 
     def neutronCalculationTool(self):
-        print('Not Implemeted yet neutronCalculationTool')
+        calculatorManager = CalculatorManager()
+        self.windows.append(calculatorManager)
+        calculatorManager.show()
 
     def absolutNormalizationTool(self):
         absolutNormalizationWindow = NormalizationManager(parent=None)
