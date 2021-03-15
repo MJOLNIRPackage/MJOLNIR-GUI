@@ -364,7 +364,7 @@
             <item>
              <widget class="QLabel" name="scattering_a4_label">
               <property name="text">
-               <string>37.5530</string>
+               <string>-37.5530</string>
               </property>
              </widget>
             </item>
@@ -387,7 +387,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="scattering_de_spinBox"/>
+             <widget class="QDoubleSpinBox" name="scattering_de_spinBox">
+              <property name="minimum">
+               <double>-99.989999999999995</double>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
