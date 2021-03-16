@@ -42,10 +42,10 @@ def textChangedK(manager):
 def onFocus(self,event,others):
     for o in others:
         try:
-            o.textChanged.disconnect()
+            o.valueChanged.disconnect()
         except TypeError: # If no connection to remove
             pass
-    self.textChanged.connect(self.onChangeFunction)
+    self.valueChanged.connect(self.onChangeFunction)
     self.old_focusInEvent(event)
 
 

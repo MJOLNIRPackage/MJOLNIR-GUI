@@ -70,24 +70,24 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def setup(self):
         # Update all boxes with check on out focus
 
-        self.cell_a_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
-        self.cell_b_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
-        self.cell_c_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
-        self.cell_alpha_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
-        self.cell_beta_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
-        self.cell_gamma_spinBox.textChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_a_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_b_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_c_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_alpha_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_beta_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
+        self.cell_gamma_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
 
-        self.alignment1_ei_spinBox.textChanged.connect(lambda: textChangedA4Calc(1,self))
-        self.alignment1_ef_spinBox.textChanged.connect(lambda: textChangedA4Calc(1,self))
-        self.alignment1_h_spinBox.textChanged.connect(lambda: textChangedA4Calc(1,self))
-        self.alignment1_k_spinBox.textChanged.connect(lambda: textChangedA4Calc(1,self))
-        self.alignment1_l_spinBox.textChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_ei_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_ef_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
 
-        self.alignment2_ei_spinBox.textChanged.connect(lambda: textChangedA4Calc(2,self))
-        self.alignment2_ef_spinBox.textChanged.connect(lambda: textChangedA4Calc(2,self))
-        self.alignment2_h_spinBox.textChanged.connect(lambda: textChangedA4Calc(2,self))
-        self.alignment2_k_spinBox.textChanged.connect(lambda: textChangedA4Calc(2,self))
-        self.alignment2_l_spinBox.textChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_ei_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_ef_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
 
         
         self.scan_a4_lineEdit.setValidator(self.a4Validator)
