@@ -51,9 +51,6 @@
             <property name="maximum">
              <double>999.990000000000009</double>
             </property>
-            <property name="stepType">
-             <enum>QAbstractSpinBox::DefaultStepType</enum>
-            </property>
             <property name="value">
              <double>6.283200000000000</double>
             </property>
@@ -115,9 +112,6 @@
             <property name="maximum">
              <double>999.990000000000009</double>
             </property>
-            <property name="stepType">
-             <enum>QAbstractSpinBox::DefaultStepType</enum>
-            </property>
             <property name="value">
              <double>6.283200000000000</double>
             </property>
@@ -178,9 +172,6 @@
             </property>
             <property name="maximum">
              <double>999.990000000000009</double>
-            </property>
-            <property name="stepType">
-             <enum>QAbstractSpinBox::DefaultStepType</enum>
             </property>
             <property name="value">
              <double>6.283200000000000</double>
