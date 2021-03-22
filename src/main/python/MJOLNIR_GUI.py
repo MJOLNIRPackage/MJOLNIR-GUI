@@ -36,6 +36,7 @@ try:
     from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
     from Views.NormalizationManager import NormalizationManager
+    from Views.MolecularCalculationManager import MolecularCalculationManager
     from Views.PredictionToolManager import PredictionToolManager
     from Views.CalculatorManager import CalculatorManager
     from Views.collapsibleBox import CollapsibleBox
@@ -61,6 +62,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
     from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
     from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
+    from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
     from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
@@ -729,7 +731,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return
             
     def molarMassTool(self):
-        print('Not Implemeted yet molarMassTool')
+        molecularCalculationManager = MolecularCalculationManager()
+        self.windows.append(molecularCalculationManager)
+        molecularCalculationManager.show()
+        
 
     def neutronCalculationTool(self):
         calculatorManager = CalculatorManager()
