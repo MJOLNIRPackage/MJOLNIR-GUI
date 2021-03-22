@@ -128,6 +128,9 @@ class MolecularCalculationManager(MolecularCalculationManagerBase, MolecularCalc
         # Connect the check validater when text is edited
         sampleFormLE.textChanged.connect(lambda text:checkValidSampleFormula(sampleFormLE,text,sampleMassL))
         self.MolecularCalculationManager_molarMass_tableView.setModel(self.elementModel)
+
+        # Call textChanged with empty text to update list view
+        sampleFormLE.textChanged.emit('')
         
 
 
