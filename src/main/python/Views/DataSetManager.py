@@ -106,7 +106,6 @@ def setupDataSet_binning_comboBox(self):
 def selectedDataSetChanged(self,*args,**kwargs):
     self.DataFileModel.updateCurrentDataSetIndex()
     self.selectedDataFileChanged()
-    self.normalizationManager.updateCurrentDataSetIndex()
     self.stateMachine.run()
 
 def selectedDataFileChanged(self,*args,**kwargs):
@@ -116,18 +115,15 @@ def selectedDataFileChanged(self,*args,**kwargs):
 
 def DataSet_NewDataSet_button_function(self):
     ds = GuiDataSet(name='Added')
-    #normalizationParams = self.normalizationManager.getSampleInputs()
     #ds.currentNormalizationSettings.update(normalizationParams)
 
     self.DataSetModel.append(ds)
-    #self.normalizationManager.updateCurrentDataSetIndex()
     self.update()
     self.stateMachine.run()
 
 def DataSet_DeleteDataSet_button_function(self):
     self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
     self.DataFileModel.layoutChanged.emit()
-    #self.normalizationManager.updateCurrentDataSetIndex()
     self.stateMachine.run()
     
 def DataSet_DeleteFiles_button_function(self):
