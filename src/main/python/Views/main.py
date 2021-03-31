@@ -169,8 +169,8 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.actionElectronicLogbook)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuMask.menuAction())
-        self.menubar.addAction(self.menuHelp.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
