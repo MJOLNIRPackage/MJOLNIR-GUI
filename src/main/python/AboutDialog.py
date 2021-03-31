@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 #from qtmodern.windows import ModernDialog
 import MJOLNIR
+import sys
 
 class AboutDialog(QtWidgets.QDialog):
 
@@ -13,6 +14,9 @@ class AboutDialog(QtWidgets.QDialog):
             text = '\n'.join([line.replace('\n','') for line in f.readlines()])
         text = text.replace('{MJOLNIRGui}',version)
         text = text.replace('{MJOLNIR}',MJOLNIR.__version__)
+
+        pythonVersion = '.'.join([str(x) for x in sys.version_info[:3]])
+        text = text.replace('{PythonVersion}',pythonVersion)
         
         self.about_label = QtWidgets.QLabel(text=text)
         self.about_label.setWordWrap(True)

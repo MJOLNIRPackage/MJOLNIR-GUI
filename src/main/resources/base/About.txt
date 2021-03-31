@@ -1,5 +1,6 @@
 MJOLNIR_Gui Version {MJOLNIRGui}
 MJOLNIR Version {MJOLNIR}
+Python Version {PythonVersion}
 
 MJOLNIR_Gui is a developed GUI application dedicated
 to the MJOLNIR package. It is meant to provide an interface to 
