@@ -2,8 +2,10 @@
     "app_name": "MJOLNIRGui",
     "author": "Jakob Lass and Henrik Jacobsen",
     "main_module": "src/main/python/main.py",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "gpg_key": "045B8EA10E9DFEA2757FD613709C3104BC498E0B",
     "gpg_name": "MJOLNIRPackage",
-    "hidden_imports": ["cmath"]
+    "hidden_imports": [
+        "cmath"
+    ]
 }
