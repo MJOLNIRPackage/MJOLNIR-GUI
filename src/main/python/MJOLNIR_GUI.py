@@ -191,15 +191,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadedGuiSettings = None
         self.ui.menubar.setNativeMenuBar(False)
         
-        ## Update image of arrows to correct style on mack
-        correctedArrows = """QToolButton::down-arrow {
-    image: url("""+self.AppContext.get_resource('down.png')+""");
-}"""+\
-    """QToolButton::right-arrow {
-    image: url("""+self.AppContext.get_resource('right.png')+""");
-}"""
+        if sys.platform.lower() == 'darwin':
+        ## Update image of arrows to correct style on mac
+            correctedArrows = """QToolButton::down-arrow {
+        image: url("""+self.AppContext.get_resource('down.png')+""");
+    }
 
-        self.setStyleSheet(self.styleSheet()+correctedArrows)
+    QToolButton::right-arrow {
+        image: url("""+self.AppContext.get_resource('right.png')+""");
+    }"""
+
+            self.setStyleSheet(self.styleSheet()+correctedArrows)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
@@ -302,7 +304,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionNeutronCalculations.triggered.connect(self.neutronCalculationTool)
 
         self.ui.actionElectronicLogbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
-        self.ui.actionElectronicLogbook.setDisabled(False)
+        self.ui.actionElectronicLogbook.setDisabled(True)
         self.ui.actionElectronicLogbook.setToolTip('Generate Electronic Logbook from files') 
         self.ui.actionElectronicLogbook.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
         self.ui.actionElectronicLogbook.triggered.connect(self.electronicLogbookTool)
