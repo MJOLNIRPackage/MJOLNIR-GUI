@@ -48,10 +48,10 @@ setup(
     package_data={'': ['*']},
     include_package_data=True,
     entry_points = {
-        "console_scripts": ['MJOLNIRGui = MJOLNIRGui.main:main']
+        "console_scripts": ['MJOLNIRGui = MJOLNIRGui.src.main.python.MJOLNIR_GUI:main']
         },
     python_requires='>=3.5',
-    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','fbs','MJOLNIR','ufit>=1.4.0'], #
+    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR','ufit>=1.4.0'], #,'fbs'
     
     classifiers=[
         'Development Status :: 3 - Alpha',
