@@ -801,7 +801,11 @@ def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     QtWidgets.QApplication.processEvents()
 
 def main():
-    import AppContextEmulator
+    try:
+        import AppContextEmulator
+    except ImportError:
+        from MJOLNIRGui.src.main.python import AppContextEmulator
+        
 
     app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
 
