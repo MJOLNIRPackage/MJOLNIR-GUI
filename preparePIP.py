@@ -6,47 +6,43 @@ Script to copy all dependencies into the MJOLNIRGui folder to prepare for pip
 installation
 """
 
-import os
+import os, shutil
+def copytree(src, dst, symlinks=False, ignore=None, remove=None):
+    if remove is None:
+        remove = []
+    for item in os.listdir(src):
+        if os.path.split(item)[-1] in remove:
+            continue
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+            print('Copying folder {} to {}'.format(s,d))
+        else:
+            shutil.copy2(s, d)
+            print('Copying file {} to {}'.format(s,d))
+
+
+delCommand = 'del'
 
 local = os.path.dirname(__file__)
 
 targetDir = os.path.join(local,'MJOLNIRGui')
 
-if False:
-    
-    settingsDir = os.path.join('src','build','settings','*')
-    settingsDirName = 'settings'
-    
-    iconsDir = os.path.join('src','main','icons','*')
-    iconsDirName = 'icons'
-    
-    fileDir = os.path.join('src','main','python','*')
-    fileDirName = ''
-    
-    resourceDir = os.path.join('src','main','resources','*')
-    resourceDirName = 'resources'
-    # Resulting structure 
-    # copy:
-    #   settingsDir -> targetDir+settingsDirName
-    #   iconsDir -> targetDir+iconsDirName
-    #   fileDir -> targetDir+fileDirName
-    #   settingsDir -> targetDir+settingsDirName
-
 
 if not os.path.exists(targetDir):
     os.system("mkdir {}".format(targetDir))
 
-# for path,name in zip([settingsDir,iconsDir,fileDir,resourceDir],[settingsDirName,iconsDirName,fileDirName,resourceDirName]):
-#     target = os.path.join(local,targetDir,name)
-#     if not os.path.exists(target):
-#         os.system("mkdir {}".format(target))
-#     os.system("cp -rf {} {}".format(path,target))
+# If the build folder exists also delete the main folder
+if os.path.exists(os.path.join(targetDir,'build')):
+    shutil.rmtree(os.path.join(targetDir,'build'))
+    shutil.rmtree(os.path.join(targetDir,'main'))
 
-os.system("cp -rf {} {}".format(os.path.join(local,'src'),targetDir))
-os.system("cp -f {} {}".format(os.path.join(local,'src','main','python','main.py'),os.path.join(targetDir,'main.py')))
+# Do not include the installer or sign folders
+removeList = ['installer','sign']
 
+copytree(os.path.join(local,'src'),targetDir,remove=removeList)
 
+# Remove secret json file (Currently not present)
+os.remove(os.path.join(targetDir,'build','settings','secret.json'))
 
-os.system('rm '+os.path.join(targetDir,'src','build','settings','secret.json'))
-os.system('rm -rf '+os.path.join(targetDir,'src','installer'))
-os.system('rm -rf '+os.path.join(targetDir,'src','sign'))
