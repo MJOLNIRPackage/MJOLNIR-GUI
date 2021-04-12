@@ -804,7 +804,6 @@ def main():
     import AppContextEmulator
 
     app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
-    qtmodern.styles.dark(app)
 
     appEmu = AppContextEmulator.AppContextEmulator(__file__)
 
@@ -825,7 +824,6 @@ def main():
     
 
     window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
-    window = qtmodern.windows.ModernWindow(window)
     splash.finish(window)
     window.show()
     timer.stop()
