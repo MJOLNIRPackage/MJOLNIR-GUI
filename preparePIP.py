@@ -27,7 +27,7 @@ delCommand = 'del'
 
 local = os.path.dirname(__file__)
 
-targetDir = os.path.join(local,'MJOLNIRGui')
+targetDir = os.path.join(local,'MJOLNIRGui','src')
 
 
 if not os.path.exists(targetDir):
