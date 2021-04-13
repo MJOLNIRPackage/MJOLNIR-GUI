@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
-    import MJOLNIRGui._tools as _GUItools
-    from MJOLNIRGui.DataModels import Cut1DModel
-    from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    import MJOLNIRGui.src.main.python._tools as _GUItools
+    from MJOLNIRGui.src.main.python.DataModels import Cut1DModel
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import Gui1DCutObject
 except ImportError:
     from DataModels import Cut1DModel
     from MJOLNIR_Data import Gui1DCutObject
@@ -134,25 +134,33 @@ def Cut1D_plot_button_function(self):
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
         return False
         
-    #try:
-    if True:
+    try:
         if cutQ: # If cut along Q, 
             ax,ufitObject = ds.plotCut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=True)
+            parameters = ['q1','q2','width','minPixel','Emin','Emax','rlu','constantBins','method']
+            values = [q1,q2,width,minPixel,EMin,EMax,rlu,False,'plotCut1D']
         else: # else along E
             ax,ufitObject = ds.plotCut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=True)
+            parameters = ['E1','E2','q','rlu','width','minPixel','method']
+            values = [EMin,EMax,q1,rlu,width,minPixel,'plotCut1DE']
         
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
             self.cutNumber = 1
         gui1DCut = Gui1DCutObject(name='Cut {}'.format(self.cutNumber),uFitDataset=ufitObject)
+        for par,val in zip(parameters,values):
+            setattr(gui1DCut,par,val)
+
+        gui1DCut.parameters = parameters
         self.cutNumber+=1
         self.Cut1DModel.append(gui1DCut)
         self.windows.append(ax.get_figure())
         self.Cut1D=ax
         return True
-    #except:
-    #    _GUItools.dialog(text='1D Cut could not be made. Check the limits for the cut and try again!')
-    #    return False
+    except AttributeError as e:
+        raise e
+        #_GUItools.dialog(text='1D Cut could not be made. Check the limits for the cut and try again!')
+        return False
 
 @ProgressBarDecoratorArguments(runningText='Cutting Cut1D',completedText='Cutting Done')
 def Cut1D_Generate1D_button_function(self):
@@ -162,22 +170,29 @@ def Cut1D_Generate1D_button_function(self):
     ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
         return False
-    #try:
-    if True:
+    try:
         if cutQ:
             ufitObject = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=True)
+            parameters = ['q1','q2','width','minPixel','Emin','Emax','rlu','constantBins','method']
+            values = [q1,q2,width,minPixel,EMin,EMax,rlu,False,'cut1D']
         else: # else along E
-            ufitObject = ds.cut1DE(self,EMin,EMax,q1,rlu=rlu,width=width, minPixel = minPixel,ufit=True)
+            ufitObject = ds.cut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=True)
+            parameters = ['E1','E2','q','rlu','width','minPixel','method']
+            values = [EMin,EMax,q1,rlu,width,minPixel,'cut1DE']
         
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
             self.cutNumber = 1
         gui1DCut = Gui1DCutObject(name='Cut {}'.format(self.cutNumber),uFitDataset=ufitObject)
+        for par,val in zip(parameters,values):
+            setattr(gui1DCut,par,val)
+        gui1DCut.parameters = parameters
         self.cutNumber+=1
         self.Cut1DModel.append(gui1DCut)
-    #except:
-    #    _GUItools.dialog(text='1D Cut could not be made. Check the limits for the cut and try again!')
-    #    return False
+    except AttributeError as e:
+        raise e
+        #_GUItools.dialog(text='1D Cut could not be made. Check the limits for the cut and try again!')
+        return False
 
 
 def Cut1D_SetTitle_button_function(self):
@@ -246,7 +261,10 @@ def plotItem(self,item):
 try:
     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
 except:
-    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
+    try:
+        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
+    except:
+        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Cut1D_new.ui"))
 class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(Cut1DManager, self).__init__(parent)

@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
 except ImportError:
     from _tools import ProgressBarDecoratorArguments
 
@@ -73,7 +73,10 @@ def QPlane_SetTitle_button_function(self):
 try:
     QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
 except:
-    QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QPlane.ui"))
+    try:
+        QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QPlane.ui"))
+    except:
+        QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"QPlane.ui"))
 
 class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
     def __init__(self, parent=None, guiWindow=None):

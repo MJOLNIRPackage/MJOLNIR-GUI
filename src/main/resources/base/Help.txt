@@ -1,4 +1,5 @@
-﻿The Gui is split into two main parts: the upper concering data files and sets, and the lower, which concers data plotting and visualization.
+﻿
+The Gui is split into two main parts: the upper concering data files and sets, and the lower, which concers data plotting and visualization.
 
 Simple start:
 - To start, create a new DataSet by clicking the highlighted button in the top left corner.

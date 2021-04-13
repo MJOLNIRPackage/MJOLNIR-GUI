@@ -48,7 +48,7 @@ FunctionEnd
     !define MUI_FINISHPAGE_NOAUTOCLOSE
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_RUN_CHECKED
-    !define MUI_FINISHPAGE_TEXT 'Thank you for installing MJOLNIRGui. If you like the MJOLNIR $\r$\nsoftware, please cite it using the DOI and article found at https://www.psi.ch/en/sinq/camea/data-treatment'
+    !define MUI_FINISHPAGE_TEXT 'Thank you for installing MJOLNIRGui. $\r$\nPlease cite the MJOLNIR software using the DOI https://doi.org/10.1016/j.softx.2020.100600 or through $\r$\nhttps://www.psi.ch/en/sinq/camea/data-treatment'
     !define MUI_FINISHPAGE_RUN_TEXT "Run MJOLNIRGui"
     !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
   !insertmacro MUI_PAGE_FINISH
@@ -77,7 +77,7 @@ Section
     "$\"$InstDir\uninstall.exe$\" /$MultiUser.InstallMode"
   WriteRegStr SHCTX "${UNINST_KEY}" "QuietUninstallString" \
     "$\"$InstDir\uninstall.exe$\" /$MultiUser.InstallMode /S"
-  WriteRegStr SHCTX "${UNINST_KEY}" "Publisher" "Jakob Lass and Henrik Jacobsen"
+  WriteRegStr SHCTX "${UNINST_KEY}" "Publisher" "MJOLNIRPackage"
   ${GetSize} "$InstDir" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD SHCTX "${UNINST_KEY}" "EstimatedSize" "$0"

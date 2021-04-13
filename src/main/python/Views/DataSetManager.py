@@ -2,9 +2,9 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
-    from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
 except ImportError:
     from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
@@ -115,6 +115,8 @@ def selectedDataFileChanged(self,*args,**kwargs):
 
 def DataSet_NewDataSet_button_function(self):
     ds = GuiDataSet(name='Added')
+    #ds.currentNormalizationSettings.update(normalizationParams)
+
     self.DataSetModel.append(ds)
     self.update()
     self.stateMachine.run()
@@ -242,9 +244,19 @@ def setupDataFileInfoModel(self):
 
 
 try:
+    # needed when freezing app
     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+    
 except:
-    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+    try:
+        # needed when running app local through fbs
+        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+        
+    except:
+        # needed when running app after pip install
+        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
+        
+        
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(DataSetManager, self).__init__(parent)
@@ -288,3 +300,13 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataFile() # Setup datafiles      
         self.guiWindow.setupRaw1DCutSpinBoxes()
         self.guiWindow.setupDataSet_binning_comboBox()
+
+        self.guiWindow.mask_changed.connect(self.testCall)
+
+    @QtCore.pyqtSlot()
+    def testCall(self):
+        mask = self.guiWindow.maskingManager.getMasks()
+        print('There was a change to the masking and I received a signal with the new mask ',mask)
+        currentDS = self.guiWindow.DataSetModel.getCurrentDataSet()
+        if not currentDS is None:
+            currentDS.mask = mask

@@ -11,7 +11,7 @@ class HelpDialog(QtWidgets.QDialog):
         #self.resize(400, 250)
 
         with open(helpFile) as f:
-            text = '\n'.join([line.replace('\n','') for line in f.readlines()])
+            text = '\n'.join([line.strip().replace('\n','') for line in f.readlines()[1:]])
 
         self.help_label = QtWidgets.QLabel(text=text)
         self.help_label.setWordWrap(True)

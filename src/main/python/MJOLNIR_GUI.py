@@ -7,7 +7,10 @@ except:
 
 
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
-import _tools as _guitools
+try:
+    import _tools as _guitools
+except ImportError:
+    import MJOLNIRGui.src.main.python._tools as _guitools
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -17,20 +20,27 @@ from time import sleep
 from os import path
 import os
 
+from MJOLNIR.Data import Mask
 
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
     #from MJOLNIR_GUI_ui import Ui_MainWindow  
+    
     from Views.main import Ui_MainWindow
     from Views.DataSetManager import DataSetManager
     from Views.View3DManager import View3DManager
     from Views.QELineManager import QELineManager
     from Views.QPlaneManager import QPlaneManager
     from Views.Cut1DManager import Cut1DManager
+    from Views.MaskManager import MaskManager
     from Views.Raw1DManager import Raw1DManager
+    from Views.NormalizationManager import NormalizationManager
+    from Views.MolecularCalculationManager import MolecularCalculationManager
+    from Views.PredictionToolManager import PredictionToolManager
+    from Views.CalculatorManager import CalculatorManager
     from Views.collapsibleBox import CollapsibleBox
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet
+    from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
     from GuiStates import empty,partial,raw,converted
@@ -38,27 +48,32 @@ try:
     from HelpDialog import HelpDialog
     from generateScripts import initGenerateScript,setupGenerateScript
     from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
+    
 except ModuleNotFoundError:
     sys.path.append('.')
     
     #from .MJOLNIR_GUI_ui import Ui_MainWindow  
-    from .Views.main import Ui_MainWindow
-    from .Views.DataSetManager import DataSetManager
-    from .Views.View3DManager import View3DManager
-    from .Views.QELineManager import QELineManager
-    from .Views.QPlaneManager import QPlaneManager
-    from .Views.Cut1DManager import Cut1DManager
-    from .Views.Raw1DManager import Raw1DManager
-    from .Views.Raw1DManager import Raw1DManager
-    from .Views.collapsibleBox import CollapsibleBox
-    from .MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from .DataModels import DataSetModel,DataFileModel
-    from .StateMachine import StateMachine
-    from .GuiStates import empty,partial,raw,converted
-    from .AboutDialog import AboutDialog
-    from .HelpDialog import HelpDialog
-    from .generateScripts import initGenerateScript,setupGenerateScript
-    from ._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python.Views.main import Ui_MainWindow
+    from MJOLNIRGui.src.main.python.Views.DataSetManager import DataSetManager
+    from MJOLNIRGui.src.main.python.Views.View3DManager import View3DManager
+    from MJOLNIRGui.src.main.python.Views.QELineManager import QELineManager
+    from MJOLNIRGui.src.main.python.Views.QPlaneManager import QPlaneManager
+    from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
+    from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
+    from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
+    from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
+    from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
+    from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
+    from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
+    from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
+    from MJOLNIRGui.src.main.python.StateMachine import StateMachine
+    from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
+    from MJOLNIRGui.src.main.python.AboutDialog import AboutDialog
+    from MJOLNIRGui.src.main.python.HelpDialog import HelpDialog
+    from MJOLNIRGui.src.main.python.generateScripts import initGenerateScript,setupGenerateScript
+    from MJOLNIRGui.src.main.python._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 
 import sys
 
@@ -78,7 +93,8 @@ home = str(Path.home())
 
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
-
+    mask_changed = QtCore.pyqtSignal()
+    state_changed = QtCore.pyqtSignal(str,str,name='stateChanged')
     def __init__(self,AppContext):
 
         super(MJOLNIRMainWindow, self).__init__()
@@ -117,9 +133,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views.append(self.ui.dataSetManager)
 
         # Lists of views in shown order
-        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data']
-        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D]
-        self.startState = [True,False,False,False,True] # If not collapsed
+        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
+        self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D] # NormalizationManager
+        self.startState = [True,False,False,False,True,False] # If not collapsed #False
 
         # Find correct layout to insert views
         vlay = QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
@@ -133,11 +149,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             lay = QtWidgets.QVBoxLayout()
 
             widget = Type(guiWindow=self)
+            #if Type == NormalizationManager: # Get a reference to the sample manager directly in self
+            #    self.normalizationManager = widget
             self.views.append(widget)
             lay.addWidget(widget)
            
             box.setContentLayout(lay)
         vlay.addStretch()
+
+        self.maskingManager = MaskManager(self)
 
         self.windows = [] # Holder for generated plotting windows
 
@@ -150,6 +170,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.lineEdits = [getattr(self.ui,item) for item in self.ui.__dict__ if '_lineEdit' in item[-9:]] # Collect all lineedits
         self.radioButtons = [getattr(self.ui,item) for item in self.ui.__dict__ if '_radioButton' in item] # Collect all radiobuttons
+        self.spinBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_spinBox' in item[-8:]] # Collect all spinboxes
+        self.checkBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_checkBox' in item[-9:]] # Collect all checkboxes
 
         self.update()
         initGenerateScript(self)
@@ -168,6 +190,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadFolder() # Load last folder as default 
         self.loadedGuiSettings = None
         self.ui.menubar.setNativeMenuBar(False)
+        
+        if sys.platform.lower() == 'darwin':
+        ## Update image of arrows to correct style on mac
+            correctedArrows = """QToolButton::down-arrow {
+        image: url("""+self.AppContext.get_resource('down.png')+""");
+    }
+
+    QToolButton::right-arrow {
+        image: url("""+self.AppContext.get_resource('right.png')+""");
+    }"""
+
+            self.setStyleSheet(self.styleSheet()+correctedArrows)
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
@@ -221,13 +255,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
         self.ui.actionOpen_mask_gui.setDisabled(True)
-        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui - Not Implemented') 
+        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
         self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
+        self.ui.actionOpen_mask_gui.triggered.connect(self.maskingManager.setWindowVisible)
         
         self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-load.png')))
         self.ui.actionLoad_mask.setDisabled(True)
         self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
         self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
+        #self.ui.actionLoad_mask.triggered.connect(self.maskingManager.getMasks)
 
         self.ui.actionSettings.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
         self.ui.actionSettings.setDisabled(False)
@@ -241,6 +277,37 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.setToolTip('Close All Plotting Windows') 
         self.ui.actionClose_Windows.setStatusTip(self.ui.actionClose_Windows.toolTip())
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
+
+
+        self.ui.actionNormalizationWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/ruler.png')))
+        self.ui.actionNormalizationWidget.setDisabled(False)
+        self.ui.actionNormalizationWidget.setToolTip('Generate a script to normalize data absolutely') 
+        self.ui.actionNormalizationWidget.setStatusTip(self.ui.actionNormalizationWidget.toolTip())
+        self.ui.actionNormalizationWidget.triggered.connect(self.absolutNormalizationTool)
+
+        self.ui.actionPredictionWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/predict.png')))
+        self.ui.actionPredictionWidget.setDisabled(False)
+        self.ui.actionPredictionWidget.setToolTip('Predict scan coverage') 
+        self.ui.actionPredictionWidget.setStatusTip(self.ui.actionPredictionWidget.toolTip())
+        self.ui.actionPredictionWidget.triggered.connect(self.predictionTool)
+
+        self.ui.actionMolecularWeight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
+        self.ui.actionMolecularWeight.setDisabled(False)
+        self.ui.actionMolecularWeight.setToolTip('Calculate Molecular Mass from Chemical Formula') 
+        self.ui.actionMolecularWeight.setStatusTip(self.ui.actionMolecularWeight.toolTip())
+        self.ui.actionMolecularWeight.triggered.connect(self.molarMassTool)
+
+        self.ui.actionNeutronCalculations.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/calculator.png')))
+        self.ui.actionNeutronCalculations.setDisabled(False)
+        self.ui.actionNeutronCalculations.setToolTip('Calculate standard neutron quantities') 
+        self.ui.actionNeutronCalculations.setStatusTip(self.ui.actionNeutronCalculations.toolTip())
+        self.ui.actionNeutronCalculations.triggered.connect(self.neutronCalculationTool)
+
+        self.ui.actionElectronicLogbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionElectronicLogbook.setDisabled(True)
+        self.ui.actionElectronicLogbook.setToolTip('Generate Electronic Logbook from files') 
+        self.ui.actionElectronicLogbook.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
+        self.ui.actionElectronicLogbook.triggered.connect(self.electronicLogbookTool)
 
     def getProgressBarValue(self):
         return self.ui.progressBar.value
@@ -313,14 +380,17 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.closeWindows()
 
-    @ProgressBarDecoratorArguments(runningText='Closing Windowa',completedText='Windows Closed')
+    @ProgressBarDecoratorArguments(runningText='Closing Windows',completedText='Windows Closed')
     def closeWindows(self):
         if hasattr(self,'windows'):
             for window in self.windows:
                 try:
                     plt.close(window)
                 except:
-                    pass
+                    try:
+                        window.close()
+                    except:
+                        pass
         return True
 
     def about(self):
@@ -377,13 +447,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         lineEditString = self.generateCurrentLineEditSettings()
         radioButtonString = self.generateCurrentRadioButtonSettings()
+        spinBoxString = self.generateCurrentSpinBoxSettings()
+        checkBoxString = self.generateCurrentcheckBoxSettings()
         fileDir = self.getCurrentDirectory()
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
-        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,
-                      'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+        returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -391,6 +463,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         for item in self.lineEdits:
             lineEditValueString[item.objectName()] = item.text()
         return lineEditValueString
+
+    def generateCurrentSpinBoxSettings(self):
+        spinBoxValueString = {}
+        for item in self.spinBoxes:
+            spinBoxValueString[item.objectName()] = item.value()
+        return spinBoxValueString
+
+    def generateCurrentcheckBoxSettings(self):
+        chechValueString = {}
+        for item in self.checkBoxes:
+            chechValueString[item.objectName()] = item.isChecked()
+        return chechValueString
 
     def generateCurrentRadioButtonSettings(self):
         radioButtonString = {}
@@ -405,7 +489,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
 
     @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done',failedText='Cancelled')
-    def loadGui(self):
+    def loadGui(self,presetFileLocation=None):
         
         # Load saveFile
         if not hasattr(self,'loadedSettingsFolder'):
@@ -413,7 +497,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             folder = self.loadedSettingsFolder
         
-        settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        if presetFileLocation is None: # When no file is provided, open file dialogue
+            settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        else:
+            settingsFile = presetFileLocation
         self.update()
         self.loadedSettingsFolder = os.path.dirname(settingsFile)
         self.loadedSettingsFile = settingsFile
@@ -474,6 +561,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
         self.loadRadioButtons(file=settingsFile)
+        # self.loadSpinBoxes(file=settingsFile)
+        # self.loadCheckBoxes(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -530,6 +619,35 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     getattr(self.ui,item).setChecked(value)
                 except AttributeError:
                     pass
+
+    def loadSpinBoxes(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        spinBoxValueString = loadSetting(file,'spinBoxes')
+        if not spinBoxValueString is None:
+            if isinstance(spinBoxValueString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in spinBoxValueString.items():
+                try:
+                    getattr(self.ui,item).setValue(value)
+                except AttributeError:
+                    pass
+    
+    def loadCheckBoxes(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        checkBoxString = loadSetting(file,'checkBoxes')
+        if not checkBoxString is None:
+            if isinstance(checkBoxString,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            for item,value in checkBoxString.items():
+                try:
+                    getattr(self.ui,item).setChecked(value)
+                except AttributeError:
+                    pass
+
 
     def getCurrentDirectory(self):
         return self.ui.DataSet_path_lineEdit.text()
@@ -616,6 +734,30 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileInfoModel.layoutChanged.emit()
         else:
             return
+            
+    def molarMassTool(self):
+        molecularCalculationManager = MolecularCalculationManager()
+        self.windows.append(molecularCalculationManager)
+        molecularCalculationManager.show()
+        
+
+    def neutronCalculationTool(self):
+        calculatorManager = CalculatorManager()
+        self.windows.append(calculatorManager)
+        calculatorManager.show()
+
+    def absolutNormalizationTool(self):
+        absolutNormalizationWindow = NormalizationManager(parent=None)
+        self.windows.append(absolutNormalizationWindow)
+        absolutNormalizationWindow.show()
+
+    def predictionTool(self):
+        predictionToolWindow = PredictionToolManager(parent=None,guiWindow=self)
+        self.windows.append(predictionToolWindow)
+        predictionToolWindow.show()
+
+    def electronicLogbookTool(self):
+        print('Not Implemeted yet electronicLogbookTool')
 
 class settingsBoxDialog(QtWidgets.QDialog):
 
@@ -650,6 +792,8 @@ class settingsBoxDialog(QtWidgets.QDialog):
     def reject(self):
         return super(settingsBoxDialog,self).reject()
 
+
+
 def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     currentTime = datetime.datetime.now()
     points = int(1000.0*(currentTime-originalTime).total_seconds()/updateInterval)+1
@@ -660,10 +804,13 @@ def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     QtWidgets.QApplication.processEvents()
 
 def main():
-    import AppContextEmulator
+    try:
+        import AppContextEmulator
+    except ImportError:
+        from MJOLNIRGui.src.main.python import AppContextEmulator
+        
 
     app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
-    qtmodern.styles.dark(app)
 
     appEmu = AppContextEmulator.AppContextEmulator(__file__)
 
@@ -684,10 +831,12 @@ def main():
     
 
     window = MJOLNIRMainWindow(appEmu) # This window has to be closed for app to end
-    window = qtmodern.windows.ModernWindow(window)
     splash.finish(window)
     window.show()
     timer.stop()
+
+    if len(sys.argv)==2:
+        window.loadGui(presetFileLocation=sys.argv[1])
 
     app.exec_() 
 

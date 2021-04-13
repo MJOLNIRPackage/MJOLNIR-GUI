@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,7 +24,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>800</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -194,9 +194,20 @@
     <addaction name="actionAbout"/>
     <addaction name="actionHelp"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionPredictionWidget"/>
+    <addaction name="actionMolecularWeight"/>
+    <addaction name="actionNeutronCalculations"/>
+    <addaction name="actionNormalizationWidget"/>
+    <addaction name="actionElectronicLogbook"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_GUI_state">
@@ -259,7 +270,7 @@
     <string>Change Theme</string>
    </property>
   </action>
-  <action name="actionSettings">
+    <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
    </property>

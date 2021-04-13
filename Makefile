@@ -2,22 +2,28 @@ distribution:
 	fbs freeze
 	fbs installer
 
+releasedistribution:
+	fbs release $(version)
 
 wheel:
-	python setup.py sdist
+	python preparePIP.py
+	python setup.py sdist 
+	python setup.py bdist_wheel
 
 
 upload:
-	twine upload $(shell ls -t dist/* | head -1) -r testpypi
-	twine upload $(shell ls -t dist/* | head -1) -r pypi
+	twine upload $(shell ls -t dist/* | head -2) -r pypiMJOLNIRPackage
+	
+fbsupload:
+	fbs upload
 
 
 version: 
 	python Update.py $(version)
 
-#	git add 'src/build/settings/base.json
-#	git commit -m 'Update version'
-#	git tag -a $(version) -m \'$(version)\'
-#	make wheel
-#	git push
-#	git push --tags
+release:
+	make wheel
+	make distribution
+	make upload
+
+
