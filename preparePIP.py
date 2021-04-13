@@ -44,5 +44,7 @@ removeList = ['installer','sign']
 copytree(os.path.join(local,'src'),targetDir,remove=removeList)
 
 # Remove secret json file (Currently not present)
-os.remove(os.path.join(targetDir,'build','settings','secret.json'))
+secretFile = os.path.join(targetDir,'build','settings','secret.json')
+if os.path.exists(secretFile):
+    os.remove(os.path.join(targetDir,'build','settings','secret.json'))
 
