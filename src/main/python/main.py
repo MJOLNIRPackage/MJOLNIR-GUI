@@ -43,7 +43,9 @@ class AppContext(ApplicationContext):
         QtWidgets.QApplication.processEvents()
         self.splash.finish(self.main_window)
         self.main_window.show()
-        
+
+        if len(sys.argv)==2:
+            self.main_window.loadGui(presetFileLocation=sys.argv[1])
         return self.app.exec_()
 
     @cached_property

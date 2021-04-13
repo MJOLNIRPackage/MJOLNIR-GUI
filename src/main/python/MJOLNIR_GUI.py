@@ -489,7 +489,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
 
     @ProgressBarDecoratorArguments(runningText='Loading gui settings',completedText='Loading Done',failedText='Cancelled')
-    def loadGui(self):
+    def loadGui(self,presetFileLocation=None):
         
         # Load saveFile
         if not hasattr(self,'loadedSettingsFolder'):
@@ -497,7 +497,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             folder = self.loadedSettingsFolder
         
-        settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        if presetFileLocation is None: # When no file is provided, open file dialogue
+            settingsFile,_ = QtWidgets.QFileDialog.getOpenFileName(self,"Open GUI settings file", folder,"Setting (*.MJOLNIRGuiSettings);;All Files (*)")
+        else:
+            settingsFile = presetFileLocation
         self.update()
         self.loadedSettingsFolder = os.path.dirname(settingsFile)
         self.loadedSettingsFile = settingsFile
@@ -831,6 +834,9 @@ def main():
     splash.finish(window)
     window.show()
     timer.stop()
+
+    if len(sys.argv)==2:
+        window.loadGui(presetFileLocation=sys.argv[1])
 
     app.exec_() 
 
