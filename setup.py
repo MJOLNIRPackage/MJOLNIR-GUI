@@ -40,21 +40,20 @@ setup(
     author_email=settings['author_email'],
     url=settings['url'],
     license='MPL-2.0',
-    #data_files = [(pythonPath+'/Views/', ["MJOLNIRGui/Views/main.ui"]),(pythonPath+'/settings/', ["MJOLNIRGui/settings/base.json","MJOLNIRGui/settings/linux.json","MJOLNIRGui/settings/mac.json",])],#,('MJOLNIRGui/resources', ["*"]),('MJOLNIRGui/settings', ["*"])],#,((os.path.join(pythonPath),['MJOLNIR/CalibrationFlatCone.csv'])),((os.path.join(pythonPath),['MJOLNIR/CalibrationMultiFLEXX.csv'])),
-    #            ((os.path.join(pythonPath,'Geometry'),['MJOLNIR/Geometry/detsequence.dat']))],#,(pythonPath+'/CommandLineScripts/',['MJOLNIR/CommandLineScripts/.settings'])],
-    packages=packages,#['MJOLNIRGui','MJOLNIRGui/Views','MJOLNIRGui/settings','MJOLNIRGui/resources','MJOLNIRGui/resources/base','MJOLNIRGui/icons'],
-    #scripts=['MJOLNIR/CommandLineScripts/MJOLNIRCalibrationInspector','MJOLNIR/CommandLineScripts/MJOLNIRHistory','MJOLNIR/CommandLineScripts/MJOLNIRConvert',
-    #'MJOLNIR/CommandLineScripts/MJOLNIR3DView'],
+    packages=packages,
     package_data={'': ['*']},
     include_package_data=True,
     entry_points = {
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.src.main.python.MJOLNIR_GUI:main']
         },
     python_requires='>=3.5',
-    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR','ufit>=1.4.0'], #,'fbs'
+    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR>=1.1.18','ufit>=1.4.0'], 
     
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         ],
     )
