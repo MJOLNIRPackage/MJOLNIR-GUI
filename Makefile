@@ -13,6 +13,8 @@ wheel:
 
 upload:
 	twine upload $(shell ls -t dist/* | head -2) -r pypiMJOLNIRPackage
+	
+fbsupload:
 	fbs upload
 
 

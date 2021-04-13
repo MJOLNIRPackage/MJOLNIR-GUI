@@ -2,7 +2,7 @@
     "app_name": "MJOLNIRGui",
     "author": "MJOLNIRPackage",
     "main_module": "src/main/python/main.py",
-    "version": "0.8.4",
+    "version": "0.9.0",
     "gpg_key": "045B8EA10E9DFEA2757FD613709C3104BC498E0B",
     "gpg_name": "MJOLNIRPackage",
     "hidden_imports": [
