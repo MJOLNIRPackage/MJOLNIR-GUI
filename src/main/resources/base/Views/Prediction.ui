@@ -66,7 +66,7 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>alpha [deg]</string>
+             <string>α [deg]</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -127,7 +127,7 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>beta [deg]</string>
+             <string>β [deg]</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -188,7 +188,7 @@
           <item>
            <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>gamma [deg]</string>
+             <string>γ [deg]</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -781,7 +781,7 @@
             <item>
              <widget class="QLabel" name="label_40">
               <property name="text">
-               <string>A4 [deg]</string>
+               <string>2θ [deg]</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
