@@ -98,8 +98,13 @@ def View3D_plot_button_function(self):
     else:
         customSlicer = True
 
+    if self.ui.View3D_RawCounts_checkBox.isChecked():
+        counts = True
+    else:
+        counts = False
+
     #try:
-    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer)
+    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts)
 
     if customSlicer:
         self.windows.append(self.V.parent())

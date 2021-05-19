@@ -209,6 +209,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="View3D_RawCounts_checkBox">
+       <property name="text">
+        <string>Raw Counts</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="View3D_SetTitle_lineEdit"/>
      </item>
      <item>
@@ -391,8 +398,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
