@@ -223,15 +223,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
-        self.actionSave_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
-        self.actionSave_GUI_state_shortcut.activated.connect(self.saveCurrentGui)
+        #self.actionSave_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        #self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
         self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
-        self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
-        self.actionLoad_GUI_state_shortcut.activated.connect(self.loadGui)
+        #self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
+        #self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
@@ -450,12 +450,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         spinBoxString = self.generateCurrentSpinBoxSettings()
         checkBoxString = self.generateCurrentcheckBoxSettings()
         fileDir = self.getCurrentDirectory()
+        if hasattr(self,'predictionSettings'):
+            predictionSettings  = self.predictionSettings
+        else:
+            predictionSettings = {}
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
-                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -563,6 +567,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadRadioButtons(file=settingsFile)
         # self.loadSpinBoxes(file=settingsFile)
         # self.loadCheckBoxes(file=settingsFile)
+        self.loadPredictionSettings(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -619,6 +624,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     getattr(self.ui,item).setChecked(value)
                 except AttributeError:
                     pass
+
+    def loadPredictionSettings(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        predictionSettings = loadSetting(file,'predictionSettings')
+        if not predictionSettings is None:
+            if isinstance(predictionSettings,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            self.predictionSettings = predictionSettings
 
     def loadSpinBoxes(self,file=None):
         if file is None:

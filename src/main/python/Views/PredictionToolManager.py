@@ -64,6 +64,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
     def initPredictionToolManager(self):    
 
+        self.loadSettings()
         self.setup()
         
 
@@ -94,6 +95,13 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         self.tool_generate_button.clicked.connect(self.generatePrediction)
 
+        for key,value in self.__dict__.items():
+            if hasattr(value,'valueCanged'):
+                value.valueChanged.connect(self.updateSettings)
+            elif hasattr(value,'textChanged'):
+                value.textChanged.connect(self.updateSettings)
+        
+
     def getAlignment(self,alignment=1):
         """Get values for alignment vector 1"""
         Ei = getattr(self,'alignment{}_ei_spinBox'.format(alignment)).value()
@@ -106,7 +114,17 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         A4 = getattr(self,'alignment{}_a4_spinBox'.format(alignment)).value()
 
         return [H,K,L,A3,A4,0.0,0.0,Ei,Ef] # H,K,L,A3,A4,phi,chi,Ei,Ef
-        
+
+    def setAlignment(self,R,alignment=1):
+        [H,K,L,A3,A4,_,_,Ei,Ef] = R
+        getattr(self,'alignment{}_ei_spinBox'.format(alignment)).setValue(Ei)
+        getattr(self,'alignment{}_ef_spinBox'.format(alignment)).setValue(Ef)
+
+        getattr(self,'alignment{}_h_spinBox'.format(alignment)).setValue(H)
+        getattr(self,'alignment{}_k_spinBox'.format(alignment)).setValue(K)
+        getattr(self,'alignment{}_l_spinBox'.format(alignment)).setValue(L)
+        getattr(self,'alignment{}_a3_spinBox'.format(alignment)).setValue(A3)
+        getattr(self,'alignment{}_a4_spinBox'.format(alignment)).setValue(A4)
 
     def calculateA4(self,alignment=1):
         cell = self.getCell()
@@ -170,10 +188,27 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return A3Start,A3Stop,A3Steps,Ei,A4,points
 
+    def setScan(self,scan):
+        A3Start,A3Stop,A3Steps,Ei,A4,points = scan
+        self.scan_a3Start_spinBox.setValue(A3Start)
+        self.scan_a3Stop_spinBox.setValue(A3Stop)
+        self.scan_a3Steps_spinBox.setValue(A3Steps)
+        self.scan_ei_spinBox.setValue(Ei)
+
+        strA4 = ','.join([str(a4) for a4 in A4])
+        self.scan_a4_lineEdit.setText(strA4)
+        
+        points = self.scan_plot_checkBox.setChecked(points)
+
     
     def formatA4String(self,A4String):
         if ',' in A4String:
-            A4 = [float(x) for x in A4String.split(',')]
+            A4 = []
+            for x in A4String.split(','):
+                try:
+                    A4.append(float(x))
+                except ValueError:
+                    pass
         else:
             A4 = [float(A4String)]
 
@@ -188,3 +223,45 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         gamma = self.cell_gamma_spinBox.value()
 
         return a,b,c,alpha,beta,gamma
+
+
+    def setCell(self,cell):
+        a,b,c,alpha,beta,gamma = cell
+
+        self.cell_a_spinBox.setValue(a)
+        self.cell_b_spinBox.setValue(b)
+        self.cell_c_spinBox.setValue(c)
+        self.cell_alpha_spinBox.setValue(alpha)
+        self.cell_beta_spinBox.setValue(beta)
+        self.cell_gamma_spinBox.setValue(gamma)
+
+    def updateSettings(self):
+        """Update self.guiWindow.predictionSettings with current settings"""
+        R1 = self.getAlignment(alignment = 1)
+        R2 = self.getAlignment(alignment = 2)
+        cell = self.getCell()
+        scan = self.getScan()
+
+        names = ['R1','R2','cell','scan']
+        values = [R1,R2,cell,scan]
+        for name,value in zip(names,values):
+            self.guiWindow.predictionSettings[name] = value
+
+    def loadSettings(self):
+        # Set up saving of settings in guiWindow
+
+        if hasattr(self.guiWindow,'predictionSettings'): 
+            R1 = self.guiWindow.predictionSettings['R1']
+            R2 = self.guiWindow.predictionSettings['R2']
+            cell = self.guiWindow.predictionSettings['cell']
+            scan = self.guiWindow.predictionSettings['scan']
+            self.setAlignment(R1,alignment = 1)
+            self.setAlignment(R2,alignment = 2)
+            self.setCell(cell)
+            self.setScan(scan)
+
+        else:# Create an empty dict
+            self.guiWindow.predictionSettings = {}
+
+    def closeEvent(self, event):
+        self.updateSettings()

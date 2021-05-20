@@ -109,7 +109,7 @@ class Ui_MainWindow(object):
         self.actionSave_GUI_state.setShortcut("Ctrl+S")
         self.actionLoad_GUI_state = QtWidgets.QAction(MainWindow)
         self.actionLoad_GUI_state.setObjectName("actionLoad_GUI_state")
-        self.actionLoad_GUI_state.setShortcut("Ctrl+L")
+        self.actionLoad_GUI_state.setShortcut("Ctrl+O")
         self.actionGenerate_View3d_script = QtWidgets.QAction(MainWindow)
         self.actionGenerate_View3d_script.setObjectName("actionGenerate_View3d_script")
         self.actionGenerate_QELine_script = QtWidgets.QAction(MainWindow)
