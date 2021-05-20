@@ -66,6 +66,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         self.loadSettings()
         self.setup()
+        self.generateScanCommands()
         
 
     def setup(self):
@@ -92,6 +93,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         
         self.scan_a4_lineEdit.setValidator(self.a4Validator)
+
+        self.scan_a3Start_spinBox.valueChanged.connect(self.generateScanCommands)
+        self.scan_a3Stop_spinBox.valueChanged.connect(self.generateScanCommands)
+        self.scan_a3Steps_spinBox.valueChanged.connect(self.generateScanCommands)
+        self.scan_ei_spinBox.valueChanged.connect(self.generateScanCommands)
+        self.scan_a4_lineEdit.textChanged.connect(self.generateScanCommands)
 
         self.tool_generate_button.clicked.connect(self.generatePrediction)
 
@@ -262,6 +269,30 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         else:# Create an empty dict
             self.guiWindow.predictionSettings = {}
+
+    def generateScanCommands(self):
+        
+        A3Start,A3Stop,A3Steps,Ei,A4,points = self.getScan()
+        if A3Steps == 1:
+            A3StepSize = 0
+        else:
+            A3StepSize = (A3Stop-A3Start)/(A3Steps-1.0)
+        A3middle = 0.5*(A3Start+A3Stop)
+
+        scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn 100000'.format(A3middle,A3StepSize,A3Steps)
+
+        commandString = []
+        commandString.append('dr 2t {:.2f}'.format(A4[0]))
+        commandString.append('dr ei {:.2f}'.format(Ei))
+        commandString.append('')
+        for a4 in A4:
+            commandString.append('dr 2t {:.2f}'.format(a4))
+            commandString.append(scanCommand)
+            commandString.append('')
+
+        commandString.append('')
+        cmdStr = '\n'.join(commandString)
+        self.scanCommand_textEdit.setText(cmdStr)
 
     def closeEvent(self, event):
         self.updateSettings()
