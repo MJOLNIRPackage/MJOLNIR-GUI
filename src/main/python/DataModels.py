@@ -570,10 +570,11 @@ def formatRaw(array):
 
 Info = namedtuple('Info','location baseText formatter')
 name = Info('sample/name','Sample: ',formatTextArray)
+title = Info('title','Title: ',formatTextArray)
 projectionVector1 = Info('sample/projectionVector1','Projection 1: ',formatVector)
 projectionVector2 = Info('sample/projectionVector2','Projection 2: ',formatVector)
 A3 = Info('A3','A3 [deg]: ',formatValueArray)
-A4 = Info('A4','A4 [deg]: ',formatValueArray)
+tt = Info('twotheta','2θ [deg]: ',formatValueArray)
 magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
 temperature = Info('temperature','Temperature [K]: ',formatValueArray)
 scanCommand = Info('scanCommand','Command: ',formatTextArray)
@@ -582,12 +583,12 @@ scanParameters = Info('scanParameters','Parameter: ',formatTextArrayAdder)
 comment = Info('comment','Comment: ',formatTextArray)
 binning = Info('binning','Binning: ',formatRaw)
 Ei = Info('Ei','Ei [meV]: ',formatValueArray)
-countingTime = Info('Time', 'Scan step time [s]: ',formatValueArray)
+countingTime = Info('Time', 'Step time [s]: ',formatValueArray)
 startTime = Info('startTime', 'Start time: ', formatTextArrayAdder)
 endTime = Info('endTime', 'End time: ', formatTextArrayAdder)
 
-settings = {'sample/name':name,'sample/projectionVector1':projectionVector1,'sample/projectionVector2':projectionVector2,'Ei':Ei, 'A3':A3,'A4':A4, 'magneticField':magneticField,'temperature':temperature,
-            'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters, 'comment':comment, 'binning':binning,
+settings = {'sample/name':name,'title':title,'sample/projectionVector1':projectionVector1,'sample/projectionVector2':projectionVector2,'Ei':Ei, 'A3':A3,'twotheta':tt, 'magneticField':magneticField,'temperature':temperature,
+            'comment':comment, 'binning':binning,'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters,
             'Time':countingTime,'startTime':startTime, 'endTime':endTime}
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
