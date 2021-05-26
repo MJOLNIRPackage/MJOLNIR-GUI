@@ -1,4 +1,6 @@
-import sys
+import sys,os
+
+from MJOLNIR import TasUBlibDEG
 sys.path.append('..')
 
 try:
@@ -11,7 +13,9 @@ from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
-from MJOLNIR.Geometry.Instrument import prediction
+from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy
+from MJOLNIR.Data import Sample
+import MJOLNIR 
 import pyperclip
 
 # Handles all functionality related to the PredictionToolManager. 
@@ -44,8 +48,23 @@ def textChangedA4Calc(alignment,manager):
         A4 = manager.calculateA4(alignment=a)
         if not A4 is None:
             getattr(manager,'alignment{}_a4_spinBox'.format(a)).setValue(A4)
-    
 
+    manager.updateSample()
+    
+def onFocus(self,event,others):
+    for o in others:
+        try:
+            o.valueChanged.disconnect()
+        except TypeError: # If no connection to remove
+            try:
+                o.currentIndexChanged.disconnect()
+            except (TypeError,AttributeError):
+                pass
+    try:
+        self.valueChanged.connect(self.onChangeFunction)
+    except AttributeError:
+        self.currentIndexChanged.connect(self.onChangeFunction)
+    self.old_focusInEvent(event)
 
 
 class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm):
@@ -63,11 +82,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.initPredictionToolManager()
         
     def initPredictionToolManager(self):    
-
+        self.loadEnergies()
         self.loadSettings()
         self.setup()
         self.generateScanCommands()
-        
+        self.updateSample()
+
 
     def setup(self):
         # Update all boxes with check on out focus
@@ -80,13 +100,13 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.cell_gamma_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
 
         self.alignment1_ei_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
-        self.alignment1_ef_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        self.alignment1_ef_comboBox.currentIndexChanged.connect(lambda Index: textChangedA4Calc(1,self))
         self.alignment1_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
         self.alignment1_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
         self.alignment1_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
 
         self.alignment2_ei_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
-        self.alignment2_ef_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_ef_comboBox.currentIndexChanged.connect(lambda Index: textChangedA4Calc(2,self))
         self.alignment2_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
         self.alignment2_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
         self.alignment2_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
@@ -102,17 +122,58 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         self.tool_generate_button.clicked.connect(self.generatePrediction)
 
+        self.HKL_ei_spinBox.onChangeFunction = self.calcualteHKLtoA3A4
+        self.HKL_ef_comboBox.onChangeFunction = lambda I: self.calcualteHKLtoA3A4()
+
+        self.HKL_H_doubleSpinBox.onChangeFunction = self.calcualteHKLtoA3A4
+        self.HKL_K_doubleSpinBox.onChangeFunction = self.calcualteHKLtoA3A4
+        self.HKL_L_doubleSpinBox.onChangeFunction = self.calcualteHKLtoA3A4
+
+        self.HKL_A3_doubleSpinBox.onChangeFunction = self.calcualteA3A4toHKL
+        self.HKL_A4_doubleSpinBox.onChangeFunction = self.calcualteA3A4toHKL
+
+
+        self.HKL_A3_doubleSpinBox.old_focusInEvent = self.HKL_A3_doubleSpinBox.focusInEvent
+        self.HKL_A4_doubleSpinBox.old_focusInEvent = self.HKL_A4_doubleSpinBox.focusInEvent
+        self.HKL_H_doubleSpinBox.old_focusInEvent = self.HKL_H_doubleSpinBox.focusInEvent
+        self.HKL_K_doubleSpinBox.old_focusInEvent = self.HKL_K_doubleSpinBox.focusInEvent
+        self.HKL_L_doubleSpinBox.old_focusInEvent = self.HKL_L_doubleSpinBox.focusInEvent
+        self.HKL_ei_spinBox.old_focusInEvent = self.HKL_ei_spinBox.focusInEvent
+        self.HKL_ef_comboBox.old_focusInEvent = self.HKL_ef_comboBox.focusInEvent
+        
+        
+        # Update focusing for A3 and A4
+        others = [self.HKL_ei_spinBox,self.HKL_H_doubleSpinBox,self.HKL_K_doubleSpinBox,self.HKL_L_doubleSpinBox,self.HKL_ef_comboBox]
+        self.HKL_A3_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_A3_doubleSpinBox,event,others)
+        self.HKL_A4_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_A4_doubleSpinBox,event,others)
+
+        # Update focusing for H,K,L,Ei,Ef
+        others = [self.HKL_A3_doubleSpinBox,self.HKL_A4_doubleSpinBox]
+        self.HKL_H_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_H_doubleSpinBox,event,others)
+        self.HKL_K_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_K_doubleSpinBox,event,others)
+        self.HKL_L_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_L_doubleSpinBox,event,others)
+
+        self.HKL_ei_spinBox.focusInEvent= lambda event: onFocus(self.HKL_ei_spinBox,event,others)
+        self.HKL_ef_comboBox.focusInEvent= lambda event: onFocus(self.HKL_ef_comboBox,event,others)    
+
+        
         for key,value in self.__dict__.items():
             if hasattr(value,'valueCanged'):
                 value.valueChanged.connect(self.updateSettings)
             elif hasattr(value,'textChanged'):
                 value.textChanged.connect(self.updateSettings)
         
+    def updateSample(self):
+        cell = np.array(self.getCell())
+        r1 = np.array(self.getAlignment(1))
+        r2 = np.array(self.getAlignment(2))
+        self.sample = Sample.Sample(*cell,projectionVector1=r1,projectionVector2=r2)
+        self.calcualteHKLtoA3A4()
 
     def getAlignment(self,alignment=1):
         """Get values for alignment vector 1"""
         Ei = getattr(self,'alignment{}_ei_spinBox'.format(alignment)).value()
-        Ef = getattr(self,'alignment{}_ef_spinBox'.format(alignment)).value()
+        Ef = self.Efs[getattr(self,'alignment{}_ef_comboBox'.format(alignment)).currentIndex()]
 
         H = getattr(self,'alignment{}_h_spinBox'.format(alignment)).value()
         K = getattr(self,'alignment{}_k_spinBox'.format(alignment)).value()
@@ -125,7 +186,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def setAlignment(self,R,alignment=1):
         [H,K,L,A3,A4,_,_,Ei,Ef] = R
         getattr(self,'alignment{}_ei_spinBox'.format(alignment)).setValue(Ei)
-        getattr(self,'alignment{}_ef_spinBox'.format(alignment)).setValue(Ef)
+        EfIndex = np.argmin(np.abs(Ef-self.Efs))
+        getattr(self,'alignment{}_ef_comboBox'.format(alignment)).setCurrentIndex(EfIndex)
 
         getattr(self,'alignment{}_h_spinBox'.format(alignment)).setValue(H)
         getattr(self,'alignment{}_k_spinBox'.format(alignment)).setValue(K)
@@ -146,6 +208,25 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         A4 = calTwoTheta(B=B,qe=qe,ss=-1)
         return A4
 
+    def loadEnergies(self,instrument='CAMEA'):
+        if instrument == 'CAMEA':
+            MJOLNIRDir = os.path.dirname(MJOLNIR.__file__)
+            calibPath = os.path.join(MJOLNIRDir,'Normalization_1.calib')
+
+            calib = np.loadtxt(calibPath,delimiter=',',skiprows=3)
+
+            self.A4Instrument = calib[:,-1].reshape(104,8)
+            self.EfInstrument = calib[:,4].reshape(104,8)
+            self.EfInstrument[np.isclose(self.EfInstrument,0.0)]=np.nan
+        else:
+            raise NotImplementedError('Currently only CAMEA is created... sorry')
+
+        self.Efs = np.nanmean(self.EfInstrument,axis=0)[::-1]
+        for key,value in self.__dict__.items():
+            if 'ef_comboBox' in key:
+                for i,ef in enumerate(self.Efs):
+                    value.addItem('{:.2f} ({:d})'.format(ef,len(self.Efs)-i-1))
+        
 
 
     def validated(self):
@@ -248,9 +329,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         R2 = self.getAlignment(alignment = 2)
         cell = self.getCell()
         scan = self.getScan()
+        calc = self.getCalculation()
 
-        names = ['R1','R2','cell','scan']
-        values = [R1,R2,cell,scan]
+        names = ['R1','R2','cell','scan','calc']
+        values = [R1,R2,cell,scan,calc]
         for name,value in zip(names,values):
             self.guiWindow.predictionSettings[name] = value
 
@@ -262,10 +344,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             R2 = self.guiWindow.predictionSettings['R2']
             cell = self.guiWindow.predictionSettings['cell']
             scan = self.guiWindow.predictionSettings['scan']
+            calc = self.guiWindow.predictionSettings['calc']
             self.setAlignment(R1,alignment = 1)
             self.setAlignment(R2,alignment = 2)
             self.setCell(cell)
             self.setScan(scan)
+            self.setCalculation(calc)
 
         else:# Create an empty dict
             self.guiWindow.predictionSettings = {}
@@ -293,6 +377,48 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         commandString.append('')
         cmdStr = '\n'.join(commandString)
         self.scanCommand_textEdit.setText(cmdStr)
+
+    def getCalculation(self):
+        Ei = self.HKL_ei_spinBox.value()
+        Ef = self.Efs[self.HKL_ef_comboBox.currentIndex()]
+        H = self.HKL_H_doubleSpinBox.value()
+        K = self.HKL_K_doubleSpinBox.value()
+        L = self.HKL_L_doubleSpinBox.value()
+        A3 = self.HKL_A3_doubleSpinBox.value()
+        A4 = self.HKL_A4_doubleSpinBox.value()
+
+        return Ei,Ef,H,K,L,A3,A4
+
+    def setCalculation(self,calc):
+        Ei,Ef,H,K,L,A3,A4 = calc
+
+        EfIdx = np.argmin(np.abs(Ef-self.Efs))
+        self.HKL_ef_comboBox.setCurrentIndex(EfIdx)
+        self.HKL_ei_spinBox.setValue(Ei)
+        self.HKL_H_doubleSpinBox.setValue(H)
+        self.HKL_K_doubleSpinBox.setValue(K)
+        self.HKL_L_doubleSpinBox.setValue(L)
+        self.HKL_A3_doubleSpinBox.setValue(A3)
+        self.HKL_A4_doubleSpinBox.setValue(A4)
+
+    def calcualteHKLtoA3A4(self):
+        Ei,Ef,H,K,L,A3,A4 = self.getCalculation()
+        
+        B = self.sample.B
+        Qx,Qy,_ = np.dot([H,K,L],B)
+
+        A3,A4 = converterToA3A4(Qx,Qy,Ei,Ef,A3Off=self.sample.theta,A4Sign=np.sign(self.sample.plane_vector1[4]))
+        
+        self.HKL_A3_doubleSpinBox.setValue(A3)
+        self.HKL_A4_doubleSpinBox.setValue(A4)
+        
+    def calcualteA3A4toHKL(self):
+        Ei,Ef,H,K,L,A3,A4 = self.getCalculation()
+        Qx,Qy = converterToQxQy(A3,A4,Ei,Ef)
+        H,K,L = self.sample.calculateQxQyToHKL(Qx,Qy)
+        self.HKL_H_doubleSpinBox.setValue(H)
+        self.HKL_K_doubleSpinBox.setValue(K)
+        self.HKL_L_doubleSpinBox.setValue(L)
 
     def closeEvent(self, event):
         self.updateSettings()
