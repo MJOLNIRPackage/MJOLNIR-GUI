@@ -173,7 +173,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def getAlignment(self,alignment=1):
         """Get values for alignment vector 1"""
         Ei = getattr(self,'alignment{}_ei_spinBox'.format(alignment)).value()
-        Ef = self.Efs[getattr(self,'alignment{}_ef_comboBox'.format(alignment)).currentIndex()]
+        EfIndex = getattr(self,'alignment{}_ef_comboBox'.format(alignment)).currentIndex()
+        if EfIndex == len(self.Efs): # Equal to last entry => Ei=Ef
+            Ef = Ei
+        else:
+            Ef = self.Efs[EfIndex]
 
         H = getattr(self,'alignment{}_h_spinBox'.format(alignment)).value()
         K = getattr(self,'alignment{}_k_spinBox'.format(alignment)).value()
@@ -226,6 +230,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             if 'ef_comboBox' in key:
                 for i,ef in enumerate(self.Efs):
                     value.addItem('{:.2f} ({:d})'.format(ef,len(self.Efs)-i-1))
+
+                value.addItem(' = Ei')
         
 
 
@@ -380,20 +386,23 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def getCalculation(self):
         Ei = self.HKL_ei_spinBox.value()
-        Ef = self.Efs[self.HKL_ef_comboBox.currentIndex()]
+        EfIndex = self.HKL_ef_comboBox.currentIndex()
+        if EfIndex == len(self.Efs): # Equal to last entry => Ei=Ef
+            Ef = Ei
+        else:
+            Ef = self.Efs[EfIndex]
         H = self.HKL_H_doubleSpinBox.value()
         K = self.HKL_K_doubleSpinBox.value()
         L = self.HKL_L_doubleSpinBox.value()
         A3 = self.HKL_A3_doubleSpinBox.value()
         A4 = self.HKL_A4_doubleSpinBox.value()
 
-        return Ei,Ef,H,K,L,A3,A4
+        return Ei,Ef,H,K,L,A3,A4,EfIndex
 
     def setCalculation(self,calc):
-        Ei,Ef,H,K,L,A3,A4 = calc
+        Ei,Ef,H,K,L,A3,A4,EfIndex = calc
 
-        EfIdx = np.argmin(np.abs(Ef-self.Efs))
-        self.HKL_ef_comboBox.setCurrentIndex(EfIdx)
+        self.HKL_ef_comboBox.setCurrentIndex(EfIndex)
         self.HKL_ei_spinBox.setValue(Ei)
         self.HKL_H_doubleSpinBox.setValue(H)
         self.HKL_K_doubleSpinBox.setValue(K)
@@ -402,7 +411,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.HKL_A4_doubleSpinBox.setValue(A4)
 
     def calcualteHKLtoA3A4(self):
-        Ei,Ef,H,K,L,A3,A4 = self.getCalculation()
+        Ei,Ef,H,K,L,*_ = self.getCalculation()
         
         B = self.sample.B
         Qx,Qy,_ = np.dot([H,K,L],B)
@@ -413,7 +422,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.HKL_A4_doubleSpinBox.setValue(A4)
         
     def calcualteA3A4toHKL(self):
-        Ei,Ef,H,K,L,A3,A4 = self.getCalculation()
+        Ei,Ef,_,_,_,A3,A4,_ = self.getCalculation()
         Qx,Qy = converterToQxQy(A3,A4,Ei,Ef)
         H,K,L = self.sample.calculateQxQyToHKL(Qx,Qy)
         self.HKL_H_doubleSpinBox.setValue(H)
