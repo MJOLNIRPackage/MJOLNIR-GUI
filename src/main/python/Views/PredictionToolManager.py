@@ -119,6 +119,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.scan_a3Steps_spinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_ei_spinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_a4_lineEdit.textChanged.connect(self.generateScanCommands)
+        self.scan_monitor_spinBox.valueChanged.connect(self.generateScanCommands)
 
         self.tool_generate_button.clicked.connect(self.generatePrediction)
 
@@ -280,14 +281,17 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         points = self.scan_plot_checkBox.isChecked()
 
-        return A3Start,A3Stop,A3Steps,Ei,A4,points
+        Monitor = self.scan_monitor_spinBox.value()
+
+        return A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor
 
     def setScan(self,scan):
-        A3Start,A3Stop,A3Steps,Ei,A4,points = scan
+        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = scan
         self.scan_a3Start_spinBox.setValue(A3Start)
         self.scan_a3Stop_spinBox.setValue(A3Stop)
         self.scan_a3Steps_spinBox.setValue(A3Steps)
         self.scan_ei_spinBox.setValue(Ei)
+        self.scan_monitor_spinBox.setValue(Monitor)
 
         strA4 = ','.join([str(a4) for a4 in A4])
         self.scan_a4_lineEdit.setText(strA4)
@@ -362,14 +366,14 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def generateScanCommands(self):
         
-        A3Start,A3Stop,A3Steps,Ei,A4,points = self.getScan()
+        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = self.getScan()
         if A3Steps == 1:
             A3StepSize = 0
         else:
             A3StepSize = (A3Stop-A3Start)/(A3Steps-1.0)
         A3middle = 0.5*(A3Start+A3Stop)
 
-        scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn 100000'.format(A3middle,A3StepSize,A3Steps)
+        scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn {:}'.format(A3middle,A3StepSize,A3Steps,Monitor)
 
         commandString = []
         commandString.append('dr 2t {:.2f}'.format(A4[0]))
