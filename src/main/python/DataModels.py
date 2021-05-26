@@ -197,6 +197,94 @@ class Cut1DModel(QtCore.QAbstractListModel):
             self.Cut1D_listView.setCurrentIndex(index)
 
 
+class BraggListModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, BraggList=None, braggList_listView=None, **kwargs):
+        super(BraggListModel, self).__init__(*args, **kwargs)
+        self.data = BraggList or []
+        self.braggList_listView = braggList_listView
+        
+    def data(self, index, role):
+        if role == Qt.DisplayRole:# or role == QtCore.Qt.EditRole:
+            text = '\t'.join(map(str,self.data[index.row()]))
+            return text
+        
+    def getData(self,*args,**kwargs):
+        return self.data(*args,**kwargs)
+
+    def rowCount(self, index=None):
+        return len(self.data)
+
+    def append(self,BraggPoint):
+        self.data.append(BraggPoint)
+        self.selectLastBragg()
+        self.layoutChanged.emit()
+
+    def delete(self,index):
+        indices = [ind.row() for ind in index] # Extract numeric index, sort decending
+        indices.sort(reverse=True)
+        for ind in indices:
+            try:
+                del self.data[ind]
+                self.layoutChanged.emit()
+            except:
+                pass
+
+        QtWidgets.QApplication.processEvents()
+        index = self.getCurrentBraggIndex()
+       
+        if index is None:
+            self.selectLastBragg()
+        else:
+            if index.row()==self.rowCount(None):
+                self.selectLastBragg()
+
+    def item(self,index):
+        if not index is None:
+            return self.data[index.row()]
+
+    #def setData(self, index, value, role=QtCore.Qt.EditRole):
+    #    ds = self.item(index)
+    #    if role == QtCore.Qt.EditRole:
+    #        ds.name = value
+    #        self.dataChanged.emit(index, index)
+    #        return True
+    #       
+    #    return False
+
+    def flags(self,index):
+        return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
+
+    def getCurrentBraggIndex(self):
+        indices = self.braggList_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            index = indices[0]
+            if index.row()<self.rowCount(None):
+                return index
+            else:
+                return None
+
+    def getCurrentBraggIndexRow(self):
+        currentIndex = self.getCurrentBraggIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return currentIndex.row()
+
+    def getCurrentBragg(self):
+        index = self.getCurrentBraggIndex()
+        return self.item(index)
+
+    def selectLastBragg(self):
+        bragg = self.rowCount(None)
+        if bragg!=0:
+            index = self.index(self.rowCount(None)-1,0)
+            self.braggList_listView.setCurrentIndex(index)
+
+
+
 
 class MaskModel(QtCore.QAbstractListModel):
     def __init__(self, *args, masks=None, Mask_listView=None, guiWindow=None, **kwargs):

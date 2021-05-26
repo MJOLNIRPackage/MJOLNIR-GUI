@@ -6,9 +6,11 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
     import MJOLNIRGui.src.main.python._tools as _GUItools
+    from MJOLNIRGui.src.main.python.Views import BraggListManager
 except ImportError:
     from _tools import ProgressBarDecoratorArguments
     import _tools as _GUItools
+    from Views import BraggListManager
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
@@ -74,6 +76,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.guiWindow = guiWindow
 
         self.a4Validator = QtGui.QRegExpValidator()
+        self.predictionAX = None
+        self.braggPoints = None
        
         regExp = QtCore.QRegExp(r'(-?[0-9]*\.[0-9]+|-?[0-9]+)(,(-?[0-9]*\.[0-9]+|-?[0-9]+))*')
         self.a4Validator.setRegExp(regExp)
@@ -120,6 +124,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.scan_ei_spinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_a4_lineEdit.textChanged.connect(self.generateScanCommands)
         self.scan_monitor_spinBox.valueChanged.connect(self.generateScanCommands)
+
+        self.scan_curratAxe_pushButton.clicked.connect(self.curratAxeList)
 
         self.tool_generate_button.clicked.connect(self.generatePrediction)
 
@@ -260,7 +266,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
     def generatePrediction(self):
         """Generate prediction window from MJOLNIR"""
-        A3Start,A3Stop,A3Steps,Ei,A4,points = self.getScan()
+        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = self.getScan()
         r1 = np.array(self.getAlignment(alignment=1))
         r2 = np.array(self.getAlignment(alignment=2))
 
@@ -268,8 +274,47 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,points=points)
 
+        self.predictionAx = ax
         self.guiWindow.windows.append(ax[0].get_figure())
+
+
+        curratAxe = self.scan_curratAxe_checkBox.isChecked()
+
+        if curratAxe:
+            self.plotCurratAxe()
         
+    def plotCurratAxe(self):
+        if hasattr(self,'BraggListWindow'):
+            BraggPoint = self.BraggListWindow.BraggListModel.data
+        elif hasattr(self,'braggPoints'):
+            BraggPoint = self.braggPoints
+        else:
+            return
+
+        if not hasattr(self,'predictionAx'):
+            return
+        
+        Ef = self.Efs[::-1]
+        Ei = self.getScan()[3]
+        SpurionPositionsMono = self.sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Monochromator').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
+        SpurionPositionsAna  = self.sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Analyser').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
+                
+        
+        self.monoPoints = []
+        self.anaPoints = []
+        for ax,posMono,posAna in zip(self.predictionAx,SpurionPositionsMono,SpurionPositionsAna):
+            for bragg in posMono:
+                self.monoPoints.append( ax.scatter(*bragg[:2],marker='o',color='r'))
+            for bragg in posAna:
+                self.anaPoints.append(ax.scatter(*bragg[:2],marker='o',color='k'))
+
+    def removeCurratAxe(self):
+        if hasattr(self,'predictionAx'):
+            if hasattr(self,'monoPoints'):
+                for p in np.concatenate(self.monoPoints,self.anaPoints):
+                    p.setVisible(False)
+
+
 
     def getScan(self):
         A3Start = self.scan_a3Start_spinBox.value()
@@ -340,9 +385,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         cell = self.getCell()
         scan = self.getScan()
         calc = self.getCalculation()
+        bragg = self.braggPoints
 
-        names = ['R1','R2','cell','scan','calc']
-        values = [R1,R2,cell,scan,calc]
+        names = ['R1','R2','cell','scan','calc','braggPoints']
+        values = [R1,R2,cell,scan,calc,bragg]
         for name,value in zip(names,values):
             self.guiWindow.predictionSettings[name] = value
 
@@ -360,6 +406,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             self.setCell(cell)
             self.setScan(scan)
             self.setCalculation(calc)
+            self.braggPoints = self.guiWindow.predictionSettings['braggPoints']
 
         else:# Create an empty dict
             self.guiWindow.predictionSettings = {}
@@ -433,5 +480,18 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.HKL_K_doubleSpinBox.setValue(K)
         self.HKL_L_doubleSpinBox.setValue(L)
 
+    def curratAxeList(self):
+        if hasattr(self,'BraggListWindow'): # If a window is open, use it
+            self.braggPoints = self.BraggListWindow.BraggListModel.data
+        
+        self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
+        self.guiWindow.windows.append(self.BraggListWindow)
+        self.BraggListWindow.show()
+
+
     def closeEvent(self, event):
+        if hasattr(self,'BraggListWindow'):
+            self.braggPoints = self.BraggListWindow.BraggListModel.data
+        else:
+            self.braggPoints = None
         self.updateSettings()

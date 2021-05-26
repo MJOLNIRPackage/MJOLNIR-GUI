@@ -957,6 +957,13 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="QPushButton" name="scan_curratAxe_pushButton">
+            <property name="text">
+             <string>Currat Axe List</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -1015,6 +1022,13 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="QCheckBox" name="scan_curratAxe_checkBox">
+            <property name="text">
+             <string>Plot Currat Axe</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -1050,18 +1064,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_55">
-            <item>
-             <widget class="QCheckBox" name="scan_plot_checkBox">
-              <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
-              </property>
-              <property name="text">
-               <string>Plot Points</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QHBoxLayout" name="horizontalLayout_55"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_17">
@@ -1095,6 +1098,16 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="scan_plot_checkBox">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Plot Scan Points</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1176,7 +1189,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>scan_a3Steps_spinBox</tabstop>
   <tabstop>scan_ei_spinBox</tabstop>
   <tabstop>scan_a4_lineEdit</tabstop>
-  <tabstop>scan_plot_checkBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
