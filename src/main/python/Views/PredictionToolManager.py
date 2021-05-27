@@ -62,11 +62,12 @@ def onFocus(self,event,others):
                 o.currentIndexChanged.disconnect()
             except (TypeError,AttributeError):
                 pass
-    try:
-        self.valueChanged.connect(self.onChangeFunction)
-    except AttributeError:
-        self.currentIndexChanged.connect(self.onChangeFunction)
-    self.old_focusInEvent(event)
+    if hasattr(self,'onChangeFunction'):
+        try:
+            self.valueChanged.connect(self.onChangeFunction)
+        except AttributeError:
+            self.currentIndexChanged.connect(self.onChangeFunction)
+    #   self.old_focusInEvent(event)
 
 
 class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm):
@@ -108,12 +109,14 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.alignment1_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
         self.alignment1_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
         self.alignment1_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
-
+        self.alignment1_a3_spinBox.valueChanged.connect(lambda: textChangedA4Calc(1,self))
+        
         self.alignment2_ei_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
         self.alignment2_ef_comboBox.currentIndexChanged.connect(lambda Index: textChangedA4Calc(2,self))
         self.alignment2_h_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
         self.alignment2_k_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
         self.alignment2_l_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
+        self.alignment2_a3_spinBox.valueChanged.connect(lambda: textChangedA4Calc(2,self))
 
         
         self.scan_a4_lineEdit.setValidator(self.a4Validator)
@@ -150,7 +153,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
         
         # Update focusing for A3 and A4
-        others = [self.HKL_ei_spinBox,self.HKL_H_doubleSpinBox,self.HKL_K_doubleSpinBox,self.HKL_L_doubleSpinBox,self.HKL_ef_comboBox]
+        others = [self.HKL_H_doubleSpinBox,self.HKL_K_doubleSpinBox,self.HKL_L_doubleSpinBox]
         self.HKL_A3_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_A3_doubleSpinBox,event,others)
         self.HKL_A4_doubleSpinBox.focusInEvent= lambda event: onFocus(self.HKL_A4_doubleSpinBox,event,others)
 
@@ -464,10 +467,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def calcualteHKLtoA3A4(self):
         Ei,Ef,H,K,L,*_ = self.getCalculation()
         
-        B = self.sample.B
-        Qx,Qy,_ = np.dot([H,K,L],B)
+        UB = self.sample.UB
 
-        A3,A4 = converterToA3A4(Qx,Qy,Ei,Ef,A3Off=self.sample.theta,A4Sign=np.sign(self.sample.plane_vector1[4]))
+        Qx,Qy,_ = np.dot(UB,[H,K,L])
+        A3,A4 = converterToA3A4(Qx,Qy,Ei,Ef,A3Off=0.0,A4Sign=np.sign(self.sample.plane_vector1[4]))
         
         self.HKL_A3_doubleSpinBox.setValue(A3)
         self.HKL_A4_doubleSpinBox.setValue(A4)
