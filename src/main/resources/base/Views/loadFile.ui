@@ -41,8 +41,23 @@
      </item>
      <item>
       <widget class="QListView" name="DataSet_DataSets_listView">
+       <property name="dragEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::NoDragDrop</enum>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::CopyAction</enum>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="movement">
+        <enum>QListView::Static</enum>
        </property>
       </widget>
      </item>

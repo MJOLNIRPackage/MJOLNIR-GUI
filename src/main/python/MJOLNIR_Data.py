@@ -40,6 +40,18 @@ class GuiDataSet(DataSet.DataSet):
     def flags(self):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
 
+    def insert(self,*args,**kwargs):
+        if len(self.convertedFiles)>0:
+            return self.convertedFiles.insert(*args,**kwargs)
+        else:
+            return self.dataFiles.insert(*args,**kwargs)
+
+    def pop(self,*args,**kwargs):
+        if len(self.convertedFiles)>0:
+            return self.convertedFiles.pop(*args,**kwargs)
+        else:
+            return self.dataFiles.pop(*args,**kwargs)
+
     # def undoAbsolutNormalize(self):
     #     if len(self.convertedFiles)>0: # If there are converted files present, undo normalization
     #         super(GuiDataSet,self).undoAbsolutNormalize()

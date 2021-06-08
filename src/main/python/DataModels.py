@@ -2,6 +2,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
+import pickle
+
 import numpy as np
 import sys
 import warnings
@@ -21,16 +23,33 @@ except ImportError:
     import _tools
 
 class DataSetModel(QtCore.QAbstractListModel):
+
+    dragDropFinished = QtCore.pyqtSignal()
+
     def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
         super(DataSetModel, self).__init__(*args, **kwargs)
         self.dataSets = dataSets or []
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
+        self.lastDroppedItems = []
+        self.pendingRemoveRowsAfterDrop = False
+
+    def rowForItem(self, item):
+        '''
+        rowForItem method returns the row corresponding to the passed in item
+        or None if no such item exists in the model
+        '''
+        try:
+            row = self.dataSets.index(item)
+        except ValueError:
+            return None
+        return row
         
     def data(self, index, role):
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
             text = self.dataSets[index.row()].name
             return text
-        
+        if role == Qt.ItemDataRole:
+            return self.dataSets[index.row()]
         #if role == Qt.DecorationRole:
         #    status = self.dataSets[index.row()].checked
         #    if status:
@@ -42,7 +61,50 @@ class DataSetModel(QtCore.QAbstractListModel):
     def rowCount(self, index):
         return len(self.dataSets)
 
+    def insertRows(self, row, count, index):
+        if index.isValid():
+            return False
+        if count <= 0:
+            return False
+        # inserting 'count' empty rows starting at 'row'
+        self.beginInsertRows(QtCore.QModelIndex(), row, row + count - 1)
+        for i in range(0, count):
+            self.dataSets.insert(row + i, None)
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, row, count, index):
+        if index.isValid():
+            return False
+        if count <= 0:
+            return False
+        # num_rows = self.rowCount(QtCore.QModelIndex())
+        self.beginRemoveRows(QtCore.QModelIndex(), row, row + count - 1)
+        for i in range(count, 0, -1):
+            self.dataSets.pop(row - i + 1)
+        self.endRemoveRows()
+
+        if self.pendingRemoveRowsAfterDrop:
+            '''
+            If we got here, it means this call to removeRows is the automatic
+            'cleanup' action after drag-n-drop performed by Qt
+            '''
+            self.pendingRemoveRowsAfterDrop = False
+            self.dragDropFinished.emit()
+
+        return True
+
     def append(self,ds):
+        while ds.name in [DS.name for DS in self.dataSets]: # name already exists.. This screws up drag/drop
+            name = ds.name
+            try:
+                idx = int(name.split(' ')[-1])
+            except ValueError:
+                name = name+' 1'
+            else:
+                name = name[:-(len(str(idx))+1)] + ' ' + str(idx+1)
+            ds.name = name
+
         self.dataSets.append(ds)
         self.selectLastDataSet()
         self.layoutChanged.emit()
@@ -75,9 +137,83 @@ class DataSetModel(QtCore.QAbstractListModel):
             
         return False
 
-    def flags(self,index):
-        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+    def index(self, row, column, parent=None):
+        if row < 0 or row >= self.rowCount(None):
+            return QtCore.QModelIndex()
+        return self.createIndex(row, column)
 
+    def parent(self, index):
+        return QtCore.QModelIndex()
+
+    def supportedDropActions(self):
+        return QtCore.Qt.MoveAction 
+        
+
+    def flags(self,index):
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | \
+            QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
+
+    def mimeTypes(self):
+        return ['mjolnirgui/datasetdragdrop.list']
+
+    def mimeData(self, indexes):
+        mimedata = QtCore.QMimeData()
+        encoded_data = QtCore.QByteArray()
+        stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.WriteOnly)
+        for index in indexes:
+            if index.isValid():
+                item = self.data(index, QtCore.Qt.ItemDataRole)
+                
+        stream << QtCore.QByteArray(item.name.encode('utf-8'))#pickle.dumps(item))
+        mimedata.setData('mjolnirgui/datasetdragdrop.list', encoded_data)
+        return mimedata
+
+    def dropMimeData(self, data, action, row, column, parent):
+        if action == QtCore.Qt.IgnoreAction:
+            return True
+        if not data.hasFormat('mjolnirgui/datasetdragdrop.list'):
+            return False
+        if column > 0:
+            return False
+
+        num_rows = self.rowCount(QtCore.QModelIndex())
+        if num_rows <= 0:
+            return False
+
+        if row < 0:
+            if parent.isValid():
+                row = parent.row()
+            else:
+                return False
+
+        encoded_data = data.data('mjolnirgui/datasetdragdrop.list')
+        stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.ReadOnly)
+
+        new_items = []
+        rows = 0
+        while not stream.atEnd():
+            item = QtCore.QByteArray()
+            stream >> item
+            item = bytes(item).decode('utf-8')#pickle.loads(item)
+            index = [ds.name for ds in self.dataSets].index(item)
+            item = self.dataSets[index]
+            new_items.append((item, index))
+            rows += 1
+
+        self.lastDroppedItems = []
+        for (text, index) in new_items:
+            target_row = row
+            if index < row:
+                target_row += 1
+            self.beginInsertRows(QtCore.QModelIndex(), target_row, target_row)
+            self.dataSets.insert(target_row, text)
+            self.endInsertRows()
+            self.lastDroppedItems.append(text)
+            row += 1
+        self.pendingRemoveRowsAfterDrop = True
+        return True
 
     def getCurrentDatasetIndex(self):
         indices = self.DataSet_DataSets_listView.selectedIndexes()
@@ -108,6 +244,29 @@ class DataSetModel(QtCore.QAbstractListModel):
             index = self.index(self.rowCount(None)-1,0)
             self.DataSet_DataSets_listView.setCurrentIndex(index)
 
+
+class SelectionModel(QtCore.QItemSelectionModel):
+    """Selection model created from https://github.com/d1vanov/PyQt5-reorderable-list-model/blob/master/reorderable_list_model.py
+    When drag/drop is used, selects newly inserted item"""
+    def __init__(self, parent=None):
+        QtCore.QItemSelectionModel.__init__(self, parent)
+
+    def onModelItemsReordered(self):
+        new_selection = QtCore.QItemSelection()
+        new_index = QtCore.QModelIndex()
+        for item in self.model().lastDroppedItems:
+            row = self.model().rowForItem(item)
+            if row is None:
+                continue
+            new_index = self.model().index(row, 0, QtCore.QModelIndex())
+            new_selection.select(new_index, new_index)
+
+        self.clearSelection()
+        flags = QtCore.QItemSelectionModel.ClearAndSelect | \
+                QtCore.QItemSelectionModel.Rows | \
+                QtCore.QItemSelectionModel.Current
+        self.select(new_selection, flags)
+        self.setCurrentIndex(new_index, flags)
 
 
 class Cut1DModel(QtCore.QAbstractListModel):
@@ -438,17 +597,33 @@ class defDict(dict):
 
 
 class DataFileModel(QtCore.QAbstractListModel):
+
+    dragDropFinished = QtCore.pyqtSignal()
+
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,guiWindow=None, **kwargs):
         super(DataFileModel, self).__init__(*args, **kwargs)
         self.dataSetModel = dataSetModel
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.DataSet_filenames_listView = DataSet_filenames_listView
         self.guiWindow = guiWindow
+        self.lastDroppedItems = []
+        self.pendingRemoveRowsAfterDrop = False
 
         self.IconDict = defDict()
         self.IconDict['default']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/document.png'))
         self.IconDict['hdf']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/HDF_logo_16.png'))
         self.IconDict['nxs']=QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/NXS_logo_16.png'))
+
+    def rowForItem(self, item):
+        '''
+        rowForItem method returns the row corresponding to the passed in item
+        or None if no such item exists in the model
+        '''
+        try:
+            row = list(self.dataSetModel.item(self.getCurrentDatasetIndex())).index(item)
+        except ValueError:
+            return None
+        return row
         
     def data(self, index, role):
 
@@ -461,6 +636,52 @@ class DataFileModel(QtCore.QAbstractListModel):
             t = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].type
             return self.IconDict[t]
 
+        if role == Qt.ItemDataRole:
+            return self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()]
+
+    def insertRows(self, row, count, index):
+        if index.isValid():
+            return False
+        if count <= 0:
+            return False
+        # inserting 'count' empty rows starting at 'row'
+        self.beginInsertRows(QtCore.QModelIndex(), row, row + count - 1)
+        for i in range(0, count):
+            self.dataSetModel.item(self.getCurrentDatasetIndex()).insert(row + i, None)
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, row, count, index):
+        if index.isValid():
+            return False
+        if count <= 0:
+            return False
+        # num_rows = self.rowCount(QtCore.QModelIndex())
+        self.beginRemoveRows(QtCore.QModelIndex(), row, row + count - 1)
+        for i in range(count, 0, -1):
+             self.dataSetModel.item(self.getCurrentDatasetIndex()).pop(row - i + 1)
+        self.endRemoveRows()
+
+        if self.pendingRemoveRowsAfterDrop:
+            '''
+            If we got here, it means this call to removeRows is the automatic
+            'cleanup' action after drag-n-drop performed by Qt
+            '''
+            self.pendingRemoveRowsAfterDrop = False
+            self.dragDropFinished.emit()
+
+        return True
+
+    def index(self, row, column, parent=None):
+        if row < 0 or row >= self.rowCount(None):
+            return QtCore.QModelIndex()
+        return self.createIndex(row, column)
+
+    def parent(self, index):
+        return QtCore.QModelIndex()
+
+    def supportedDropActions(self):
+        return QtCore.Qt.MoveAction 
 
     def getCurrentDatasetIndex(self):
         
@@ -561,7 +782,11 @@ class DataFileModel(QtCore.QAbstractListModel):
 
 
     def flags(self,index):
-        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | \
+            QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
+        #return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
 
     def delete(self,idx=None):
@@ -574,7 +799,8 @@ class DataFileModel(QtCore.QAbstractListModel):
             for idx in indices:
                 del ds[idx]
                 indices-=1
-            self.layoutChanged.emit()
+            if not self.pendingRemoveRowsAfterDrop:
+                self.layoutChanged.emit()
             self.guiWindow.updateDataFileLabels()
 
 
@@ -590,8 +816,70 @@ class DataFileModel(QtCore.QAbstractListModel):
             
 
         ds.append(dfs)
-        self.layoutChanged.emit()
+        if not self.pendingRemoveRowsAfterDrop:
+            self.layoutChanged.emit()
         guiWindow.updateDataFileLabels()
+
+
+    def mimeTypes(self):
+        return ['mjolnirgui/datafiledragdrop.list']
+
+    def mimeData(self, indexes):
+        mimedata = QtCore.QMimeData()
+        encoded_data = QtCore.QByteArray()
+        stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.WriteOnly)
+        for index in indexes:
+            if index.isValid():
+                item = self.data(index, QtCore.Qt.ItemDataRole)
+                
+        stream << QtCore.QByteArray(item.name.encode('utf-8'))#pickle.dumps(item))
+        mimedata.setData('mjolnirgui/datafiledragdrop.list', encoded_data)
+        return mimedata
+
+    def dropMimeData(self, data, action, row, column, parent):
+        if action == QtCore.Qt.IgnoreAction:
+            return True
+        if not data.hasFormat('mjolnirgui/datafiledragdrop.list'):
+            return False
+        if column > 0:
+            return False
+
+        num_rows = self.rowCount(QtCore.QModelIndex())
+        if num_rows <= 0:
+            return False
+
+        if row < 0:
+            if parent.isValid():
+                row = parent.row()
+            else:
+                return False
+
+        encoded_data = data.data('mjolnirgui/datafiledragdrop.list')
+        stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.ReadOnly)
+
+        new_items = []
+        rows = 0
+        while not stream.atEnd():
+            item = QtCore.QByteArray()
+            stream >> item
+            item = bytes(item).decode('utf-8')#pickle.loads(item)
+            index = [df.name for df in self.dataSetModel.item(self.getCurrentDatasetIndex())].index(item)
+            item = self.dataSetModel.item(self.getCurrentDatasetIndex())[index]
+            new_items.append((item, index))
+            rows += 1
+
+        self.lastDroppedItems = []
+        for (text, index) in new_items:
+            target_row = row
+            if index < row:
+                target_row += 1
+            self.beginInsertRows(QtCore.QModelIndex(), target_row, target_row)
+            self.dataSetModel.item(self.getCurrentDatasetIndex()).insert(target_row, text)
+            self.endInsertRows()
+            self.lastDroppedItems.append(text)
+            row += 1
+        self.pendingRemoveRowsAfterDrop = True
+        return True
 
 
 def getAttribute(obj,location):

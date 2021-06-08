@@ -2,11 +2,11 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
 except ImportError:
-    from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from _tools import ProgressBarDecoratorArguments
 
@@ -34,9 +34,13 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
 
     self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
     self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
+    self.ui.DataSet_DataSets_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+    self.ui.DataSet_DataSets_listView.setDragDropOverwriteMode(False)
 
-    self.DataSetSelectionModel = self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataSetSelectionModel = SelectionModel(self.DataSetModel)#self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataSetModel.dragDropFinished.connect(self.DataSetSelectionModel.onModelItemsReordered)
     self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
+    self.ui.DataSet_DataSets_listView.setSelectionModel(self.DataSetSelectionModel)
     
     self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
 
@@ -66,8 +70,14 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,guiWindow=self)
     self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
 
-    self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
+    self.ui.DataSet_filenames_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+    self.ui.DataSet_filenames_listView.setDragDropOverwriteMode(False)
+
+    #self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
+    self.DataFileSelectionModel = SelectionModel(self.DataFileModel)#self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataFileModel.dragDropFinished.connect(self.DataFileSelectionModel.onModelItemsReordered)
     self.DataFileSelectionModel.selectionChanged.connect(self.selectedDataFileChanged)
+    self.ui.DataSet_filenames_listView.setSelectionModel(self.DataFileSelectionModel)
     
     self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
     self.ui.DataSet_DeleteFiles_button.setToolTip('Delete selected Datafile')
