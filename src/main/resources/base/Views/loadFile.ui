@@ -88,6 +88,9 @@
      </item>
      <item>
       <widget class="QListView" name="DataSet_filenames_listView">
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::NoDragDrop</enum>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>

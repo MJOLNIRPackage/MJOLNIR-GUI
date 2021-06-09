@@ -9,8 +9,9 @@ class GuiDataSet(DataSet.DataSet):
         self.name = name
         #self.currentNormalizationSettings = defaultdict(lambda: None) # Holder for newest settings
         #self.normalizationSettings = defaultdict(lambda: None) # Holder for latest used settings
+        for idx,df in enumerate(self):
+            df.idx = idx
         
-    
     def setData(self,column,value):
         if column == 0: self.name = value
         
@@ -40,17 +41,19 @@ class GuiDataSet(DataSet.DataSet):
     def flags(self):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable
 
-    def insert(self,*args,**kwargs):
+    def insert(self,target_row,item,**kwargs):
         if len(self.convertedFiles)>0:
-            return self.convertedFiles.insert(*args,**kwargs)
+            self.dataFiles.insert(target_row,item.original_file,**kwargs)
+            return self.convertedFiles.insert(target_row,item,**kwargs)
         else:
-            return self.dataFiles.insert(*args,**kwargs)
+            return self.dataFiles.insert(target_row,item,**kwargs)
 
-    def pop(self,*args,**kwargs):
+    def pop(self,position):
         if len(self.convertedFiles)>0:
-            return self.convertedFiles.pop(*args,**kwargs)
+            self.dataFiles.pop(position)
+            return self.convertedFiles.pop(position)
         else:
-            return self.dataFiles.pop(*args,**kwargs)
+            return self.dataFiles.pop(position)
 
     # def undoAbsolutNormalize(self):
     #     if len(self.convertedFiles)>0: # If there are converted files present, undo normalization
@@ -105,6 +108,7 @@ class GuiDataSet(DataSet.DataSet):
                 
 class GuiDataFile(DataFile.DataFile):
     def __init__(self,fileLocation, **kwargs):
+        self._idx = 0
         super(GuiDataFile,self).__init__(fileLocation=fileLocation,**kwargs)
         binning = 1
         calibrationIndex = list(self.possibleBinnings).index(binning) # Only binning 1 is used for raw plotting
@@ -132,6 +136,24 @@ class GuiDataFile(DataFile.DataFile):
         self.maxAnalyzerSelection = EPrDetector
         self.detectorSelectionOriginal = self.detectorSelection
         self.analyzerSelectionOriginal = self.analyzerSelection
+        
+    @property
+    def idx(self):
+        return self._idx
+
+    @idx.setter
+    def idx(self,value):
+        if self.type == 'nxs':
+            self.original_file.idx = value
+        else:
+            self._idx = value
+    
+    @idx.getter
+    def idx(self):
+        if self.type == 'nxs':
+            return self.original_file.idx
+        else:
+            return self._idx
 
     def setData(self,column,value):
         if column == 0: self.name = value

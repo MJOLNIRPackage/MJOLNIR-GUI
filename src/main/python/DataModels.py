@@ -44,7 +44,7 @@ class DataSetModel(QtCore.QAbstractListModel):
             return None
         return row
         
-    def data(self, index, role):
+    def data(self, index, role = Qt.ItemDataRole):
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
             text = self.dataSets[index.row()].name
             return text
@@ -94,17 +94,25 @@ class DataSetModel(QtCore.QAbstractListModel):
 
         return True
 
-    def append(self,ds):
-        while ds.name in [DS.name for DS in self.dataSets]: # name already exists.. This screws up drag/drop
-            name = ds.name
+    def generateValidName(self,ds):
+        name = ds.name
+        while name in [DS.name for DS in self.dataSets if not DS is ds]: # name already exists.. This screws up drag/drop
             try:
                 idx = int(name.split(' ')[-1])
             except ValueError:
                 name = name+' 1'
             else:
                 name = name[:-(len(str(idx))+1)] + ' ' + str(idx+1)
-            ds.name = name
+        return name
 
+    def append(self,ds):
+        ds.name = self.generateValidName(ds)
+
+        if self.rowCount(None)>0:
+            numbers = [d.idx for d in self.dataSets]
+        else:
+            numbers = [-1]
+        ds.idx = np.max(numbers)+1
         self.dataSets.append(ds)
         self.selectLastDataSet()
         self.layoutChanged.emit()
@@ -166,7 +174,7 @@ class DataSetModel(QtCore.QAbstractListModel):
             if index.isValid():
                 item = self.data(index, QtCore.Qt.ItemDataRole)
                 
-        stream << QtCore.QByteArray(item.name.encode('utf-8'))#pickle.dumps(item))
+        stream << QtCore.QByteArray(str(item.idx).encode('utf-8'))#pickle.dumps(item))
         mimedata.setData('mjolnirgui/datasetdragdrop.list', encoded_data)
         return mimedata
 
@@ -196,8 +204,8 @@ class DataSetModel(QtCore.QAbstractListModel):
         while not stream.atEnd():
             item = QtCore.QByteArray()
             stream >> item
-            item = bytes(item).decode('utf-8')#pickle.loads(item)
-            index = [ds.name for ds in self.dataSets].index(item)
+            item = int((bytes(item)).decode('utf-8)'))#pickle.loads(item)
+            index = [ds.idx for ds in self.dataSets].index(item)
             item = self.dataSets[index]
             new_items.append((item, index))
             rows += 1
@@ -828,11 +836,14 @@ class DataFileModel(QtCore.QAbstractListModel):
         mimedata = QtCore.QMimeData()
         encoded_data = QtCore.QByteArray()
         stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.WriteOnly)
+        items = []
         for index in indexes:
             if index.isValid():
                 item = self.data(index, QtCore.Qt.ItemDataRole)
+                items.append(item)
                 
-        stream << QtCore.QByteArray(item.name.encode('utf-8'))#pickle.dumps(item))
+        for item in items:
+            stream << QtCore.QByteArray(str(item.idx).encode('utf-8'))#pickle.dumps(item))
         mimedata.setData('mjolnirgui/datafiledragdrop.list', encoded_data)
         return mimedata
 
@@ -862,8 +873,9 @@ class DataFileModel(QtCore.QAbstractListModel):
         while not stream.atEnd():
             item = QtCore.QByteArray()
             stream >> item
-            item = bytes(item).decode('utf-8')#pickle.loads(item)
-            index = [df.name for df in self.dataSetModel.item(self.getCurrentDatasetIndex())].index(item)
+            item = int(bytes(item).decode('utf-8'))#pickle.loads(item)
+            index = [df.idx for df in self.dataSetModel.item(self.getCurrentDatasetIndex())].index(item)
+
             item = self.dataSetModel.item(self.getCurrentDatasetIndex())[index]
             new_items.append((item, index))
             rows += 1
