@@ -43,6 +43,14 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.ui.DataSet_DataSets_listView.setSelectionModel(self.DataSetSelectionModel)
     
     self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
+    def checkUpdatedName(self,index,*args):
+        ds = self.model().data(index)
+        suggestedName = self.model().generateValidName(ds)
+        if not suggestedName == ds.name:
+            ds.name = suggestedName
+            self.model().layoutChanged.emit()
+
+    self.ui.DataSet_DataSets_listView.dataChanged = checkUpdatedName
 
     def deleteFunction(self,gui,idx):
         gui.DataSetModel.delete(idx[0])
@@ -98,7 +106,7 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
             if event.type() == QtCore.QEvent.ContextMenu:
                 menu = QtWidgets.QMenu()
                 delete = QtWidgets.QAction('Delete')
-                delete.setToolTip('Delete DataSet') 
+                delete.setToolTip('Delete DataFile') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(self.DataSet_DeleteFiles_button_function)
 
