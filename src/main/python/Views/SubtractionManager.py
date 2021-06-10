@@ -206,7 +206,13 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
             self.Subtraction_dataSet_name_lineEdit.setText('Subtracted')
 
     def checkDataSetCombability(self,*args,**kwargs):
-        
+        if self.DataFileModel_foreground.rowCount(None)==0 or self.DataFileModel_foreground.rowCount(None)==0:
+            self.Subtraction_generateSubtraction_button.setDisabled(True)
+            self.DataFileModel_foreground.layoutChanged.emit()
+            self.DataFileModel_background.layoutChanged.emit()
+            self.guiWindow.DataFileModel.layoutChanged.emit()
+            return
+
         foregroundFiles = self.DataFileModel_foreground.getData()
         backgroundFiles = self.DataFileModel_background.getData()
 
