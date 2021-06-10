@@ -600,7 +600,12 @@ class defDict(dict):
         dict.__setitem__(self, key, val)
     
     
+class DummyIndexClass(object):
+    def __init__(self,row):
+        self._row = row
 
+    def row(self):
+        return self._row
 
 
 
@@ -608,8 +613,8 @@ class DataFileModel(QtCore.QAbstractListModel):
 
     dragDropFinished = QtCore.pyqtSignal()
 
-    def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,guiWindow=None, **kwargs):
-        super(DataFileModel, self).__init__(*args, **kwargs)
+    def __init__(self,DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,guiWindow=None, **kwargs):
+        super(DataFileModel, self).__init__(**kwargs)
         self.dataSetModel = dataSetModel
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.DataSet_filenames_listView = DataSet_filenames_listView
@@ -633,19 +638,28 @@ class DataFileModel(QtCore.QAbstractListModel):
             return None
         return row
         
-    def data(self, index, role):
+    def data(self, index, role=Qt.ItemDataRole):
+        try:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        except AttributeError:
+            return None
+        
+        ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        row = index.row()
+        if row>= len(ds):
+            return None
 
         if role == Qt.DisplayRole or role == Qt.EditRole:
             
-            text = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].name
+            text = ds[row].name
             return text
         
         if role == Qt.DecorationRole:
-            t = self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()].type
+            t = ds[row].type
             return self.IconDict[t]
 
         if role == Qt.ItemDataRole:
-            return self.dataSetModel.item(self.getCurrentDatasetIndex())[index.row()]
+            return ds[row]
 
     def insertRows(self, row, count, index):
         if index.isValid():
@@ -692,13 +706,18 @@ class DataFileModel(QtCore.QAbstractListModel):
         return QtCore.Qt.MoveAction 
 
     def getCurrentDatasetIndex(self):
-        
-        index = self.dataSetModel.getCurrentDatasetIndex()
-        
-        if index is None:
-            return None
-        else:
-            return index
+        if hasattr(self.DataSet_DataSets_listView,'selectedIndexes'): # If DataSet_DataSets_listView is listView
+            indices = self.DataSet_DataSets_listView.selectedIndexes()
+            
+            if indices is None:
+                return None
+            else:
+                if len(indices)==0:
+                    return None
+                else:
+                    return indices[0]
+        else: # If it is a combo box, needed for subrtaction manager. Mimic a proper index
+            return DummyIndexClass(self.DataSet_DataSets_listView.currentIndex())
 
     def getCurrentDatasetIndexRow(self):
         currentIndex = self.getCurrentDatasetIndex()
@@ -758,8 +777,14 @@ class DataFileModel(QtCore.QAbstractListModel):
         
         return dfs
 
+    def getCurrentDataSet(self):
+        return self.dataSetModel.item(self.getCurrentDatasetIndex())
+
     def rowCount(self, index):
-        ds = self.dataSetModel.getCurrentDataSet()
+        try:
+            ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
+        except IndexError:
+            return 0
         if ds is None:
             return 0
         else:
@@ -978,6 +1003,8 @@ endTime = Info('endTime', 'End time: ', formatTextArrayAdder)
 settings = {'sample/name':name,'title':title,'sample/projectionVector1':projectionVector1,'sample/projectionVector2':projectionVector2,'Ei':Ei, 'A3':A3,'twotheta':tt, 'magneticField':magneticField,'temperature':temperature,
             'comment':comment, 'binning':binning,'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters,
             'Time':countingTime,'startTime':startTime, 'endTime':endTime}
+
+subtractionSettings = {'sample/name':name,'title':title,'sample/projectionVector1':projectionVector1,'sample/projectionVector2':projectionVector2,'Ei':Ei, 'A3':A3,'twotheta':tt, 'magneticField':magneticField,'temperature':temperature, 'scanCommand':scanCommand, 'scanSteps':scanSteps, 'scanParameters':scanParameters}
 
 class DataFileInfoModel(QtCore.QAbstractListModel):
     def __init__(self, *args, DataSet_filenames_listView=None,dataSetModel=None,DataSet_DataSets_listView=None,dataFileModel=None,guiWindow=None, **kwargs):

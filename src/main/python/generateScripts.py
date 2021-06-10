@@ -40,7 +40,7 @@ def startString():
     
     return '\n'.join(importString)
 
-def generateFileLoader(dataFiles):
+def generateFileLoader(dataFiles,name='dataFiles'):
     """Generate a string to be run in order to load the provided data file paths"""
     try:
         dataFiles = np.concatenate(dataFiles)
@@ -68,20 +68,19 @@ def generateFileLoader(dataFiles):
                     prefix = prefix[:-1]
                 year = int(prefix[5:9])
                 numbers = np.array([n[len(prefix):] for n in names],dtype=int)
-                sortNumbers = np.sort(numbers)
-                diff = np.diff(sortNumbers)
-                separators = list(np.arange(len(diff))[diff>1]+1) # add one due to diff removing 1 lenght
+                diff = np.diff(numbers)
+                separators = list(np.arange(len(diff))[np.logical_and(diff!=1,diff!=-1)]+1) # add one due to diff removing 1 lenght
                 groups = []
                 if len(separators) == 0:
-                    groups.append('-'.join([str(sortNumbers[0]),str(sortNumbers[-1])]))
+                    groups.append('-'.join([str(numbers[0]),str(numbers[-1])]))
                 else:
                     separators.insert(0,0)
                     separators.append(-1)
                     for start,stop in zip(separators[:-1],separators[1:]):
                         if stop == -1:
-                            group = sortNumbers[start:]
+                            group = numbers[start:]
                         else:
-                            group = sortNumbers[start:stop]
+                            group = numbers[start:stop]
                         if len(group)>2:
                             groups.append('-'.join([str(group[0]),str(group[-1])]))
                         elif len(group)==2:
@@ -99,39 +98,62 @@ def generateFileLoader(dataFiles):
             
             
     if len(fileStrings)>1:
-        loadString = 'dataFiles = []\n'
-        loadString+= 'dataFiles.append('+')\ndataFiles.append('.join(fileStrings)+')\n'
-        loadString+= 'dataFiles = np.concatenate(dataFiles)\n'
+        loadString = name+' = []\n'
+        loadString+= name+'.append('+')\n'+name+'.append('.join(fileStrings)+')\n'
+        loadString+= name+' = np.concatenate('+name+')'
         
     else:
-        loadString = 'dataFiles = '+fileStrings[0]+'\n'
+        loadString = name+' = '+fileStrings[0]
     
     return loadString
 
 
-def loadDataSet(dataSetName='ds',DataFiles=None):
+def loadAndBinDataSet(dataSetName='ds',DataFiles=None,convertBeforeSubtract=None,backgroundFiles=None,binning=8):
     """Generate string to be run in order to load a dataset"""
     
     loadString = []
-    if DataFiles is None:
-        loadString.append('{} = DataSet.DataSet()'.format(dataSetName))
-    else:
-        loadString.append(generateFileLoader(DataFiles))
-        loadString.append('{} = DataSet.DataSet(dataFiles)'.format(dataSetName))
 
-    return '\n'.join(loadString)
-
-def binDataSet(dataSetName='ds',binning=8):
-    plotString = []
     if binning is None:
         binString = ''
     else:
         binString = 'binning = {},'.format(binning)
-    plotString.append('# Run the converter. This automatically generates nxs-file(s). \n'
-                        +'# Binning can be changed with binning argument.')
-    plotString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+
+    if DataFiles is None:
+        loadString.append('{} = DataSet.DataSet()'.format(dataSetName))
+    else:
+        if not backgroundFiles is None: # Dealing with subtracted data set
+            loadString.append(generateFileLoader(DataFiles,name = 'foreground'))
+            loadString.append('{} = DataSet.DataSet(foreground)'.format('FG'))
+            loadString.append(generateFileLoader(backgroundFiles,name = 'background'))
+            loadString.append('{} = DataSet.DataSet(background)'.format('BG'))
+
+            if not convertBeforeSubtract: # Subtract first
+                loadString.append('{} = FG - BG'.format(dataSetName))
+                loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
+                                +'# Binning can be changed with binning argument.')
+                loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+
+            else:
+                loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
+                                +'# Binning can be changed with binning argument.')
+                
+                loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format('FG',binString))
+                loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format('BG',binString))
+                loadString.append('{} = FG - BG'.format(dataSetName))
+
+
+        else:
+            loadString.append(generateFileLoader(DataFiles))
+            loadString.append('{} = DataSet.DataSet(dataFiles)'.format(dataSetName))
+
+            loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
+                                +'# Binning can be changed with binning argument.')
+            loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+
+
     
-    return '\n'.join(plotString)
+    
+    return '\n'.join(loadString)
 
 
 # Below here we have the functions for each option in the menu. 
@@ -156,9 +178,15 @@ def generate3DScript(self):
 
     # Start loading information from the GUI
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name
+    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    if not ds.background is None: # Dealing with a subracted dataset
+        convertBeforeSubtract = ds.convertBeforeSubtract
+        backgroundFiles = ds.background
+    else:
+        convertBeforeSubtract = None
+        backgroundFiles = None
 
     binning = self.ui.DataSet_binning_comboBox.currentText()
     qx = self.ui.View3D_QXBin_lineEdit.text()
@@ -186,7 +214,8 @@ def generate3DScript(self):
     # And generate the script
     generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
                                 RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
-                                title=title, selectView=selectView,customViewer=customViewer,counts=counts)
+                                title=title, selectView=selectView,customViewer=customViewer,counts=counts,convertBeforeSubtract=convertBeforeSubtract,
+                                backgroundFiles=backgroundFiles)
 
     return True
 
@@ -194,16 +223,15 @@ def generate3DScript(self):
 
 def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, 
                            qx=0.05, qy=0.05, E = 0.08, RLU=True, 
-                           CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2, customViewer=False,counts=False):
+                           CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2, customViewer=False,counts=False,
+                           convertBeforeSubtract=None,backgroundFiles=None):
     # The script is generated by appending the various elements, the joining 
     # them with a \n
     saveString = []
     
     saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
+    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
     
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
-
 
     saveString.append(plotViewer3D(dataSetName=dataSetName, qx=qx, qy=qy, E=E, 
                                     RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
@@ -293,9 +321,15 @@ def generateQELineScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name
+    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    if not ds.background is None: # Dealing with a subracted dataset
+        convertBeforeSubtract = ds.convertBeforeSubtract
+        backgroundFiles = ds.background
+    else:
+        convertBeforeSubtract = None
+        backgroundFiles = None
 
     binning = self.ui.DataSet_binning_comboBox.currentText()
     
@@ -327,7 +361,8 @@ def generateQELineScript(self):
     generatePlotQELineScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
                                 HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
                                 width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
-                                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins)
+                                CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins,
+                                convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles)
 
     return True    
 
@@ -335,13 +370,12 @@ def generateQELineScript(self):
 def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
                              HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                              width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
-                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False):
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False,
+                             convertBeforeSubtract=None,backgroundFiles=None):
     saveString = []
     
     saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
 
     saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
                width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
@@ -437,9 +471,15 @@ def generateQPlaneScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name
+    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    if not ds.background is None: # Dealing with a subracted dataset
+        convertBeforeSubtract = ds.convertBeforeSubtract
+        backgroundFiles = ds.background
+    else:
+        convertBeforeSubtract = None
+        backgroundFiles = None
 
     binning = self.ui.DataSet_binning_comboBox.currentText()
     
@@ -465,7 +505,8 @@ def generateQPlaneScript(self):
     generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = binning, 
                              xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
                              EMin = EMin,EMax=EMax, RLU=RLU, 
-                             CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title)
+                             CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title,
+                             convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles)
 
     return True    
 
@@ -473,13 +514,12 @@ def generateQPlaneScript(self):
 def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None, 
                              xBinTolerance=0.03, yBinTolerance=0.03,
                              EMin = 0.0,EMax=10, RLU=True, 
-                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title=''):
+                             CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='',
+                             convertBeforeSubtract=None,backgroundFiles=None):
     saveString = []
     
     saveString.append(startString())
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
     
     saveString.append(plotQPlaneText(dataSetName=dataSetName, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
                 EMin = EMin,EMax=EMax, RLU=RLU, 
@@ -559,17 +599,22 @@ def generateCut1DScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name
+    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    if not ds.background is None: # Dealing with a subracted dataset
+        convertBeforeSubtract = ds.convertBeforeSubtract
+        backgroundFiles = ds.background
+    else:
+        convertBeforeSubtract = None
+        backgroundFiles = None
 
     binning = self.ui.DataSet_binning_comboBox.currentText()
     
     saveString = []
     saveString.append(startString())
     saveString.append('\n\n')
-    saveString.append(loadDataSet(dataSetName=dataSetName,DataFiles=dataFiles))
-    saveString.append(binDataSet(dataSetName=dataSetName,binning=binning))
+    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
 
     if self.Cut1DModel.rowCount() == 1:
         cut = self.Cut1DModel.dataCuts1D[0]

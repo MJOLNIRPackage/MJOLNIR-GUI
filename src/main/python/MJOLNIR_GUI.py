@@ -20,8 +20,6 @@ from time import sleep
 from os import path
 import os
 
-from MJOLNIR.Data import Mask
-
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -39,6 +37,7 @@ try:
     from Views.MolecularCalculationManager import MolecularCalculationManager
     from Views.PredictionToolManager import PredictionToolManager
     from Views.CalculatorManager import CalculatorManager
+    from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -65,6 +64,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
     from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
+    from MJOLNIRGui.src.main.python.Views.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -309,8 +309,19 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionElectronicLogbook.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
         self.ui.actionElectronicLogbook.triggered.connect(self.electronicLogbookTool)
 
+        self.ui.actionSubtraction.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionSubtraction.setToolTip('Perform Subtraction of two DataSets') 
+        self.ui.actionSubtraction.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
+        self.ui.actionSubtraction.triggered.connect(self.subtractionManager)
+
     def getProgressBarValue(self):
         return self.ui.progressBar.value
+
+    def addProgressBarValue(self,value):
+        currentValue = self.getProgressBarValue()+value
+        self.ui.progressBar.setValue(currentValue)
+        self.ui.progressBar.value = currentValue
+        
 
     def setProgressBarValue(self,value):
         if not hasattr(self,'ui.progressBar.value'):
@@ -442,6 +453,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             dsDict['files']=localstring
             dsDict['binning'] = [None if df.type != 'nxs' else df.binning for df in ds]
+            if not ds.background is None:
+                dsDict['background'] = ds.background
+                dsDict['convertBeforeSubtract'] = ds.convertBeforeSubtract
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -524,39 +538,83 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
         # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
-        counter = 0
+        
+        self.setProgressBarValue(0)
 
 
         for dsDict in dataSetString:
             self.setProgressBarLabelText('Loading Data Set')
             DSName = dsDict['name']
-            files = dsDict['files']
-            dfs = None
-            if len(files)!=0: # If files in dataset, continue
-                dfs = []
-                for dfLocation in files:
-                    df = GuiDataFile(dfLocation)
-                    self.update()
-                    dfs.append(df)
-                    counter+=1
-                    self.setProgressBarValue(counter)
-            if DSName == '':
-                continue
-            ds = GuiDataSet(name=DSName,dataFiles=dfs)
-            if 'binning' in dsDict:
-                if not np.any([b is None for b in dsDict['binning']]):
+            files = dsDict['files'] # data or foreground data
+            if 'background' in dsDict: # Data set is a subtracted set!
+                background = dsDict['background']
+                if len(files)!=0: # If files in dataset, continue
+                    dfs = []
+                    for dfLocation in files:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfs.append(df)
+                        self.addProgressBarValue(0.5)
+                    dfsBG = []
+                    for dfLocation in background:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfsBG.append(df)
+                        self.addProgressBarValue(0.5)
+                    
+                    
+                    foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
+                    background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
                     binnings = dsDict['binning']
-                    for df,binning in zip(ds,binnings):
-                        df.binning = binning
-                    self.setProgressBarLabelText('Converting Data Set')    
-                    ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
-                    self.update()
+                    if dsDict['convertBeforeSubtract']:
+                        self.setProgressBarLabelText('Converting Data Set')
+                        for df,binning in zip(foreground_ds,binnings): # Give the correct binning
+                            df.binning = binning
+                        foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5)
+                        self.update()
+                        for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
+                            df.binning = binning
+                        background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5)
+                        self.update()
+                        
+
+                    temp = foreground_ds-background_ds
+                    
+                    ds = GuiDataSet(name=DSName,dataSet=temp)
+                    
+                    ds.background = background
+                    ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
+                    
+                    if not ds.convertBeforeSubtract: # Convert after subtraction if needed
+                        if not np.any([b is None for b in dsDict['binning']]):
+                            self.setProgressBarLabelText('Converting Data Set')    
+                            ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+                            self.update()
+
+            else: # Regular dataset
+                    
+                dfs = None
+                if len(files)!=0: # If files in dataset, continue
+                    dfs = []
+                    for dfLocation in files:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfs.append(df)
+                        self.addProgressBarValue(1)
+                ds = GuiDataSet(name=DSName,dataFiles=dfs)
+                if 'binning' in dsDict:
+                    if not np.any([b is None for b in dsDict['binning']]):
+                        binnings = dsDict['binning']
+                        for df,binning in zip(ds,binnings):
+                            df.binning = binning
+                        self.setProgressBarLabelText('Converting Data Set')    
+                        ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
+                        self.update()
             
             self.DataSetModel.append(ds)
             self.DataSetModel.layoutChanged.emit()
             self.update()
-            counter+=1
-            self.setProgressBarValue(counter)
+            self.addProgressBarValue(1)
             
         DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
@@ -682,16 +740,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
-    def changeTheme(self,name):
-        if not name in themes.keys():
-            raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
-        app = QtWidgets.QApplication.instance()
-        self.theme = name
-        themes[name](app)
-        #palette = app.palette()
-        #print('Palette:',palette)
-        #for view in self.views:
-        #    view.setPalette(palette)
+    #def changeTheme(self,name):
+    #    if not name in themes.keys():
+    #        raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
+    #    app = QtWidgets.QApplication.instance()
+    #    self.theme = name
+    #    themes[name](app)
+    #    #palette = app.palette()
+    #    #print('Palette:',palette)
+    #    #for view in self.views:
+    #    #    view.setPalette(palette)
 
 
     def settingsDialog(self):
@@ -773,6 +831,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def electronicLogbookTool(self):
         print('Not Implemeted yet electronicLogbookTool')
+
+    def subtractionManager(self):
+        subtractionManager = SubtractionManager(guiWindow=self)
+        self.windows.append(subtractionManager)
+        subtractionManager.show()
 
 class settingsBoxDialog(QtWidgets.QDialog):
 
