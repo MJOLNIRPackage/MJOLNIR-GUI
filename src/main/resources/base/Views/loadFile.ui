@@ -88,6 +88,9 @@
      </item>
      <item>
       <widget class="QListView" name="DataSet_filenames_listView">
+       <property name="editTriggers">
+        <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+       </property>
        <property name="dragDropMode">
         <enum>QAbstractItemView::NoDragDrop</enum>
        </property>
