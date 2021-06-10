@@ -399,17 +399,20 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         # Set up saving of settings in guiWindow
 
         if hasattr(self.guiWindow,'predictionSettings'): 
-            R1 = self.guiWindow.predictionSettings['R1']
-            R2 = self.guiWindow.predictionSettings['R2']
-            cell = self.guiWindow.predictionSettings['cell']
-            scan = self.guiWindow.predictionSettings['scan']
-            calc = self.guiWindow.predictionSettings['calc']
-            self.setAlignment(R1,alignment = 1)
-            self.setAlignment(R2,alignment = 2)
-            self.setCell(cell)
-            self.setScan(scan)
-            self.setCalculation(calc)
-            self.braggPoints = self.guiWindow.predictionSettings['braggPoints']
+            if self.guiWindow.predictionSettings: # If not empty
+                R1 = self.guiWindow.predictionSettings['R1']
+                R2 = self.guiWindow.predictionSettings['R2']
+                cell = self.guiWindow.predictionSettings['cell']
+                scan = self.guiWindow.predictionSettings['scan']
+                calc = self.guiWindow.predictionSettings['calc']
+                self.setAlignment(R1,alignment = 1)
+                self.setAlignment(R2,alignment = 2)
+                self.setCell(cell)
+                self.setScan(scan)
+                self.setCalculation(calc)
+                self.braggPoints = self.guiWindow.predictionSettings['braggPoints']
+            else:# Create an empty dict
+                self.guiWindow.predictionSettings = {}
 
         else:# Create an empty dict
             self.guiWindow.predictionSettings = {}
