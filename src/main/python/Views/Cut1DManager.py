@@ -14,8 +14,6 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
-from ufit.gui.session import UfitSession
-from ufit.gui.scanitem import ScanDataItem
 import matplotlib.pyplot as plt
 
 def Cut1D_Delete1D_button_function(self):
@@ -222,6 +220,8 @@ def Cut1D_toggle_units_function(self):
 
 @ProgressBarDecoratorArguments(runningText='Saving to file',completedText='Saving Done')
 def Cut1D_Save_To_uFit(self):
+    from ufit.gui.session import UfitSession
+    from ufit.gui.scanitem import ScanDataItem
     if self.Cut1DModel.rowCount() == 0:
         return
 
