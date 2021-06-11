@@ -307,5 +307,10 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.setupCut1D()
         self.guiWindow.ui.Cut1D_SelectUnits_RLU_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_units_function)
         self.guiWindow.ui.Cut1D_fit_button.clicked.connect(self.guiWindow.Cut1D_Save_To_uFit)
+
+        self.guiWindow.ui.Cut1D_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
     
     
+    def TitleChanged(self):
+        if self.guiWindow.ui.Cut1D_SetTitle_button.isEnabled():
+            self.guiWindow.Cut1D_SetTitle_button_function()

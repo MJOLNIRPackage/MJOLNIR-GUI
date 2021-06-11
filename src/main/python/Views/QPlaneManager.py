@@ -118,7 +118,9 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.ui.QPlane_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
 
     def CAxisChanged(self):
-        self.guiWindow.QPlane_setCAxis_button_function()
+        if self.guiWindow.ui.QPlane_setCAxis_button.isEnabled():
+            self.guiWindow.QPlane_setCAxis_button_function()
 
     def TitleChanged(self):
-        self.guiWindow.QPlane_SetTitle_button_function()
+        if self.guiWindow.ui.QPlane_SetTitle_button.isEnabled():
+            self.guiWindow.QPlane_SetTitle_button_function()

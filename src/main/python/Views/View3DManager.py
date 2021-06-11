@@ -212,7 +212,9 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
 
     def titleEnterPressed(self):
-        self.guiWindow.View3D_SetTitle_button_function()
+        if self.guiWindow.ui.View3D_SetTitle_button.isEnabled():
+            self.guiWindow.View3D_SetTitle_button_function()
 
     def CAxisChanged(self):
-        self.View3D_setCAxis_button_function()
+        if self.guiWindow.ui.View3D_setCAxis_button.isEnabled():
+            self.guiWindow.View3D_setCAxis_button_function()

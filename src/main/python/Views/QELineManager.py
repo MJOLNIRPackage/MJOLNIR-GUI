@@ -172,7 +172,9 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
         self.guiWindow.ui.QELine_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
 
     def CAxisChanged(self):
-        self.guiWindow.QELine_setCAxis_button_function()
+        if self.guiWindow.ui.QELine_setCAxis_button.isEnabled():
+            self.guiWindow.QELine_setCAxis_button_function()
 
     def TitleChanged(self):
-        self.guiWindow.QELine_SetTitle_button_function()
+        if self.guiWindow.ui.QELine_SetTitle_button.isEnabled():
+            self.guiWindow.QELine_SetTitle_button_function()

@@ -129,6 +129,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views = []
         ## Set up DataSetManager
         self.ui.dataSetManager = DataSetManager(self.ui.fixedOpen,self)
+        #self.ui.fixedOpen.addStretch()
         self.update()
         self.views.append(self.ui.dataSetManager)
 
