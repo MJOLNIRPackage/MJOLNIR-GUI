@@ -232,8 +232,10 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
                 fore.BGColor = InvalidColour
                 back.BGColor = InvalidColour
 
+        # Check if selected datasets are converted
+        subtracted = np.any([not X.dataSetModel.item(X.getCurrentDatasetIndex()).background is None for X in [self.DataFileModel_foreground,self.DataFileModel_background]])
         
-        if np.all(checks) and len(checks)==maxlength: # subraction is allowed
+        if np.all(checks) and len(checks)==maxlength and not subtracted: # subraction is allowed
             self.Subtraction_generateSubtraction_button.setDisabled(False)
         else:
             self.Subtraction_generateSubtraction_button.setDisabled(True)
