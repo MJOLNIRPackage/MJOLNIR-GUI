@@ -165,3 +165,14 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
         self.guiWindow.ui.QELine_setCAxis_button.clicked.connect(self.guiWindow.QELine_setCAxis_button_function)
         self.guiWindow.ui.QELine_SetTitle_button.clicked.connect(self.guiWindow.QELine_SetTitle_button_function)
         self.guiWindow.ui.QELine_SelectUnits_RLU_radioButton.toggled.connect(self.guiWindow.QELine_toggle_units_function)
+
+        self.guiWindow.ui.QELine_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
+        self.guiWindow.ui.QELine_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
+
+        self.guiWindow.ui.QELine_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
+
+    def CAxisChanged(self):
+        self.guiWindow.QELine_setCAxis_button_function()
+
+    def TitleChanged(self):
+        self.guiWindow.QELine_SetTitle_button_function()

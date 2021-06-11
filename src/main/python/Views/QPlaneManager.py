@@ -111,3 +111,14 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.ui.QPlane_plot_button.clicked.connect(self.guiWindow.QPlane_plot_button_function)
         self.guiWindow.ui.QPlane_setCAxis_button.clicked.connect(self.guiWindow.QPlane_setCAxis_button_function)
         self.guiWindow.ui.QPlane_SetTitle_button.clicked.connect(self.guiWindow.QPlane_SetTitle_button_function)
+
+        self.guiWindow.ui.QPlane_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
+        self.guiWindow.ui.QPlane_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
+
+        self.guiWindow.ui.QPlane_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
+
+    def CAxisChanged(self):
+        self.guiWindow.QPlane_setCAxis_button_function()
+
+    def TitleChanged(self):
+        self.guiWindow.QPlane_SetTitle_button_function()
