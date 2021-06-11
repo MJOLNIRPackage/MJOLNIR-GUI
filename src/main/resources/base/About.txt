@@ -27,3 +27,5 @@ url = {https://www.sciencedirect.com/science/article/pii/S2352711020303137},
 author = {Jakob Lass and Henrik Jacobsen and Daniel G. Mazzone and Kim Lefmann},
 keywords = {Inelastic neutron scattering, Three-axis spectroscopy, Visualisation tool},
 }
+
+For CAMEA specific questions, see  <a href='https://www.psi.ch/en/sinq/camea'>CAMEA|Paul Scherrer Institut (PSI)</a>
