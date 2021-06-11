@@ -543,8 +543,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
 
         for dsDict in dataSetString:
-            self.setProgressBarLabelText('Loading Data Set')
             DSName = dsDict['name']
+            self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
             files = dsDict['files'] # data or foreground data
             if 'background' in dsDict: # Data set is a subtracted set!
                 background = dsDict['background']
@@ -567,7 +567,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
                     binnings = dsDict['binning']
                     if dsDict['convertBeforeSubtract']:
-                        self.setProgressBarLabelText('Converting Data Set')
+                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
                         for df,binning in zip(foreground_ds,binnings): # Give the correct binning
                             df.binning = binning
                         foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5)
@@ -587,7 +587,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     
                     if not ds.convertBeforeSubtract: # Convert after subtraction if needed
                         if not np.any([b is None for b in dsDict['binning']]):
-                            self.setProgressBarLabelText('Converting Data Set')    
+                            self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
                             ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
                             self.update()
 
@@ -607,7 +607,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                         binnings = dsDict['binning']
                         for df,binning in zip(ds,binnings):
                             df.binning = binning
-                        self.setProgressBarLabelText('Converting Data Set')    
+                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
                         ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
                         self.update()
             
