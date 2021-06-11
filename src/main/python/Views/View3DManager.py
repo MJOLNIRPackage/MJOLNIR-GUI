@@ -200,9 +200,19 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_plot_button.clicked.connect(self.guiWindow.View3D_plot_button_function)
         self.guiWindow.ui.View3D_setCAxis_button.clicked.connect(self.guiWindow.View3D_setCAxis_button_function)
         self.guiWindow.ui.View3D_SetTitle_button.clicked.connect(self.guiWindow.View3D_SetTitle_button_function)
+
+        self.guiWindow.ui.View3D_SetTitle_lineEdit.returnPressed.connect(self.titleEnterPressed)
+        self.guiWindow.ui.View3D_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
+        self.guiWindow.ui.View3D_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
         
         # Radiobutton to select viewing type
         self.guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)
         self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
+
+    def titleEnterPressed(self):
+        self.guiWindow.View3D_SetTitle_button_function()
+
+    def CAxisChanged(self):
+        self.View3D_setCAxis_button_function()
