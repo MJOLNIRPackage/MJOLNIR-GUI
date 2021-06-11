@@ -7,17 +7,19 @@ try:
     from Views.CalculatorSimpleManager import CalculatorSimpleManager
     from Views.CalculatorAdvancedManager import CalculatorAdvancedManager
     from Views.collapsibleBox import CollapsibleBox
+    from _tools import loadUI
 except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.CalculatorGeneralManager import CalculatorGeneralManager
     from MJOLNIRGui.src.main.python.Views.CalculatorSimpleManager import CalculatorSimpleManager
     from MJOLNIRGui.src.main.python.Views.CalculatorAdvancedManager import CalculatorAdvancedManager   
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
+    from MJOLNIRGui.src.main.python._tools import loadUI
 
 
 from os import path
 
 from PyQt5 import QtWidgets,QtGui,QtCore
-from _tools import loadUI
+
 
 # if platform.system() == 'Darwin':
 #     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))

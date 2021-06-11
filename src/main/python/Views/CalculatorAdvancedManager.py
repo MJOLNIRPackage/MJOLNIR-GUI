@@ -8,7 +8,11 @@ from PyQt5 import uic
 import platform
 from MJOLNIR._tools import WavelengthK
 from MJOLNIR.TasUBlibDEG import calcCell,calculateBMatrix,calTwoTheta
-from _tools import loadUI
+
+try:
+    from _tools import loadUI
+except ModuleNotFoundError:
+    from MJOLNIRGui.src.main.python._tools import loadUI
 
 # Handles all functionality related to the CalculatorAdvancedManager. 
 

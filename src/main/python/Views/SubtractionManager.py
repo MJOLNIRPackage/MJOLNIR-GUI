@@ -5,11 +5,12 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
 except ImportError:
     from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
+
 
 
 from os import path
@@ -57,10 +58,6 @@ class MyDelegate(QtWidgets.QStyledItemDelegate):
             # Draw the background rectangle            
             painter.drawRect(option.rect)
             painter.restore()
-
-
-from _tools import loadUI
-
 
 SubtractionManagerBase, SubtractionManagerForm = loadUI('Subtraction.ui')
 

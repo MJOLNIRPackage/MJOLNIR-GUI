@@ -8,9 +8,12 @@ sys.path.append('..')
 #     from _tools import ProgressBarDecoratorArguments
 #     import _tools as _GUItools
 # from PyQt5 import QtWidgets,uic,QtGui,QtCore
-import platform
+
 from MJOLNIR._tools import EnergyK,WavelengthK,WavelengthEnergy,EnergyWavelength,KEnergy,KWavelength
-from _tools import loadUI
+try:
+    from _tools import loadUI
+except ModuleNotFoundError:
+    from MJOLNIRGui.src.main.python._tools import loadUI
 
 # Handles all functionality related to the CalculatorGeneralManager. 
 
