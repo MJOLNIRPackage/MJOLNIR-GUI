@@ -115,8 +115,13 @@ def loadUI(fileName):
             
         except FileNotFoundError:
             # needed when running app after pip install
-            base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'..','resources','base','Views',fileName)))
+            
             # except FileNotFoundError:
             #     base,form = uic.loadUiType(path.join(folder,fileName))
+            try:
+                base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'..','resources','base','Views',fileName)))
+                
+            except FileNotFoundError:
+                base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'Views',fileName)))
     return base,form
         
