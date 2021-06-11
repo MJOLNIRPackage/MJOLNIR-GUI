@@ -2,14 +2,14 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python.DataModels import Cut1DModel
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import Gui1DCutObject
 except ImportError:
     from DataModels import Cut1DModel
     from MJOLNIR_Data import Gui1DCutObject
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets, uic, QtCore, QtGui
@@ -258,13 +258,25 @@ def plotItem(self,item):
     fig.tight_layout()
     self.windows.append(fig)
 
-try:
-    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
-except:
-    try:
-        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
-    except:
-        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Cut1D_new.ui"))
+
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
+# except:
+#     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(folder,"Cut1D_new.ui"))
+
+Cut1DManagerBase, Cut1DManagerForm = loadUI('Cut1D_new.ui')
+#try:
+#    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
+#except:
+#    try:
+#        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
+#    except:
+#        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Cut1D_new.ui"))
 class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(Cut1DManager, self).__init__(parent)

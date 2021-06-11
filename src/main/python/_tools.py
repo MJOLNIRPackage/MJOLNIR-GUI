@@ -4,7 +4,9 @@ import functools
 from PyQt5 import QtCore,QtWidgets
 
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel,QApplication
-
+from PyQt5 import uic
+import platform
+from os import path
 
 def ProgressBarDecoratorArguments(runningText='Running',completedText='Completed',failedText='Failed'):
 
@@ -93,3 +95,28 @@ def CenterWidgets(widget, host = None):
         y = (screenGeometry.height() - widget.height()) / 2
         widget.move(x, y)
     
+
+def loadUI(fileName):
+    # print(platform.system().lower(),fileName)
+    if platform.system().lower() == 'darwin':
+        folder = path.abspath(path.join(path.dirname(__file__),'..','Resources','Views'))
+    else: 
+        folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+
+    try:
+    # needed before freezing app
+        base,form = uic.loadUiType(path.join(path.dirname(__file__),fileName))
+    
+    except FileNotFoundError:
+        try:
+            # needed when running app local through fbs
+            base,form = uic.loadUiType(path.abspath(path.join(folder,fileName)))
+            
+        except FileNotFoundError:
+            # needed when running app after pip install
+            base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'..','resources','base','Views',fileName)))
+            # except FileNotFoundError:
+            #     base,form = uic.loadUiType(path.join(folder,fileName))
+    return base,form
+        

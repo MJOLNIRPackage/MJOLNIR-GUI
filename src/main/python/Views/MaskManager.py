@@ -2,7 +2,7 @@ import sys,copy
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python.DataModels import MaskModel
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiMask
@@ -10,7 +10,7 @@ try:
 except ImportError:
     from DataModels import MaskModel
     from MJOLNIR_Data import GuiMask
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments, loadUI
     import _tools as _GUItools
 from MJOLNIR.Data.Mask import MaskingObject
 from os import path
@@ -314,13 +314,8 @@ class AnotherWindow(QtWidgets.QWidget):
         
 
 
-try:
-    MaskManagerBase, MaskManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Mask.ui"))
-except:
-    try:
-        MaskManagerBase, MaskManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Mask.ui"))
-    except:
-        MaskManagerBase, MaskManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Mask.ui"))
+MaskManagerBase, MaskManagerForm = loadUI("Mask.ui")
+
 class MaskManager(MaskManagerBase, MaskManagerForm):
     def __init__(self, parent=None):
         super(MaskManager, self).__init__(parent)

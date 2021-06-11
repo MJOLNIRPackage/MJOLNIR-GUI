@@ -58,19 +58,12 @@ class MyDelegate(QtWidgets.QStyledItemDelegate):
             painter.drawRect(option.rect)
             painter.restore()
 
-try:
-    # needed when freezing app
-    SubtractionManagerBase, SubtractionManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Subtraction.ui"))
-    
-except:
-    try:
-        # needed when running app local through fbs
-        SubtractionManagerBase, SubtractionManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Subtraction.ui"))
-        
-    except:
-        # needed when running app after pip install
-        SubtractionManagerBase, SubtractionManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Subtraction.ui"))
-        
+
+from _tools import loadUI
+
+
+SubtractionManagerBase, SubtractionManagerForm = loadUI('Subtraction.ui')
+
 
         
 class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):

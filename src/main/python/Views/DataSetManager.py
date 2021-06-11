@@ -4,16 +4,15 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
 except ImportError:
     from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
 
-
-from os import path
-from PyQt5 import QtWidgets,uic, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
+from os import path
 
 def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
     self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
@@ -260,19 +259,30 @@ def setupDataFileInfoModel(self):
     self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
     
 
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
 
-try:
-    # needed when freezing app
-    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-    
-except:
-    try:
-        # needed when running app local through fbs
-        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
-        
-    except:
-        # needed when running app after pip install
-        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
+# try:
+#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+# except:
+#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(folder,"loadFile.ui"))
+
+DataSetManagerBase, DataSetManagerForm = loadUI('loadFile.ui')
+
+#try:
+#    # needed when freezing app
+#    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+#    
+#except:
+#    try:
+#        # needed when running app local through fbs
+#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+#        
+#    except:
+#        # needed when running app after pip install
+#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
         
         
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):

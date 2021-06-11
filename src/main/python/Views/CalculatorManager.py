@@ -15,16 +15,31 @@ except ModuleNotFoundError:
 
 
 from os import path
-from PyQt5 import QtWidgets,uic,QtGui,QtCore
+
+from PyQt5 import QtWidgets,QtGui,QtCore
+from _tools import loadUI
+
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator.ui"))
+# except:
+#     CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(folder,"Calculator.ui"))
 
 
-try:
-    CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator.ui"))
-except:
-    try:
-        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator.ui"))
-    except:
-        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator.ui"))
+CalculatorManagerBase, CalculatorManagerForm = loadUI('Calculator.ui')
+
+
+#try:
+#    CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator.ui"))
+#except:
+#    try:
+#        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator.ui"))
+#    except:
+#        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator.ui"))
 # All of this connects the buttons and their functions to the main window.
        
 

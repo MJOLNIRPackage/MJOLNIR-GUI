@@ -4,11 +4,11 @@ from MJOLNIR import TasUBlibDEG
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python.Views import BraggListManager
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
     from Views import BraggListManager
 from os import path
@@ -22,13 +22,26 @@ import pyperclip
 
 # Handles all functionality related to the PredictionToolManager. 
 
-try:
-    PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
-except:
-    try:
-        PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Prediction.ui"))
-    except:
-        PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Prediction.ui"))
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
+# except:
+#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(folder,"Prediction.ui"))
+
+
+PredictionToolManagerBase, PredictionToolManagerForm = loadUI('Prediction.ui')
+
+# try:
+#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
+# except:
+#     try:
+#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Prediction.ui"))
+#     except:
+#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Prediction.ui"))
 # All of this connects the buttons and their functions to the main window.
        
 

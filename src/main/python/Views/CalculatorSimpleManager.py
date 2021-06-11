@@ -3,18 +3,30 @@ sys.path.append('..')
 
 from os import path
 
-from PyQt5 import uic
-from MJOLNIR._tools import DSpacing,ScatteringAngle
 
+from MJOLNIR._tools import DSpacing,ScatteringAngle
+from _tools import loadUI
 # Handles all functionality related to the CalculatorSimpleManager. 
 
-try:
-    CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_Simple.ui"))
-except:
-    try:
-        CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator_Simple.ui"))
-    except:
-        CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator_Simple.ui"))
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_Simple.ui"))
+# except:
+#     CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(folder,"Calculator_Simple.ui"))
+
+
+CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = loadUI('Calculator_Simple.ui')
+#try:
+#    CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_Simple.ui"))
+#except:
+#    try:
+#        CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator_Simple.ui"))
+#    except:
+#        CalculatorSimpleManagerBase, CalculatorSimpleManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator_Simple.ui"))
 # All of this connects the buttons and their functions to the main window.
        
 

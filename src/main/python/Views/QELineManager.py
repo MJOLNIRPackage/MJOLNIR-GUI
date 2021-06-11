@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets, uic
@@ -123,13 +123,25 @@ def QELine_SetTitle_button_function(self):
         fig = self.QELine.get_figure()
         fig.canvas.draw()
 
-try:
-    QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
-except:
-    try:
-        QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QELine.ui"))
-    except:
-        QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"QELine.ui"))
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
+# except:
+#     QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(folder,"QELine.ui"))
+
+QELineManagerBase, QELineManagerForm = loadUI('QELine.ui')
+
+# try:
+#     QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QELine.ui"))
+# except:
+#     try:
+#         QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QELine.ui"))
+#     except:
+#         QELineManagerBase, QELineManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"QELine.ui"))
 class QELineManager(QELineManagerBase, QELineManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(QELineManager, self).__init__(parent)

@@ -12,13 +12,10 @@ from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
 
 
-try:
-    BraggListManagerBase, BraggListManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"braggListWidget.ui"))
-except:
-    try:
-        BraggListManagerBase, BraggListManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','..','resources','base','Views',"braggListWidget.ui"))
-    except:
-        BraggListManagerBase, BraggListManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"braggListWidget.ui"))
+from _tools import loadUI
+
+BraggListManagerBase, BraggListManagerForm = loadUI('braggListWidget.ui')
+
 class BraggListManager(BraggListManagerBase, BraggListManagerForm):
     def __init__(self, parent=None, guiWindow=None,BraggList=None):
         super(BraggListManager, self).__init__(parent)

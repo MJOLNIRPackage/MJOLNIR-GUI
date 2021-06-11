@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic
@@ -153,14 +153,27 @@ def View3D_toggle_mode_function(self):
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
         
         
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
 
-try:
-    View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
-except:
-    try:
-        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
-    except:
-        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
+# try:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+# except:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(folder,"View3D.ui"))
+
+
+
+View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
+
+# try:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+# except:
+#     try:
+#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
+#     except:
+#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
 # All of this connects the buttons and their functions to the main window.
 
 class View3DManager(View3DManagerBase, View3DManagerForm):
