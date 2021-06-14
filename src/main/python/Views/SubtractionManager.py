@@ -6,10 +6,12 @@ try:
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
+    from MJOLNIRGui.src.main.python.HelpDialog import HelpDialog
 except ImportError:
     from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from _tools import ProgressBarDecoratorArguments,loadUI
+    from HelpDialog import HelpDialog
 
 
 from os import path
@@ -80,13 +82,22 @@ class DataFileDelegate(QtWidgets.QStyledItemDelegate):
 SubtractionManagerBase, SubtractionManagerForm = loadUI('Subtraction.ui')
 
 
-        
+
 class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
     def __init__(self, parent=None, guiWindow=None):
-        super(SubtractionManager, self).__init__(parent)
+        super(SubtractionManager, self).__init__(parent,QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint | \
+            QtCore.Qt.WindowMinMaxButtonsHint )
         self.setupUi(self)
         self.guiWindow = guiWindow
         self.initSubtractionManager()
+        #self.guiWindow.subtractionHelp()
+
+    def accept(self):
+        if not self.Subtraction_generateSubtraction_button.isDisabled():
+            self.Subtraction_generateSubtraction_button.clicked.emit()
+            super(SubtractionManager,self).accept()
+        
+    
 
     def initSubtractionManager(self):
 
@@ -262,6 +273,4 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         self.DataFileModel_foreground.layoutChanged.emit()
         self.DataFileModel_background.layoutChanged.emit()
         self.guiWindow.DataFileModel.layoutChanged.emit()
-
-
 
