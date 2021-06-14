@@ -941,6 +941,26 @@ def formatValueArray(array, formatString = '{:.2f} [{:.2f}  -  {:.2f}]'):
 
     return formatString.format(mean,min_,max_)
 
+def formatValueArrayDirection(array, formatString = '{:.2f} [{:.2f}  -  {:.2f}]'):
+    """Format array to string using mean, min, max as well as direction (for A3)"""
+    try:
+        array = np.concatenate(array)
+    except ValueError:
+        return 'N/A'
+    mean = np.mean(array)
+    max_ = np.max(array)
+    min_ = np.min(array)
+    diff = np.diff(array.flatten())
+    if np.all(diff>0):
+        direction = ' Scan dir: +'
+    elif np.all(diff<0):
+        direction = ' Scan dir: -'
+    else:
+        direction = ''
+
+
+    return formatString.format(mean,min_,max_)+direction
+
 def formatTextArray(array):
     """Return string only if all entries are equal"""
     if len(array)==1:
@@ -986,7 +1006,7 @@ name = Info('sample/name','Sample: ',formatTextArray)
 title = Info('title','Title: ',formatTextArray)
 projectionVector1 = Info('sample/projectionVector1','Projection 1: ',formatVector)
 projectionVector2 = Info('sample/projectionVector2','Projection 2: ',formatVector)
-A3 = Info('A3','A3 [deg]: ',formatValueArray)
+A3 = Info('A3','A3 [deg]: ',formatValueArrayDirection)
 tt = Info('twotheta','2θ [deg]: ',formatValueArray)
 magneticField = Info('magneticField','Mag [B]: ',formatValueArray)
 temperature = Info('temperature','Temperature [K]: ',formatValueArray)
@@ -1032,6 +1052,21 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
                 return info.baseText+info.formatter(data)
             else:
                 return info.baseText
+        elif role == Qt.ItemDataRole:
+            I = index.row()
+            info = self.infos[I]
+            dfs = self.dataFileModel.getCurrentDatafiles()
+            if not dfs is None:
+                df = dfs[0]
+            else:
+                return True
+            
+            if hasattr(df,info.location+'_check'):
+                return getattr(df,info.location+'_check')
+            else:
+                return True
+
+
         
         
     def rowCount(self,index):
