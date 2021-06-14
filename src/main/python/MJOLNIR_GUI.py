@@ -220,6 +220,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
         self.ui.actionHelp.triggered.connect(self.help)
 
+        self.ui.subtractionHelp.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
+        self.ui.subtractionHelp.setToolTip('Show Subtraction Help') 
+        self.ui.subtractionHelp.setStatusTip(self.ui.subtractionHelp.toolTip())
+        self.ui.subtractionHelp.triggered.connect(self.subtractionHelp)
+
         self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
@@ -411,6 +416,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def help(self):
         dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog.exec_()
+
+    def subtractionHelp(self):
+        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'))
         dialog.exec_()
 
 
