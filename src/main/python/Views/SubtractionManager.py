@@ -12,38 +12,32 @@ except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
 
 
-
 from os import path
 from PyQt5 import QtWidgets,uic, QtCore, QtGui
 from PyQt5.QtCore import Qt
 import numpy as np
-def subtractable(file1,file2):
-    if file1.type != file2.type:
-        return False
-    if file1.I.shape != file2.I.shape:
-        return False
+def subtractable(file1,file2,A3Precision=0.1,twothetaPrecision=0.1,EiPrecision=0.1):
+    checked = {}
+    checked['type'] = file1.type == file2.type
+    checked['scanSteps'] = file1.I.shape == file2.I.shape
 
-    floatArrays = ['A3','A4','Ei']
-    for param in floatArrays:
-        if not np.all(np.isclose(getattr(file1,param),getattr(file2,param))):
-            return False
-
-    if not file1.scanParameters == file2.scanParameters:
-        return False
-
-    return True
+    checked['A3'] = np.all(np.isclose(file1.A3,file2.A3,atol=A3Precision))
+    checked['twotheta'] = np.all(np.isclose(file1.twotheta,file2.twotheta,atol=twothetaPrecision))
+    checked['Ei'] = np.all(np.isclose(file1.Ei,file2.Ei,atol=EiPrecision))
+    checked['scanParameters'] = file1.scanParameters == file2.scanParameters
+    return checked
 
 ValidColour =  QtGui.QColor(255, 255, 255, 0)
 InvalidColour = QtGui.QColor(255, 0, 0, 120)
 
-class MyDelegate(QtWidgets.QStyledItemDelegate):
+class DataSetDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None, *args):
-        #super(MyDelegate,self).__init__(self)
+        """Delegate colouring the background of data files with the BG colour given by df.BGColor, default is ValidColor"""
         QtWidgets.QStyledItemDelegate.__init__(self, parent, *args)
 
 
     def paint(self, painter, option, index):
-        super(MyDelegate,self).paint(painter, option, index)
+        super(DataSetDelegate,self).paint(painter, option, index)
         if True:
             df = index.model().data(index,Qt.ItemDataRole)
             painter.save()
@@ -58,6 +52,30 @@ class MyDelegate(QtWidgets.QStyledItemDelegate):
             # Draw the background rectangle            
             painter.drawRect(option.rect)
             painter.restore()
+
+class DataFileDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None, *args):
+        """Delegate colouring the background of data file properties depending on whether they match or not"""
+        QtWidgets.QStyledItemDelegate.__init__(self, parent, *args)
+
+
+    def paint(self, painter, option, index):
+        super(DataFileDelegate,self).paint(painter, option, index)
+        
+        dataPropertyCheck = index.model().data(index,role=Qt.ItemDataRole)
+    
+        painter.save()
+        painter.setPen(QtGui.QPen(Qt.NoPen))
+        
+        if dataPropertyCheck: # Check is successful
+            c = ValidColour
+        else:
+            c = InvalidColour
+        painter.setBrush(QtGui.QBrush(c))
+
+        # Draw the background rectangle            
+        painter.drawRect(option.rect)
+        painter.restore()
 
 SubtractionManagerBase, SubtractionManagerForm = loadUI('Subtraction.ui')
 
@@ -98,9 +116,14 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         self.Subtraction_filenames_foreground_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.Subtraction_filenames_foreground_listView.setDragDropOverwriteMode(False)
 
-        dg = MyDelegate()
-        self.Subtraction_filenames_foreground_listView.setItemDelegate(dg)
-        self.Subtraction_filenames_background_listView.setItemDelegate(dg)
+        dataSetDelegate = DataSetDelegate() # Painter for DataSet comparison
+        dataFileDelegate = DataFileDelegate() # Painter for properties of data files
+
+        self.Subtraction_filenames_foreground_listView.setItemDelegate(dataSetDelegate)
+        self.Subtraction_filenames_background_listView.setItemDelegate(dataSetDelegate)
+
+        self.Subtraction_fileAttributs_foreground_listView.setItemDelegate(dataFileDelegate)
+        self.Subtraction_fileAttributs_background_listView.setItemDelegate(dataFileDelegate)
         
 
         # add selection model for smooth selection when drag/dropping
@@ -115,8 +138,9 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         self.DataFile_foreground_infoModel = DataFileInfoModel(DataSet_filenames_listView=self.Subtraction_filenames_foreground_listView,dataSetModel=self.guiWindow.DataSetModel,
         DataSet_DataSets_listView=self.Subtraction_dataSet_foreground_comboBox,dataFileModel=self.DataFileModel_foreground,guiWindow=self.guiWindow)
         self.DataFile_foreground_infoModel.infos = [x for x in subtractionSettings.keys()]
-        self.Subtraction_fileAttributs_foreground_listView.setModel(self.DataFile_foreground_infoModel)
         
+        self.Subtraction_fileAttributs_foreground_listView.setModel(self.DataFile_foreground_infoModel)
+
         #self.DataFileModel_foreground.layoutChanged.connect(self.checkDataSetCombability)
         self.DataFileModel_foreground.dragDropFinished.connect(self.DataFile_foreground_SelectionModel.onModelItemsReordered)
         self.DataFile_foreground_SelectionModel.selectionChanged.connect(self.updateDataFileLabels)
@@ -207,20 +231,25 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         backgroundFiles = self.DataFileModel_background.getData()
 
         maxlength = np.max([len(foregroundFiles),len(backgroundFiles)])
-        checks = []
-
+        checks = [] # Check of combability 
         for item in foregroundFiles+backgroundFiles:
             item.BGColor = InvalidColour
 
         for fore,back in zip(foregroundFiles,backgroundFiles):
             check = subtractable(fore,back)
-            checks.append(check)
-            if check:
+            totalCheck = np.all([v for v in check.values()])
+            checks.append(totalCheck)
+            
+            if totalCheck:
                 fore.BGColor = ValidColour
                 back.BGColor = ValidColour
             else:
                 fore.BGColor = InvalidColour
                 back.BGColor = InvalidColour
+
+            for key,value in check.items():
+                setattr(fore,key+'_check',value)
+                setattr(back,key+'_check',value)
 
         # Check if selected datasets are converted
         subtracted = np.any([not X.dataSetModel.item(X.getCurrentDatasetIndex()).background is None for X in [self.DataFileModel_foreground,self.DataFileModel_background]])
