@@ -22,8 +22,10 @@ def subtractable(file1,file2,A3Precision=0.1,twothetaPrecision=0.1,EiPrecision=0
     checked = {}
     checked['type'] = file1.type == file2.type
     checked['scanSteps'] = file1.I.shape == file2.I.shape
-
-    checked['A3'] = np.all(np.isclose(file1.A3,file2.A3,atol=A3Precision))
+    if not file1.A3.shape ==  file2.A3.shape:
+        checked['A3'] = False
+    else:
+        checked['A3'] = np.all(np.isclose(file1.A3,file2.A3,atol=A3Precision))
     checked['twotheta'] = np.all(np.isclose(file1.twotheta,file2.twotheta,atol=twothetaPrecision))
     checked['Ei'] = np.all(np.isclose(file1.Ei,file2.Ei,atol=EiPrecision))
     checked['scanParameters'] = file1.scanParameters == file2.scanParameters
