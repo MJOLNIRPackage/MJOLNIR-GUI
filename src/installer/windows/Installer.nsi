@@ -13,7 +13,7 @@
 !include LogicLib.nsh
 
 Function finishpageaction
-CreateShortcut "$desktop\foo.lnk" "$instdir\foo.exe"
+CreateShortcut "$desktop\MJOLNIRGui.lnk" "$instdir\MJOLNIRGui.exe"
 FunctionEnd
 
 
@@ -65,8 +65,8 @@ Function .onInit
   ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\MJOLNIRGui" "UninstallString"
   ${If} $0 != ""
   ${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Previous version of MJOLNIRGui was detected. Do you want to uninstall this version?" /SD IDYES IDYES`
-    !insertmacro UninstallExisting $0 $0
-    ${If} $0 <> 0
+    ExecWait "$0" $1
+    ${If} $1 <> 0
       MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
         Abort
     ${EndIf}
