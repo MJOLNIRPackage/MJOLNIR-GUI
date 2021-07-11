@@ -21,7 +21,7 @@ class GuiDataSet(DataSet.DataSet):
     def setData(self,column,value):
         if column == 0: self.name = value
         
-    def convertDataFile(self,dataFiles=None,guiWindow=None,setProgressBarMaximum=True,progressUpdate=1):
+    def convertDataFile(self,dataFiles=None,binning=None,guiWindow=None,setProgressBarMaximum=True,progressUpdate=1,printFunction=None):
         """
         
         Args:
@@ -33,6 +33,8 @@ class GuiDataSet(DataSet.DataSet):
             - setProgressBarMaximum (bool): if True, overwrite curernt progressbar max (default True)
 
             - progressUpdate (float): Amount to update progress bar (default 1)
+
+            - printFunction (function): Function called with text if any is generated during conversin (Default None, -> warning)
         """
         
         dataFiles = list(self)
@@ -41,16 +43,18 @@ class GuiDataSet(DataSet.DataSet):
 
         convertedFiles = []
         for _,rawfile in enumerate(dataFiles):
-            convFile = rawfile.convert()
+            convFile = rawfile.convert(printFunction=printFunction,binning=binning)
                 
             convertedFiles.append(convFile)
             if not guiWindow is None:
                 guiWindow.addProgressBarValue(progressUpdate)
             
         self._convertedFiles = []
-        self.convertedFiles = convertedFiles    
+        if len(convertedFiles)!=0:
+            self.convertedFiles = convertedFiles    
         
-        self._getData()
+        if len(self)!=0:
+            self._getData()
         #if not guiWindow is None:
         #    guiWindow.setProgressBarValue(len(dataFiles))
 
@@ -73,9 +77,16 @@ class GuiDataSet(DataSet.DataSet):
             return self.dataFiles.pop(position)
 
     def append(self,files):
+        convert = False # If added files should be converted
+        if len(self)>0:
+            if self[0].type == 'nxs':
+                convert = self[0].binning
         super(GuiDataSet,self).append(files)
         for idx,df in enumerate(self):
             df.idx = idx
+
+        if convert:
+            self.convertDataFile(dataFiles=files,binning=convert)
 
     def updateProperty(self,dictionary):
         if isinstance(dictionary,dict):
@@ -188,22 +199,58 @@ class GuiDataFile(DataFile.DataFile):
     def flags(self):
         return QtCore.Qt.ItemIsEditable
 
-    def convert(self):
+    def convert(self, printFunction,binning=None):
         if self.type == 'nxs':
             df = self.original_file
         else:
             df = self
-        convertedFile = GuiDataFile(super(GuiDataFile, df).convert(binning = df.binning))
+        if binning is None:
+            binning = df.binning
+        convertedFile = GuiDataFile(super(GuiDataFile, df).convert(binning = binning,printFunction=printFunction))
         
         return convertedFile
 
 class Gui1DCutObject(object):
-    def __init__(self,name,uFitDataset=None):
+    def __init__(self,name,parameters,pdData,bins):
         self.name = name
-        self.uFitDataset = uFitDataset
+        self.parameters = parameters
+        self._ufit = None
+        self.pdData = pdData
+        self.bins = bins
     
     def plot(self,*args,**kwargs):
-        return self.uFitDataset.plot(*args,**kwargs)
+        # redo to capitalize only first letter of the saved method (cut1D -> plotCut1D)
+        plotName = 'plot'+self.parameters['method'][0].capitalize()+self.parameters['method'][1:]
+        plotFunction = getattr(self.parameters['dataset'],plotName)
+        if self.parameters['method'] == 'cut1D':
+            #q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=False
+            ax,*_ = plotFunction(q1=self.parameters['q1'],q2=self.parameters['q2'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
+            Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],data=[self.pdData,self.bins],constantBins=self.parameters['constantBins'],ufit=False,**kwargs)
+        else:
+            # E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=False
+            ax,*_ = plotFunction(q=self.parameters['q1'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
+            E1=self.parameters['EMin'],E2=self.parameters['EMax'],data=[self.pdData,self.bins],ufit=False,**kwargs)
+        return ax
+    
+    def save(self,location):
+        self.pdData.to_csv(location)
+        
+
+    @property
+    def ufit(self):
+        return self._ufit
+    
+    @ufit.getter
+    def ufit(self):
+        if self._ufit is None:
+            
+            self._ufit = self.parameters['dataset'].generateUFitDataset(self.pdData,q1=self.parameters['q1'],
+            q2=self.parameters['q2'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
+            Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],QDirection=self.parameters['method']=='cut1D')
+        return self._ufit
+        
+
+    
 
     
 class GuiMask(object):
