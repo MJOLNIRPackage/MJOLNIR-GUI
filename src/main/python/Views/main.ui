@@ -182,7 +182,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="log_reset_button">
+         <widget class="QPushButton" name="log_reset_btn">
           <property name="text">
            <string>Clear</string>
           </property>

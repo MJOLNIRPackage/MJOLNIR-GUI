@@ -185,9 +185,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui.actionHelp.setShortcut("Ctrl+?")
 
-        self.log = _guitools.log(self.ui.textBrowser,button=self.ui.log_reset_button)
-        self.ui.log_reset_button.clicked.connect(self.clearStatus)
-        self.clearStatus()
+        self.log = _guitools.log(self.ui.textBrowser,button=self.ui.log_reset_btn)
+        self.ui.log_reset_btn.clicked.connect(self.clearStatus)
+        self._clearStatus() # Call underscore method to avoid decorator
         
 
         self.ui.progressBar._text = 'Ready'
@@ -779,9 +779,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def writeToStatus(self,text):
         self.log.append(text)
 
-    def clearStatus(self):
+    def _clearStatus(self):
         self.log.clear()
-        
+
+    @ProgressBarDecoratorArguments(runningText='Clear Log',completedText='Log Cleared')
+    def clearStatus(self):
+        self._clearStatus()
+        return True
     
 
     def resetProgressBarTimed(self):
