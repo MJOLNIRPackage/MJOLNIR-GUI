@@ -830,6 +830,9 @@ class DataFileModel(QtCore.QAbstractListModel):
         indices = np.array(self.getCurrentDatafileIndexRows())
         if np.all([row<len(ds) for row in indices]):
             for idx in indices:
+                df = ds[idx]
+                if df.type == 'nxs': #i.e. converted
+                    del ds._dataFiles[idx]
                 del ds[idx]
                 indices-=1
             if not self.pendingRemoveRowsAfterDrop:
@@ -838,14 +841,33 @@ class DataFileModel(QtCore.QAbstractListModel):
 
 
     def add(self,files,guiWindow=None):
-        if not guiWindow is None:
-            guiWindow.setProgressBarMaximum(len(files))
         ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
         dfs = []
+        binning = None
+        if len(ds)>0: # non-empty dataset
+            if ds[0].type=='nxs': # Converted dataset
+                binning = ds[0].binning
+
+        if not guiWindow is None:
+            if binning is None: # length is simply number of files
+                length = len(files)
+            else:
+                length = 2*len(files) # both raw and converted
+            guiWindow.setProgressBarMaximum(length)
+            printFunction = guiWindow.writeToStatus
+        else:
+            printFunction = None
+        
         for i,f in enumerate(files):
-            dfs.append(GuiDataFile(f))
+            newFile = GuiDataFile(f)
+            dfs.append(newFile)
             if not guiWindow is None:
                 guiWindow.setProgressBarValue(i+1)
+            if not binning is None:
+                convFile = newFile.convert(binning=binning,printFunction=printFunction)
+                dfs.append(convFile)
+                if not guiWindow is None:
+                    guiWindow.setProgressBarValue(i+1)
             
 
         ds.append(dfs)
