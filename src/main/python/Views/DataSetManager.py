@@ -191,7 +191,7 @@ def convert(self):
     ds = self.DataSetModel.getCurrentDataSet()
     
     try:
-        ds.convertDataFile(guiWindow=self)
+        ds.convertDataFile(guiWindow=self,printFunction=self.writeToStatus)
     except AttributeError as e:
         dialog = QtWidgets.QMessageBox()
         dialog.setIcon(QtWidgets.QMessageBox.Critical)

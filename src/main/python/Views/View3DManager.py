@@ -104,7 +104,7 @@ def View3D_plot_button_function(self):
         counts = False
 
     #try:
-    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts)
+    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,outputFunction=self.writeToStatus)
 
     if customSlicer:
         self.windows.append(self.V.parent())
