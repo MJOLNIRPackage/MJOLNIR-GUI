@@ -293,6 +293,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.predictionAx = ax
         self.guiWindow.windows.append(ax[0].get_figure())
 
+        # make all figures have the same xlim and ylim by using the last axis
+
+        for a in ax[:-1]:
+            a.set_ylim(*ax[-1].get_ylim())
+            a.set_xlim(*ax[-1].get_xlim())
 
         curratAxe = self.scan_curratAxe_checkBox.isChecked()
 
