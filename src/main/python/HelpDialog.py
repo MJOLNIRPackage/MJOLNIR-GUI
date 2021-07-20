@@ -11,13 +11,15 @@ class HelpDialog(QtWidgets.QDialog):
         #self.resize(400, 250)
 
         with open(helpFile) as f:
-            text = '\n'.join([line.strip().replace('\n','') for line in f.readlines()[1:]])
+            text = "<br>".join([line.replace('\n','') for line in f.readlines()[1:]])
 
         self.help_label = QtWidgets.QLabel(text=text)
         self.help_label.setWordWrap(True)
-        self.help_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse|QtCore.Qt.TextSelectableByKeyboard)
+        self.help_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse|QtCore.Qt.TextSelectableByKeyboard|
+                                                QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse)
         
         self.help_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.help_label.setOpenExternalLinks(True)
         
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.addWidget(self.help_label)

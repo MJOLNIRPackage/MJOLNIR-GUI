@@ -20,8 +20,6 @@ from time import sleep
 from os import path
 import os
 
-from MJOLNIR.Data import Mask
-
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -39,6 +37,7 @@ try:
     from Views.MolecularCalculationManager import MolecularCalculationManager
     from Views.PredictionToolManager import PredictionToolManager
     from Views.CalculatorManager import CalculatorManager
+    from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
@@ -65,6 +64,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
     from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
+    from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
@@ -128,7 +128,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         # List to hold all views that need to be setup
         self.views = []
         ## Set up DataSetManager
-        self.ui.dataSetManager = DataSetManager(self.ui.fixedOpen,self)
+        self.ui.dataSetManager = DataSetManager(None,self)
+        vlay = QtWidgets.QVBoxLayout(self.ui.fixedOpen)
+        vlay.addWidget(self.ui.dataSetManager)
+
+        vlay.addStretch()
+
         self.update()
         self.views.append(self.ui.dataSetManager)
 
@@ -155,8 +160,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             lay.addWidget(widget)
            
             box.setContentLayout(lay)
-        vlay.addStretch()
-
+        
+        vlay.setAlignment(QtCore.Qt.AlignTop)
         self.maskingManager = MaskManager(self)
 
         self.windows = [] # Holder for generated plotting windows
@@ -172,6 +177,36 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.radioButtons = [getattr(self.ui,item) for item in self.ui.__dict__ if '_radioButton' in item] # Collect all radiobuttons
         self.spinBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_spinBox' in item[-8:]] # Collect all spinboxes
         self.checkBoxes = [getattr(self.ui,item) for item in self.ui.__dict__ if '_checkBox' in item[-9:]] # Collect all checkboxes
+
+
+        self.ui.actionSave_GUI_state.setShortcut("Ctrl+S")
+        self.ui.actionLoad_GUI_state.setShortcut("Ctrl+O")
+        self.ui.actionExit.setShortcut("Ctrl+Q")
+
+        self.ui.actionHelp.setShortcut("Ctrl+?")
+
+        self.log = _guitools.log(self.ui.textBrowser,button=self.ui.log_reset_btn)
+        self.ui.log_reset_btn.clicked.connect(self.clearStatus)
+        self._clearStatus() # Call underscore method to avoid decorator
+        
+
+        self.ui.progressBar._text = 'Ready'
+        self.ui.progressBar.setAlignment(QtCore.Qt.AlignCenter)
+        
+
+        def setText(self, text):
+            self._text = text
+
+        def text(self):
+            if not self.value == 0:
+                return self._text + ' ' + self._oldText()
+            else:
+                return self._text
+
+        self.ui.progressBar.setText = lambda text: setText(self.ui.progressBar,text)
+        self.ui.progressBar._oldText = self.ui.progressBar.text
+        self.ui.progressBar.text = lambda: text(self.ui.progressBar)
+
 
         self.update()
         initGenerateScript(self)
@@ -219,19 +254,24 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionHelp.setStatusTip(self.ui.actionHelp.toolTip())
         self.ui.actionHelp.triggered.connect(self.help)
 
+        self.ui.actionSubtraction.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
+        self.ui.actionSubtraction.setToolTip('Show Subtraction Help') 
+        self.ui.actionSubtraction.setStatusTip(self.ui.actionSubtraction.toolTip())
+        self.ui.actionSubtraction.triggered.connect(self.subtractionHelp)
+
         self.ui.actionSave_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder-save.png')))
         self.ui.actionSave_GUI_state.setToolTip('Save current Gui setup') 
         self.ui.actionSave_GUI_state.setStatusTip(self.ui.actionSave_GUI_state.toolTip())
         self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
-        self.actionSave_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
-        self.actionSave_GUI_state_shortcut.activated.connect(self.saveCurrentGui)
+        #self.actionSave_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        #self.ui.actionSave_GUI_state.triggered.connect(self.saveCurrentGui)
 
         self.ui.actionLoad_GUI_state.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/folder--arrow.png')))
         self.ui.actionLoad_GUI_state.setToolTip('Load Gui setup') 
         self.ui.actionLoad_GUI_state.setStatusTip(self.ui.actionLoad_GUI_state.toolTip())
         self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
-        self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
-        self.actionLoad_GUI_state_shortcut.activated.connect(self.loadGui)
+        #self.actionLoad_GUI_state_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+O"), self)
+        #self.ui.actionLoad_GUI_state.triggered.connect(self.loadGui)
 
         self.ui.actionGenerate_View3d_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-3D.png')))
         self.ui.actionGenerate_View3d_script.setToolTip('Generate 3D Script') 
@@ -279,38 +319,51 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionClose_Windows.triggered.connect(self.closeWindows)
 
 
-        self.ui.actionNormalizationWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/ruler.png')))
-        self.ui.actionNormalizationWidget.setDisabled(False)
-        self.ui.actionNormalizationWidget.setToolTip('Generate a script to normalize data absolutely') 
-        self.ui.actionNormalizationWidget.setStatusTip(self.ui.actionNormalizationWidget.toolTip())
-        self.ui.actionNormalizationWidget.triggered.connect(self.absolutNormalizationTool)
+        self.ui.actionGenerate_Normalization.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/ruler.png')))
+        self.ui.actionGenerate_Normalization.setDisabled(False)
+        self.ui.actionGenerate_Normalization.setToolTip('Generate a script to normalize data absolutely') 
+        self.ui.actionGenerate_Normalization.setStatusTip(self.ui.actionGenerate_Normalization.toolTip())
+        self.ui.actionGenerate_Normalization.triggered.connect(self.absolutNormalizationTool)
 
-        self.ui.actionPredictionWidget.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/predict.png')))
-        self.ui.actionPredictionWidget.setDisabled(False)
-        self.ui.actionPredictionWidget.setToolTip('Predict scan coverage') 
-        self.ui.actionPredictionWidget.setStatusTip(self.ui.actionPredictionWidget.toolTip())
-        self.ui.actionPredictionWidget.triggered.connect(self.predictionTool)
+        self.ui.actionPrediction_Tool.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/predict.png')))
+        self.ui.actionPrediction_Tool.setDisabled(False)
+        self.ui.actionPrediction_Tool.setToolTip('Predict scan coverage') 
+        self.ui.actionPrediction_Tool.setStatusTip(self.ui.actionPrediction_Tool.toolTip())
+        self.ui.actionPrediction_Tool.triggered.connect(self.predictionTool)
+        self.ui.actionPrediction_Tool.setShortcut("Ctrl+P")
 
-        self.ui.actionMolecularWeight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
-        self.ui.actionMolecularWeight.setDisabled(False)
-        self.ui.actionMolecularWeight.setToolTip('Calculate Molecular Mass from Chemical Formula') 
-        self.ui.actionMolecularWeight.setStatusTip(self.ui.actionMolecularWeight.toolTip())
-        self.ui.actionMolecularWeight.triggered.connect(self.molarMassTool)
+        self.ui.actionCalculate_Molecular_Weight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
+        self.ui.actionCalculate_Molecular_Weight.setDisabled(False)
+        self.ui.actionCalculate_Molecular_Weight.setToolTip('Calculate Molecular Mass from Chemical Formula') 
+        self.ui.actionCalculate_Molecular_Weight.setStatusTip(self.ui.actionCalculate_Molecular_Weight.toolTip())
+        self.ui.actionCalculate_Molecular_Weight.triggered.connect(self.molarMassTool)
 
-        self.ui.actionNeutronCalculations.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/calculator.png')))
-        self.ui.actionNeutronCalculations.setDisabled(False)
-        self.ui.actionNeutronCalculations.setToolTip('Calculate standard neutron quantities') 
-        self.ui.actionNeutronCalculations.setStatusTip(self.ui.actionNeutronCalculations.toolTip())
-        self.ui.actionNeutronCalculations.triggered.connect(self.neutronCalculationTool)
+        self.ui.actionNeutron_Calculations.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/calculator.png')))
+        self.ui.actionNeutron_Calculations.setDisabled(False)
+        self.ui.actionNeutron_Calculations.setToolTip('Calculate standard neutron quantities') 
+        self.ui.actionNeutron_Calculations.setStatusTip(self.ui.actionNeutron_Calculations.toolTip())
+        self.ui.actionNeutron_Calculations.triggered.connect(self.neutronCalculationTool)
 
-        self.ui.actionElectronicLogbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
-        self.ui.actionElectronicLogbook.setDisabled(True)
-        self.ui.actionElectronicLogbook.setToolTip('Generate Electronic Logbook from files') 
-        self.ui.actionElectronicLogbook.setStatusTip(self.ui.actionElectronicLogbook.toolTip())
-        self.ui.actionElectronicLogbook.triggered.connect(self.electronicLogbookTool)
+        self.ui.actionElectronic_Logbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionElectronic_Logbook.setDisabled(True)
+        self.ui.actionElectronic_Logbook.setToolTip('Generate Electronic Logbook from files') 
+        self.ui.actionElectronic_Logbook.setStatusTip(self.ui.actionElectronic_Logbook.toolTip())
+        self.ui.actionElectronic_Logbook.triggered.connect(self.electronicLogbookTool)
+
+        self.ui.actionSubtraction_Of_DataSets.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionSubtraction_Of_DataSets.setToolTip('Perform Subtraction of two DataSets') 
+        self.ui.actionSubtraction_Of_DataSets.setStatusTip(self.ui.actionSubtraction_Of_DataSets.toolTip())
+        self.ui.actionSubtraction_Of_DataSets.triggered.connect(self.subtractionManager)
+        self.ui.actionSubtraction_Of_DataSets.setShortcut("Ctrl+D")
 
     def getProgressBarValue(self):
         return self.ui.progressBar.value
+
+    def addProgressBarValue(self,value):
+        currentValue = self.getProgressBarValue()+value
+        self.ui.progressBar.setValue(currentValue)
+        self.ui.progressBar.value = currentValue
+        
 
     def setProgressBarValue(self,value):
         if not hasattr(self,'ui.progressBar.value'):
@@ -322,7 +375,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def setProgressBarLabelText(self,text):
         if self.current_timer:
             self.current_timer.stop()
-        self.ui.progressBar_label.setText(text)
+        #self.ui.progressBar_label.setText(text)
+        self.ui.progressBar.setText(text)
 
     def setProgressBarMaximum(self,value):
         self.ui.progressBar.setMaximum(value)
@@ -401,6 +455,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
         dialog.exec_()
 
+    def subtractionHelp(self):
+        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'))
+        dialog.exec_()
+
 
     def setupStateMachine(self):
         self.stateMachine = StateMachine([empty,partial,raw,converted],self)
@@ -442,6 +500,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
             dsDict['files']=localstring
             dsDict['binning'] = [None if df.type != 'nxs' else df.binning for df in ds]
+            if not ds.background is None:
+                dsDict['background'] = ds.background
+                dsDict['convertBeforeSubtract'] = ds.convertBeforeSubtract
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -450,12 +511,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         spinBoxString = self.generateCurrentSpinBoxSettings()
         checkBoxString = self.generateCurrentcheckBoxSettings()
         fileDir = self.getCurrentDirectory()
+        if hasattr(self,'predictionSettings'):
+            predictionSettings  = self.predictionSettings
+        else:
+            predictionSettings = {}
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
-                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings}
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -520,39 +585,83 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
         # Get estimate of total number of data files
         self.setProgressBarMaximum(totalFiles)
-        counter = 0
+        
+        self.setProgressBarValue(0)
 
 
         for dsDict in dataSetString:
-            self.setProgressBarLabelText('Loading Data Set')
             DSName = dsDict['name']
-            files = dsDict['files']
-            dfs = None
-            if len(files)!=0: # If files in dataset, continue
-                dfs = []
-                for dfLocation in files:
-                    df = GuiDataFile(dfLocation)
-                    self.update()
-                    dfs.append(df)
-                    counter+=1
-                    self.setProgressBarValue(counter)
-            if DSName == '':
-                continue
-            ds = GuiDataSet(name=DSName,dataFiles=dfs)
-            if 'binning' in dsDict:
-                if not np.any([b is None for b in dsDict['binning']]):
+            self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
+            files = dsDict['files'] # data or foreground data
+            if 'background' in dsDict: # Data set is a subtracted set!
+                background = dsDict['background']
+                if len(files)!=0: # If files in dataset, continue
+                    dfs = []
+                    for dfLocation in files:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfs.append(df)
+                        self.addProgressBarValue(0.5)
+                    dfsBG = []
+                    for dfLocation in background:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfsBG.append(df)
+                        self.addProgressBarValue(0.5)
+                    
+                    
+                    foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
+                    background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
                     binnings = dsDict['binning']
-                    for df,binning in zip(ds,binnings):
-                        df.binning = binning
-                    self.setProgressBarLabelText('Converting Data Set')    
-                    ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False)
-                    self.update()
+                    if dsDict['convertBeforeSubtract']:
+                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                        for df,binning in zip(foreground_ds,binnings): # Give the correct binning
+                            df.binning = binning
+                        foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                        self.update()
+                        for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
+                            df.binning = binning
+                        background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                        self.update()
+                        
+
+                    temp = foreground_ds-background_ds
+                    
+                    ds = GuiDataSet(name=DSName,dataSet=temp)
+                    
+                    ds.background = background
+                    ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
+                    
+                    if not ds.convertBeforeSubtract: # Convert after subtraction if needed
+                        if not np.any([b is None for b in dsDict['binning']]):
+                            self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                            ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
+                            self.update()
+
+            else: # Regular dataset
+                    
+                dfs = None
+                if len(files)!=0: # If files in dataset, continue
+                    dfs = []
+                    for dfLocation in files:
+                        df = GuiDataFile(dfLocation)
+                        self.update()
+                        dfs.append(df)
+                        self.addProgressBarValue(1)
+                ds = GuiDataSet(name=DSName,dataFiles=dfs)
+                if 'binning' in dsDict:
+                    if not np.any([b is None for b in dsDict['binning']]):
+                        binnings = dsDict['binning']
+                        for df,binning in zip(ds,binnings):
+                            df.binning = binning
+                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
+                        ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
+                        self.update()
             
             self.DataSetModel.append(ds)
             self.DataSetModel.layoutChanged.emit()
             self.update()
-            counter+=1
-            self.setProgressBarValue(counter)
+            self.addProgressBarValue(1)
             
         DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
@@ -563,6 +672,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadRadioButtons(file=settingsFile)
         # self.loadSpinBoxes(file=settingsFile)
         # self.loadCheckBoxes(file=settingsFile)
+        self.loadPredictionSettings(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
         self.DataFileModel.updateCurrentDataSetIndex()
@@ -620,6 +730,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 except AttributeError:
                     pass
 
+    def loadPredictionSettings(self,file=None):
+        if file is None:
+            file = self.settingsFile
+        predictionSettings = loadSetting(file,'predictionSettings')
+        if not predictionSettings is None:
+            if isinstance(predictionSettings,str):
+                print('Please save a new gui state to comply with the new version')
+                return
+            self.predictionSettings = predictionSettings
+
     def loadSpinBoxes(self,file=None):
         if file is None:
             file = self.settingsFile
@@ -656,7 +776,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.currentFolder = folder
         self.ui.DataSet_path_lineEdit.setText(folder)
         
+    def writeToStatus(self,text):
+        self.log.append(text)
 
+    def _clearStatus(self):
+        self.log.clear()
+
+    @ProgressBarDecoratorArguments(runningText='Clear Log',completedText='Log Cleared')
+    def clearStatus(self):
+        self._clearStatus()
+        return True
     
 
     def resetProgressBarTimed(self):
@@ -667,16 +796,16 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.current_timer.setSingleShot(True)
         self.current_timer.start(3000)
 
-    def changeTheme(self,name):
-        if not name in themes.keys():
-            raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
-        app = QtWidgets.QApplication.instance()
-        self.theme = name
-        themes[name](app)
-        #palette = app.palette()
-        #print('Palette:',palette)
-        #for view in self.views:
-        #    view.setPalette(palette)
+    #def changeTheme(self,name):
+    #    if not name in themes.keys():
+    #        raise AttributeError('Theme name not recognized. Got {}, but allowed are: '.format(name),', '.join(themes.keys()))
+    #    app = QtWidgets.QApplication.instance()
+    #    self.theme = name
+    #    themes[name](app)
+    #    #palette = app.palette()
+    #    #print('Palette:',palette)
+    #    #for view in self.views:
+    #    #    view.setPalette(palette)
 
 
     def settingsDialog(self):
@@ -758,6 +887,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def electronicLogbookTool(self):
         print('Not Implemeted yet electronicLogbookTool')
+
+    def subtractionManager(self):
+        subtractionManager = SubtractionManager(guiWindow=self)
+        self.windows.append(subtractionManager)
+        subtractionManager.show()
 
 class settingsBoxDialog(QtWidgets.QDialog):
 

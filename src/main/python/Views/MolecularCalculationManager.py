@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments, loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
@@ -93,15 +93,26 @@ def checkValidSampleFormula(self,text,sampleMassL):
 
     self.parent().elementModel.reset(elements)
 
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"MolecularCalculationManager.ui"))
+# except:
+#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(folder,"MolecularCalculationManager.ui"))
 
 
-try:
-    MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"MolecularCalculationManager.ui"))
-except:
-    try:
-        MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"MolecularCalculationManager.ui"))
-    except:
-        MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"MolecularCalculationManager.ui"))
+MolecularCalculationManagerBase, MolecularCalculationManagerForm = loadUI('MolecularCalculationManager.ui')
+
+# try:
+#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"MolecularCalculationManager.ui"))
+# except:
+#     try:
+#         MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"MolecularCalculationManager.ui"))
+#     except:
+#        MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"MolecularCalculationManager.ui"))
 # All of this connects the buttons and their functions to the main window.
 
 class MolecularCalculationManager(MolecularCalculationManagerBase, MolecularCalculationManagerForm):

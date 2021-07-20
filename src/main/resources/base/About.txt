@@ -2,18 +2,30 @@ MJOLNIR_Gui Version {MJOLNIRGui}
 MJOLNIR Version {MJOLNIR}
 Python Version {PythonVersion}
 
-MJOLNIR_Gui is a developed GUI application dedicated
-to the MJOLNIR package. It is meant to provide an interface to 
-many of the features found in the software suite.
+MJOLNIR_Gui is a developed GUI application dedicated to the MJOLNIR package. It is meant to provide an interface to many of the features found in the software suite.
 
-Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons 
-Attribution 3.0 License. See https://p.yusukekamiyamane.com/
+Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons Attribution 3.0 License. See <a href='https://p.yusukekamiyamane.com/'>yusukekamiyamane.com</a>
 
-The graphical user interface has been developed by
-Jakob Lass
-Henrik Jacobsen
+The graphical user interface has been developed by:
+The CAMEA team (MJOLNIRPackage)
 
 The GUI is licensed under the GNU General Public License v3.0.
 
+For the documentation see <a href='https://mjolnir.readthedocs.io'>Read The Docs</a>
 
-For the documentation see https://mjolnir.readthedocs.io/ 
+If you use this program to analyzer your data, please cite the MJOLNIR software article found at <a href='https://www.sciencedirect.com/science/article/pii/S2352711020303137'>Science Direct</a> or by using the following bibtex entry:
+
+@article{LASS2020100600,
+title = {MJOLNIR: A software package for multiplexing neutron spectrometers},
+journal = {SoftwareX},
+volume = {12},
+pages = {100600},
+year = {2020},
+issn = {2352-7110},
+doi = {https://doi.org/10.1016/j.softx.2020.100600},
+url = {https://www.sciencedirect.com/science/article/pii/S2352711020303137},
+author = {Jakob Lass and Henrik Jacobsen and Daniel G. Mazzone and Kim Lefmann},
+keywords = {Inelastic neutron scattering, Three-axis spectroscopy, Visualisation tool},
+}
+
+For CAMEA specific questions, see  <a href='https://www.psi.ch/en/sinq/camea'>CAMEA|Paul Scherrer Institut (PSI)</a>

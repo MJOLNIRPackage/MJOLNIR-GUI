@@ -13,4 +13,4 @@ Instead of going through the hoops described above, save the gui state into a fi
 
 For further help on MJOLNIR go to
 
-https://mjolnir.readthedocs.io/ 
+<a href='https://mjolnir.readthedocs.io/'>Read The Docs</a>

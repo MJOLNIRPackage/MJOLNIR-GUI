@@ -3,10 +3,10 @@ sys.path.append('..')
 
 try:
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
 except ImportError:
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
 
 from os import path
 from PyQt5 import QtWidgets,uic
@@ -155,13 +155,25 @@ def Raw1D_plot_button_function(self):
     return True
 
 
-try:
-    Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
-except:
-    try:
-        Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Raw1D.ui"))
-    except:
-        Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Raw1D.ui"))
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
+# except:
+#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(folder,"Raw1D.ui"))
+
+Raw1DManagerBase, Raw1DManagerForm = loadUI('Raw1D.ui')
+
+# try:
+#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
+# except:
+#     try:
+#         Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Raw1D.ui"))
+#     except:
+#         Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Raw1D.ui"))
 
 class Raw1DManager(Raw1DManagerBase, Raw1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):

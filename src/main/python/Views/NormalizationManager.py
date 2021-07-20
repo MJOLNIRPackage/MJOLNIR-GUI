@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments, loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
@@ -66,14 +66,26 @@ def checkValidSampleNormalization(self,event,massSB):
         self.focusOutEvent_old2(event)
 
 
-try:
-    NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"NormalizationManager.ui"))
-except:
-    try:
-        NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"NormalizationManager.ui"))
-    except:
-        NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"NormalizationManager.ui"))
-# All of this connects the buttons and their functions to the main window.
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+
+# try:
+#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"NormalizationManager.ui"))
+# except:
+#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(folder,"NormalizationManager.ui"))
+
+NormalizationManagerBase, NormalizationManagerForm = loadUI('NormalizationManager.ui')
+
+# try:
+#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"NormalizationManager.ui"))
+# except:
+#     try:
+#         NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"NormalizationManager.ui"))
+#     except:
+#         NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"NormalizationManager.ui"))
+# # All of this connects the buttons and their functions to the main window.
 
 class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
     def __init__(self, parent=None, guiWindow=None):

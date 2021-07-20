@@ -2,10 +2,10 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic
@@ -98,8 +98,13 @@ def View3D_plot_button_function(self):
     else:
         customSlicer = True
 
+    if self.ui.View3D_RawCounts_checkBox.isChecked():
+        counts = True
+    else:
+        counts = False
+
     #try:
-    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer)
+    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,outputFunction=self.writeToStatus)
 
     if customSlicer:
         self.windows.append(self.V.parent())
@@ -148,14 +153,27 @@ def View3D_toggle_mode_function(self):
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
         
         
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
 
-try:
-    View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
-except:
-    try:
-        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
-    except:
-        View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
+# try:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+# except:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(folder,"View3D.ui"))
+
+
+
+View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
+
+# try:
+#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
+# except:
+#     try:
+#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
+#     except:
+#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
 # All of this connects the buttons and their functions to the main window.
 
 class View3DManager(View3DManagerBase, View3DManagerForm):
@@ -182,9 +200,21 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_plot_button.clicked.connect(self.guiWindow.View3D_plot_button_function)
         self.guiWindow.ui.View3D_setCAxis_button.clicked.connect(self.guiWindow.View3D_setCAxis_button_function)
         self.guiWindow.ui.View3D_SetTitle_button.clicked.connect(self.guiWindow.View3D_SetTitle_button_function)
+
+        self.guiWindow.ui.View3D_SetTitle_lineEdit.returnPressed.connect(self.titleEnterPressed)
+        self.guiWindow.ui.View3D_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
+        self.guiWindow.ui.View3D_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
         
         # Radiobutton to select viewing type
         self.guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)
         self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
+
+    def titleEnterPressed(self):
+        if self.guiWindow.ui.View3D_SetTitle_button.isEnabled():
+            self.guiWindow.View3D_SetTitle_button_function()
+
+    def CAxisChanged(self):
+        if self.guiWindow.ui.View3D_setCAxis_button.isEnabled():
+            self.guiWindow.View3D_setCAxis_button_function()

@@ -2,18 +2,17 @@ import sys
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
 except ImportError:
-    from DataModels import DataSetModel,DataFileModel,DataFileInfoModel,settings
+    from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,settings
     from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments
+    from _tools import ProgressBarDecoratorArguments,loadUI
 
-
-from os import path
-from PyQt5 import QtWidgets,uic, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
+from os import path
 
 def setupDataSet(self): # Set up main features for Gui regarding the dataset widgets
     self.ui.DataSet_convertData_button.clicked.connect(self.DataSet_convertData_button_function)
@@ -34,11 +33,23 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
 
     self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
     self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
+    self.ui.DataSet_DataSets_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+    self.ui.DataSet_DataSets_listView.setDragDropOverwriteMode(False)
 
-    self.DataSetSelectionModel = self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataSetSelectionModel = SelectionModel(self.DataSetModel)#self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataSetModel.dragDropFinished.connect(self.DataSetSelectionModel.onModelItemsReordered)
     self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
+    self.ui.DataSet_DataSets_listView.setSelectionModel(self.DataSetSelectionModel)
     
     self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
+    def checkUpdatedName(self,index,*args):
+        ds = self.model().data(index)
+        suggestedName = self.model().generateValidName(ds)
+        if not suggestedName == ds.name:
+            ds.name = suggestedName
+            self.model().layoutChanged.emit()
+
+    self.ui.DataSet_DataSets_listView.dataChanged = checkUpdatedName
 
     def deleteFunction(self,gui,idx):
         gui.DataSetModel.delete(idx[0])
@@ -66,8 +77,14 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     self.DataFileModel = DataFileModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,guiWindow=self)
     self.ui.DataSet_filenames_listView.setModel(self.DataFileModel)
 
-    self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
+    self.ui.DataSet_filenames_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+    self.ui.DataSet_filenames_listView.setDragDropOverwriteMode(False)
+
+    #self.DataFileSelectionModel = self.ui.DataSet_filenames_listView.selectionModel()
+    self.DataFileSelectionModel = SelectionModel(self.DataFileModel)#self.ui.DataSet_DataSets_listView.selectionModel()
+    self.DataFileModel.dragDropFinished.connect(self.DataFileSelectionModel.onModelItemsReordered)
     self.DataFileSelectionModel.selectionChanged.connect(self.selectedDataFileChanged)
+    self.ui.DataSet_filenames_listView.setSelectionModel(self.DataFileSelectionModel)
     
     self.ui.DataSet_DeleteFiles_button.clicked.connect(self.DataSet_DeleteFiles_button_function)
     self.ui.DataSet_DeleteFiles_button.setToolTip('Delete selected Datafile')
@@ -88,7 +105,7 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
             if event.type() == QtCore.QEvent.ContextMenu:
                 menu = QtWidgets.QMenu()
                 delete = QtWidgets.QAction('Delete')
-                delete.setToolTip('Delete DataSet') 
+                delete.setToolTip('Delete DataFile') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(self.DataSet_DeleteFiles_button_function)
 
@@ -174,7 +191,7 @@ def convert(self):
     ds = self.DataSetModel.getCurrentDataSet()
     
     try:
-        ds.convertDataFile(guiWindow=self)
+        ds.convertDataFile(guiWindow=self,printFunction=self.writeToStatus)
     except AttributeError as e:
         dialog = QtWidgets.QMessageBox()
         dialog.setIcon(QtWidgets.QMessageBox.Critical)
@@ -242,19 +259,30 @@ def setupDataFileInfoModel(self):
     self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
     
 
+# if platform.system() == 'Darwin':
+#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
+# else: 
+#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
 
-try:
-    # needed when freezing app
-    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-    
-except:
-    try:
-        # needed when running app local through fbs
-        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
-        
-    except:
-        # needed when running app after pip install
-        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
+# try:
+#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+# except:
+#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(folder,"loadFile.ui"))
+
+DataSetManagerBase, DataSetManagerForm = loadUI('loadFile.ui')
+
+#try:
+#    # needed when freezing app
+#    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
+#    
+#except:
+#    try:
+#        # needed when running app local through fbs
+#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
+#        
+#    except:
+#        # needed when running app after pip install
+#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
         
         
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):

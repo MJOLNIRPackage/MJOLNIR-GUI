@@ -113,6 +113,8 @@ def transitionEmptyPartial(StateMachine): # What is required to transition from 
     return StateMachine.guiWindow.DataSetModel.rowCount(None)>0
 
 def transitionPartialRaw(StateMachine): # What is required to transition from partial to raw
+    if StateMachine.guiWindow.DataSetModel.getCurrentDataSet() is None:
+        return False
     count = len(StateMachine.guiWindow.DataSetModel.getCurrentDataSet())
     if not count is None:
         return count>0

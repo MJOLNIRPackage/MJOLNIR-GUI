@@ -77,12 +77,15 @@
          <x>0</x>
          <y>0</y>
          <width>798</width>
-         <height>851</height>
+         <height>822</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <property name="sizeConstraint">
            <enum>QLayout::SetNoConstraint</enum>
           </property>
@@ -96,14 +99,27 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>0</width>
               <height>300</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>Manage datasets and their datafiles</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="collapsibleContainer" native="true"/>
+           <widget class="QWidget" name="collapsibleContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -113,6 +129,9 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>10</number>
+      </property>
       <property name="leftMargin">
        <number>6</number>
       </property>
@@ -136,20 +155,40 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="progressBar_label">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>10</number>
         </property>
-        <property name="text">
-         <string>Ready</string>
+        <property name="leftMargin">
+         <number>10</number>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+        <property name="rightMargin">
+         <number>10</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>45</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="log_reset_btn">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -161,7 +200,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -193,21 +232,23 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionHelp"/>
+    <addaction name="actionSubtraction"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionPredictionWidget"/>
-    <addaction name="actionMolecularWeight"/>
-    <addaction name="actionNeutronCalculations"/>
-    <addaction name="actionNormalizationWidget"/>
-    <addaction name="actionElectronicLogbook"/>
+    <addaction name="actionPrediction_Tool"/>
+    <addaction name="actionCalculate_Molecular_Weight"/>
+    <addaction name="actionNeutron_Calculations"/>
+    <addaction name="actionGenerate_Normalization"/>
+    <addaction name="actionElectronic_Logbook"/>
+    <addaction name="actionSubtraction_Of_DataSets"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMask"/>
-   <addaction name="menuHelp"/>
    <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave_GUI_state">
@@ -270,7 +311,7 @@
     <string>Change Theme</string>
    </property>
   </action>
-    <action name="actionSettings">
+  <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
    </property>
@@ -278,6 +319,41 @@
   <action name="actionClose_Windows">
    <property name="text">
     <string>Close Windows</string>
+   </property>
+  </action>
+  <action name="actionPrediction_Tool">
+   <property name="text">
+    <string>Prediction Tool</string>
+   </property>
+  </action>
+  <action name="actionCalculate_Molecular_Weight">
+   <property name="text">
+    <string>Calculate Molecular Weight</string>
+   </property>
+  </action>
+  <action name="actionNeutron_Calculations">
+   <property name="text">
+    <string>Neutron Calculations</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Normalization">
+   <property name="text">
+    <string>Generate Normalization</string>
+   </property>
+  </action>
+  <action name="actionElectronic_Logbook">
+   <property name="text">
+    <string>Electronic Logbook</string>
+   </property>
+  </action>
+  <action name="actionSubtraction_Of_DataSets">
+   <property name="text">
+    <string>Subtraction of DataSets</string>
+   </property>
+  </action>
+  <action name="actionSubtraction">
+   <property name="text">
+    <string>Subtraction</string>
    </property>
   </action>
  </widget>

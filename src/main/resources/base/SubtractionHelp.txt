@@ -1,0 +1,18 @@
+
+In order to perform a subtraction of a foreground and background measurement multiple requirements must be satisfied. Currently, the two files must have identical:
+- A3 scan points (also direction)
+- 2&theta;
+- Ei
+- Scan Parameters
+- type (raw or converted)
+
+If any of these are not met for any of the data files, the two datasets cannot be subtracted. In the subtraction window, any unsatisfied requirements are signified with a red background of the affected datafile(s) for both the foreground and bacground datasets. Selecting such a datafile shows it properties to the left (foreground) or right (background) with a red highlight background. 
+
+If the loaded datafiles have been measured with identical instrumental parameters, it might happend that the loading sequence of them differs. This can be corrected by drag-and-dropping the files into the correct order, either directly in the subtraction window or in the  datafile overview of the main interface.
+
+It is possible to subtract dataset with different monitor values. MJOLNIR rescales the background datafiles by the ratio between the measured foreground and background. However, uncertainties are not propagated! 
+
+Parameters are equal if they have difference less than (Absolute tolerance):
+A3: 0.1 deg
+2&theta;: 0.1 deg
+Ei: 0.1 meV
