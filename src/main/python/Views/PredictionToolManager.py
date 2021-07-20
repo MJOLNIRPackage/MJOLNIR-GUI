@@ -288,7 +288,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         cell = np.array(self.getCell())
 
-        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,points=points)
+        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,points=points,outputFunction=self.guiWindow.writeToStatus)
 
         self.predictionAx = ax
         self.guiWindow.windows.append(ax[0].get_figure())
