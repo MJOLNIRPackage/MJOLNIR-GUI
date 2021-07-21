@@ -391,11 +391,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                     "Do you want to save Gui Settings?",
                                     QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
         
-        
         if res == QtWidgets.QMessageBox.Save:
-            self.saveCurrentGui()
-            self.closeWindows()
-            event.accept()
+            if self.saveCurrentGui(): # successful saving
+                self.closeWindows()
+                event.accept()
+            else:
+                event.ignore()
+                return False
         elif res == QtWidgets.QMessageBox.No:
             self.closeWindows()
             event.accept()
