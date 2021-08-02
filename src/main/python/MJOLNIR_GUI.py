@@ -588,90 +588,90 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
         dataSetString = loadSetting(settingsFile,'dataSet')
+        if not dataSetString is None:
+            totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
+            # Get estimate of total number of data files
+            self.setProgressBarMaximum(totalFiles)
+            
+            self.setProgressBarValue(0)
+            logbookPreset = loadSetting(settingsFile,'logbookPreset')
+            if not logbookPreset is None:
+                self.logbookPreset = logbookPreset
+            
 
-        totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
-        # Get estimate of total number of data files
-        self.setProgressBarMaximum(totalFiles)
-        
-        self.setProgressBarValue(0)
-        logbookPreset = loadSetting(settingsFile,'logbookPreset')
-        if not logbookPreset is None:
-            self.logbookPreset = logbookPreset
-        
-
-        for dsDict in dataSetString:
-            DSName = dsDict['name']
-            self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
-            files = dsDict['files'] # data or foreground data
-            if 'background' in dsDict: # Data set is a subtracted set!
-                background = dsDict['background']
-                if len(files)!=0: # If files in dataset, continue
-                    dfs = []
-                    for dfLocation in files:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfs.append(df)
-                        self.addProgressBarValue(0.5)
-                    dfsBG = []
-                    for dfLocation in background:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfsBG.append(df)
-                        self.addProgressBarValue(0.5)
-                    
-                    
-                    foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
-                    background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
-                    binnings = dsDict['binning']
-                    if dsDict['convertBeforeSubtract']:
-                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
-                        for df,binning in zip(foreground_ds,binnings): # Give the correct binning
-                            df.binning = binning
-                        foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
-                        self.update()
-                        for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
-                            df.binning = binning
-                        background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
-                        self.update()
+            for dsDict in dataSetString:
+                DSName = dsDict['name']
+                self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
+                files = dsDict['files'] # data or foreground data
+                if 'background' in dsDict: # Data set is a subtracted set!
+                    background = dsDict['background']
+                    if len(files)!=0: # If files in dataset, continue
+                        dfs = []
+                        for dfLocation in files:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfs.append(df)
+                            self.addProgressBarValue(0.5)
+                        dfsBG = []
+                        for dfLocation in background:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfsBG.append(df)
+                            self.addProgressBarValue(0.5)
                         
-
-                    temp = foreground_ds-background_ds
-                    
-                    ds = GuiDataSet(name=DSName,dataSet=temp)
-                    
-                    ds.background = background
-                    ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
-                    
-                    if not ds.convertBeforeSubtract: # Convert after subtraction if needed
-                        if not np.any([b is None for b in dsDict['binning']]):
+                        
+                        foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
+                        background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
+                        binnings = dsDict['binning']
+                        if dsDict['convertBeforeSubtract']:
                             self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                            for df,binning in zip(foreground_ds,binnings): # Give the correct binning
+                                df.binning = binning
+                            foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                            self.update()
+                            for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
+                                df.binning = binning
+                            background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                            self.update()
+                            
+
+                        temp = foreground_ds-background_ds
+                        
+                        ds = GuiDataSet(name=DSName,dataSet=temp)
+                        
+                        ds.background = background
+                        ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
+                        
+                        if not ds.convertBeforeSubtract: # Convert after subtraction if needed
+                            if not np.any([b is None for b in dsDict['binning']]):
+                                self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                                ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
+                                self.update()
+
+                else: # Regular dataset
+                        
+                    dfs = None
+                    if len(files)!=0: # If files in dataset, continue
+                        dfs = []
+                        for dfLocation in files:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfs.append(df)
+                            self.addProgressBarValue(1)
+                    ds = GuiDataSet(name=DSName,dataFiles=dfs)
+                    if 'binning' in dsDict:
+                        if not np.any([b is None for b in dsDict['binning']]):
+                            binnings = dsDict['binning']
+                            for df,binning in zip(ds,binnings):
+                                df.binning = binning
+                            self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
                             ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                             self.update()
-
-            else: # Regular dataset
-                    
-                dfs = None
-                if len(files)!=0: # If files in dataset, continue
-                    dfs = []
-                    for dfLocation in files:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfs.append(df)
-                        self.addProgressBarValue(1)
-                ds = GuiDataSet(name=DSName,dataFiles=dfs)
-                if 'binning' in dsDict:
-                    if not np.any([b is None for b in dsDict['binning']]):
-                        binnings = dsDict['binning']
-                        for df,binning in zip(ds,binnings):
-                            df.binning = binning
-                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
-                        ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
-                        self.update()
-            
-            self.DataSetModel.append(ds)
-            self.DataSetModel.layoutChanged.emit()
-            self.update()
-            self.addProgressBarValue(1)
+                
+                self.DataSetModel.append(ds)
+                self.DataSetModel.layoutChanged.emit()
+                self.update()
+                self.addProgressBarValue(1)
             
         DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
@@ -698,18 +698,21 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return settingsDict
         
     def loadGuiSettings(self,file=None):
+        
         if file is None:
             file = self.settingsFile
+        print('File:',file)
         guiSettings = loadSetting(file,'guiSettings')
-        boxStates = guiSettings['boxStates']
-        
-        if not boxStates is None:
-            for box,value in zip(self.boxContainers,boxStates):
-                try:
-                    if box.state != value:
-                        box.on_pressed()
-                except AttributeError:
-                    pass
+        if not guiSettings is None:
+            boxStates = guiSettings['boxStates']
+            
+            if not boxStates is None:
+                for box,value in zip(self.boxContainers,boxStates):
+                    try:
+                        if box.state != value:
+                            box.on_pressed()
+                    except AttributeError:
+                        pass
 
 
     def loadLineEdits(self,file=None):
