@@ -25,6 +25,7 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
         super(ElectronicLogBookManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/book--pencil.png')))
 
         if not hasattr(self.guiWindow,'logbookPreset'):
             self.guiWindow.logbookPreset = []

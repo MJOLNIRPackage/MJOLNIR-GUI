@@ -455,15 +455,15 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         return True
 
     def about(self):
-        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version)
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version,icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/information-button.png')))
         dialog.exec_()
 
     def help(self):
-        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'),icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
         dialog.exec_()
 
     def subtractionHelp(self):
-        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'))
+        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'),icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
         dialog.exec_()
 
 
@@ -866,7 +866,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         layouts = [guiSettingsLayout,dFIMLayout]
         acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
         dialog = settingsBoxDialog(layouts=layouts,acceptFunctions=acceptFunctions)
-
+        dialog.setWindowIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
         dialog.resize(dialog.sizeHint())
         
         
@@ -878,18 +878,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return
             
     def molarMassTool(self):
-        molecularCalculationManager = MolecularCalculationManager()
+        molecularCalculationManager = MolecularCalculationManager(parent=None,guiWindow=self)
         self.windows.append(molecularCalculationManager)
         molecularCalculationManager.show()
         
 
     def neutronCalculationTool(self):
-        calculatorManager = CalculatorManager()
+        calculatorManager = CalculatorManager(parent=None,guiWindow=self)
         self.windows.append(calculatorManager)
         calculatorManager.show()
 
     def absolutNormalizationTool(self):
-        absolutNormalizationWindow = NormalizationManager(parent=None)
+        absolutNormalizationWindow = NormalizationManager(parent=None,guiWindow=self)
         self.windows.append(absolutNormalizationWindow)
         absolutNormalizationWindow.show()
 
@@ -904,7 +904,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         electronicLogBook.show()
 
     def subtractionManager(self):
-        subtractionManager = SubtractionManager(guiWindow=self)
+        subtractionManager = SubtractionManager(parent=None,guiWindow=self)
         self.windows.append(subtractionManager)
         subtractionManager.show()
 

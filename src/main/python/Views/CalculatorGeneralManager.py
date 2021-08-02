@@ -15,6 +15,8 @@ try:
 except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python._tools import loadUI
 
+from PyQt5 import QtGui
+
 # Handles all functionality related to the CalculatorGeneralManager. 
 
 # if platform.system() == 'Darwin':
@@ -72,6 +74,7 @@ class CalculatorGeneralManager(CalculatorGeneralManagerBase, CalculatorGeneralMa
         super(CalculatorGeneralManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/calculator.png')))
 
         self.initCalculatorGeneralManager()
         

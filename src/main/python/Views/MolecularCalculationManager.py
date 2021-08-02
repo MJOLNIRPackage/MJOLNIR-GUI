@@ -120,6 +120,7 @@ class MolecularCalculationManager(MolecularCalculationManagerBase, MolecularCalc
         super(MolecularCalculationManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/balance.png')))
 
 
         self.elementModel = ElementModel()

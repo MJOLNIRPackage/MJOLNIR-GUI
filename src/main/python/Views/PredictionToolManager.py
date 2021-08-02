@@ -88,6 +88,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         super(PredictionToolManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/predict.png')))
 
         self.a4Validator = QtGui.QRegExpValidator()
         self.predictionAX = None

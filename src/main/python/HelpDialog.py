@@ -4,9 +4,10 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 class HelpDialog(QtWidgets.QDialog):
 
-    def __init__(self, helpFile, *args, **kwargs):
+    def __init__(self, helpFile, icon=None,*args, **kwargs):
         super(HelpDialog, self).__init__(*args, **kwargs)
-        
+        if not icon is None:
+            self.setWindowIcon(icon)
         self.setWindowTitle("Help")
         #self.resize(400, 250)
 

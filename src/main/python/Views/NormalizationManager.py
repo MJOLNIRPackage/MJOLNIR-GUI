@@ -92,6 +92,7 @@ class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
         super(NormalizationManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/ruler.png')))
         self.initNormalizationManager()
         
     def initNormalizationManager(self):    

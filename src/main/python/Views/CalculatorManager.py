@@ -47,10 +47,12 @@ CalculatorManagerBase, CalculatorManagerForm = loadUI('Calculator.ui')
 
 
 class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
-    def __init__(self):
+    def __init__(self,parent=None,guiWindow=None):
 
-        super(CalculatorManager, self).__init__()
+        super(CalculatorManager, self).__init__(parent=parent)
         self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/calculator.png')))
 
         self.nameList = ['General','Simple','Advanced'] 
         self.viewClasses = [CalculatorGeneralManager,CalculatorSimpleManager,CalculatorAdvancedManager]
@@ -69,7 +71,7 @@ class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
 
-            widget = Type(guiWindow=self)
+            widget = Type(guiWindow=self.guiWindow)
             #if Type == NormalizationManager: # Get a reference to the sample manager directly in self
             #    self.normalizationManager = widget
             self.views.append(widget)

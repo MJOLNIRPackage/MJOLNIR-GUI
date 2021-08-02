@@ -91,6 +91,7 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
             QtCore.Qt.WindowMinMaxButtonsHint )
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/subtract.png')))
         self.initSubtractionManager()
         #self.guiWindow.subtractionHelp()
 
