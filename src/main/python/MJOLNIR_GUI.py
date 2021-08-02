@@ -39,6 +39,7 @@ try:
     from Views.CalculatorManager import CalculatorManager
     from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
+    from Views.ElectronicLogBookManager import ElectronicLogBookManager
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
@@ -66,6 +67,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
+    from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogbookManager
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
@@ -238,6 +240,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
             self.setStyleSheet(self.styleSheet()+correctedArrows)
 
+        # Set up preset for electronic logbook
+        self.logbookPreset = ['A3','twoTheta','sampleName','title','scanCommand','ei']
+
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
         self.ui.actionExit.setToolTip('Exit the application') 
@@ -345,12 +350,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionNeutron_Calculations.triggered.connect(self.neutronCalculationTool)
 
         self.ui.actionElectronic_Logbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
-        self.ui.actionElectronic_Logbook.setDisabled(True)
         self.ui.actionElectronic_Logbook.setToolTip('Generate Electronic Logbook from files') 
         self.ui.actionElectronic_Logbook.setStatusTip(self.ui.actionElectronic_Logbook.toolTip())
         self.ui.actionElectronic_Logbook.triggered.connect(self.electronicLogbookTool)
+        self.ui.actionElectronic_Logbook.setShortcut("Ctrl+E")
 
-        self.ui.actionSubtraction_Of_DataSets.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionSubtraction_Of_DataSets.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/subtract.png')))
         self.ui.actionSubtraction_Of_DataSets.setToolTip('Perform Subtraction of two DataSets') 
         self.ui.actionSubtraction_Of_DataSets.setStatusTip(self.ui.actionSubtraction_Of_DataSets.toolTip())
         self.ui.actionSubtraction_Of_DataSets.triggered.connect(self.subtractionManager)
@@ -513,6 +518,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         spinBoxString = self.generateCurrentSpinBoxSettings()
         checkBoxString = self.generateCurrentcheckBoxSettings()
         fileDir = self.getCurrentDirectory()
+        logbookPreset = self.logbookPreset.copy()
         if hasattr(self,'predictionSettings'):
             predictionSettings  = self.predictionSettings
         else:
@@ -520,9 +526,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
-        
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
-                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings}
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings,'logbookPreset':logbookPreset}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -589,7 +594,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.setProgressBarMaximum(totalFiles)
         
         self.setProgressBarValue(0)
-
+        logbookPreset = loadSetting(settingsFile,'logbookPreset')
+        if not logbookPreset is None:
+            self.logbookPreset = logbookPreset
+        
 
         for dsDict in dataSetString:
             DSName = dsDict['name']
@@ -888,7 +896,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         predictionToolWindow.show()
 
     def electronicLogbookTool(self):
-        print('Not Implemeted yet electronicLogbookTool')
+        electronicLogBook = ElectronicLogBookManager(parent=None,guiWindow=self)
+        self.windows.append(electronicLogBook)
+        electronicLogBook.show()
 
     def subtractionManager(self):
         subtractionManager = SubtractionManager(guiWindow=self)
