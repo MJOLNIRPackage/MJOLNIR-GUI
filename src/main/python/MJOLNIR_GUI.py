@@ -67,7 +67,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
-    from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogbookManager
+    from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogBookManager
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
