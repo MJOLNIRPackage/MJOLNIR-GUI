@@ -459,11 +459,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         dialog.exec_()
 
     def help(self):
-        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'),icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'),guiWindow = self)
         dialog.exec_()
 
     def subtractionHelp(self):
-        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'),icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/question-button.png')))
+        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'),guiWindow = self)
         dialog.exec_()
 
 
