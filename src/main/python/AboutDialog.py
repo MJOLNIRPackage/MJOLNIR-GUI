@@ -10,6 +10,8 @@ class AboutDialog(QtWidgets.QDialog):
         if not icon is None:
             self.setWindowIcon(icon)
         self.setWindowTitle("About")
+        # Remove the "?" in title
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
 
         with open(aboutFile) as f:
             text = "<br>".join([line.replace('\n','') for line in f.readlines()])
