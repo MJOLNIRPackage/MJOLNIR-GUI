@@ -1,16 +1,50 @@
 ﻿
-The Gui is split into two main parts: the upper concering data files and sets, and the lower, which concers data plotting and visualization.
+<h1>MJONIRGui Help</h1>
+The MJOLNIRGui is a graphical user interface for the MJOLNIR python package. All of the features available in this gui is also available in the scripting interface. Below is a walk-through of the main features of the interface and a guide explaining rudimentary loading, converting, and visualization of data files. The program highlights the most probable next button to press in blue; i.e. if a DataSet has been created it suggests to add DataFiles to it. It is possible to push all enabled buttons at any time. If e.g. the "Plot View 3D" button is pressed, the program forces you to create a converted DataSet.
 
-Simple start:
-- To start, create a new DataSet by clicking the highlighted button in the top left corner.
-- Add data files by clicking the highlighted data file button in the top center.
-- The added files can be converted by pressing the convert button.
-- When all of the above steps have successfully been followed plots can now be generated.
+<h2>Generation of python scripts</h2>
+Because the MJOLNIRGui is a direct extension of the MJOLNIR python package, it is possible to create python scripts doing the same conversions and visualizations as what is done in the gui. Generation of the scripts is provided under the "File" tab in  the menu and creates the script for the selected DataSet using the suitable parameters currently written in the input boxes. Even subtracted DataSets will be created and plotted. For 1D cuts the scripting works a little differently; each 1D cut in the list will be written into the script. 
+<b>Notice:</b> running the generated scripts requires the MJOLNIR package to be installed in the activated python environment, see <a href='https://mjolnir.readthedocs.io/'>Read The Docs</a> for an installation guide.
+
+<h2>Gui Layout</h2>
+The Gui itself is split into three main areas dealing with DataSets & DataFiles, visualization, and program status, respectively. 
+
+<center><figure><img src="TutorialPictures\gui.png" alt="Test" style="width:100%"></figure></center>
 
 
-Instead of going through the hoops described above, save the gui state into a file by entering files>Save GUI state or ctrl+s. This file can then later be loaded. Notice that this file does not contain the data, but only a description of the file location and conversion.
+<h2>Creation and conversion of DataSets/DataFiles</h2>
+The top part deals with the creation of DataSets, addition of DataFiles to them, and their conversion. First, a DataSet is to be created. It is a container holding individual DataFiles and is used to perform actions across all of these. At the instrument, every scan command creates a single DataFile and bunching these together allows addition of multiple instrumental settings into one graph. That is, it is expected that all scans for the same temperature/magnetic field settings are combined. 
+To create a DataSet click the blue "New DataSet" button as shown below. This creates a single DataSet with the name "Added". By double-clicking it you can rename the DataSet. This is particularly useful when multiple DataSets are open at the same time and for background subtraction.
+<center><figure><img src="TutorialPictures\DataTreatment1.png" alt="Creation of DataSet" style="width:75%"></figure></center>
+Not a lot can be done with an empty DataSet and thus, adding DataFiles to it is the next step. Clicking the now blue "Add Files" button opens a file dialog asking for files to add to the currently selected DataSet. The order of the DataFiles is important if a subtraction is to be performed. It can be changed by clicking and dragging the files around. When a single file is selected a range of information is provided to the right. When multiple files are selected, depending on the type of information, their values are either combined or shown as being appended to each other. Which information is shown can be changed under the Settings entry in the File tab in the menu. 
+<center><figure><img src="TutorialPictures\DataTreatment2.png" alt="Addition of DataFiles" style="width:75%"></figure></center>
+When raw DataFiles have been added, the whole DataSet can be converted by clicking the  "Convert" button. It is possible to change the prismatic binning used by changing the value in the "Select Binning" drop-down menu. This feature is only available for instruments utilizing the prismatic concept; if not only binning 1 is available. It is not possible to have different binnings for different files. In this example files from MnF2 taken at CAMEA in 2021 are used with binning 8.
+<center><figure><img src="TutorialPictures\DataTreatment3.png" alt="Conversion of DataFiles" style="width:75%"></figure></center>
+From this point, the visualization parts can be used to create plots in various forms. 
+
+<h2>Saving GuiStates</h2>
+Instead of going through the hoops described above, save the gui state into a file by entering files>Save GUI state or ctrl+s. This file can then later be loaded. Notice that this file does not contain the data, but only a description of the file location and conversion. Thus, the saved states cannot be shared between computers. 
+
+<h2>Useful Tools</h2>
+In addition to the direct handling of data and the conversion, MJOLNIRGui contains a set of tools useful within neutron scattering and specifically for experiment planning. All of these are found under the Tools tab in the menu.
+<center><figure><img src="TutorialPictures\ToolsFigure.png" alt="Tools tab in the menu" style="width:75%"></figure></center>
+Here, two of these are of special interest to the utilization of MJOLNIRGui for CAMEA data
+
+<h3>Prediction Tool</h3>    
+<center><figure><img src="TutorialPictures\prediction.png" alt="Prediction Tool" style="width:75%"></figure></center>
+
+This tool allows the prediction of where data is going to be measured during an A3 scan at CAMEA for a specified list of 2 settings and a single Ei setting. The tool requires the information of the cell parameters and the alignment of two Bragg peaks in the scattering plane. For these two, the expected scattering angle is automatically calculated, but the A3 angle is to be provided together with the incoming and outgoing energy. Nominally, these energies match, but there can be a slight mismatch. When aligning on CAMEA, an outgoing analyzer is usually selected and the same is the case for this tool. Choose the analyzer number (0-7) or the "= Ei" option if the single detectors have been used. 
+The "Calculate" part is intended to be used to find the correct sample rotation and 2θ setting for a specific energy transfer and Q point. It uses the UB matrix created from the provided unit cell and alignment peaks. 
+Lastly, the "Scan" part allows for the prediction of coverage for multiple 2θ settings and a specified Ei, together with a scan of A3 values. The 2θ values are written as a comma separated list (usually with negative values for CAMEA) while energy, A3 start, stop, number of steps, and monitor is chosen by using the spin-boxes. By pressing the "Generate" button, the predicted scan area is plotted in a 3x3 tiled window with the first 8 graphs showing the coverage for a single analyzer value while the last graphs shows the combined coverage. Hovering with the mouse or clicking a point in the first 8 graphs shows the Q point together with the corresponding A3 and A4 and Ef position. This can be used to change the A3 scan settings. 
+For some systems, spurious signals originating from accidental scattering in the monochromator or analyzer can cause confusion. These are denoted the Currat-Axe spurions and their position can be calculated. You can add this calculation to the prediction plots by clicking the "Currat Axe list" button for then to add the allowed nuclear peaks within the scattering area. Checking the "Plot Currat Axe" check box enables the over-plotting of their positions on the 8 graphs.
+<center><figure><img src="TutorialPictures\predictionPlot.png" alt="Prediction Tool" style="width:75%"></figure></center>
+
+<h3>Subtraction of DataSets</h3>
+In some experiments it is advantageous to subtract a background from a foreground set. This is supported in MJOLNIRGui through the "Subtraction of DataSets" tool. <b>However, for this to work the DataSets need to be completely equivalent!</b> This means that not only does the order of the DataFiles needs to be completely equivalent, but the individual scans need to be the exact same. This is checked in the tool when two DataSets are chosen. As seen in the sample below, any DataFiles not having an equivalent in either the background or foreground has an error. The same is true with the two files with numbers 122 and 121. All DataFiles not matching will be marked in red with their mismatching parameters also highlighted in red. In this specific case reordering the two DataFiles will result in the subtraction being allowed.
+
+<center><figure><img src="TutorialPictures\subtraction.png" alt="Subtraction Tool" style="width:75%"></figure></center>
+
+Subtraction can only be performed if there are no DataFiles highlighed in red and only between DataSets of the same type, that is one can not subtract a converted DataSet from a non-converted one. However, it is possible to both subtract before or after the conversion. The preferred way is to perform the subtraction before conversion but it should have no direct impact on the following data treatment. Subtracted DataSets are also saved when the guistate is saved and for them to be loaded, there is no need to keep the initial DataSets around (unless changes are expected).
 
 
-For further help on MJOLNIR go to
-
-<a href='https://mjolnir.readthedocs.io/'>Read The Docs</a>
+For further help on the software package itself, go to<a href='https://mjolnir.readthedocs.io/'>Read The Docs</a>
