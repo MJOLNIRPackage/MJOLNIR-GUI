@@ -155,10 +155,6 @@ def checker(q1,q2,width,minPixel,EMax,EMin,cutQ):
     if minPixel<0:
         _GUItools.dialog(text='1D Cut could not be made. Min Pixel ({}) is negative!'.format(minPixel))
         success = False
-    if not cutQ: # Cut along E
-        if not np.all(np.isclose(q1,q2)):
-            _GUItools.dialog(text='1D Cut could not be made. Start ({}) is not equal to End ({}) is negative!'.format(q1,q2))
-            success = False
     return success
 
 
@@ -220,12 +216,28 @@ def Cut1D_toggle_units_function(self):
         self.ui.Cut1D_Klabel.setText('K')
         self.ui.Cut1D_Llabel.setText('L')
         self.ui.Cut1D_LStart_lineEdit.setEnabled(True)
-        self.ui.Cut1D_LEnd_lineEdit.setEnabled(True)
+        if self.ui.Cut1D_SelectCut_Q_radioButton.isChecked():
+            self.ui.Cut1D_LEnd_lineEdit.setEnabled(True)
     else: # Changing to AA
         self.ui.Cut1D_Hlabel.setText('Qx')
         self.ui.Cut1D_Klabel.setText('Qy')
         self.ui.Cut1D_Llabel.setText('N/A')
         self.ui.Cut1D_LStart_lineEdit.setEnabled(False)
+        self.ui.Cut1D_LEnd_lineEdit.setEnabled(False)
+
+def Cut1D_toggle_CutDir_function(self):
+    if self.ui.Cut1D_SelectCut_Q_radioButton.isChecked(): # changed to Cut along Q
+        self.ui.Cut1D_StartLabel.setText('Start')
+        self.ui.Cut1D_StopLabel.setText('Stop')
+        self.ui.Cut1D_HEnd_lineEdit.setEnabled(True)
+        self.ui.Cut1D_KEnd_lineEdit.setEnabled(True)
+        if self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked(): # If RLU units
+            self.ui.Cut1D_LEnd_lineEdit.setEnabled(True)
+    else: # Changing to AA
+        self.ui.Cut1D_StartLabel.setText('Point')
+        self.ui.Cut1D_StopLabel.setText('N/A')
+        self.ui.Cut1D_HEnd_lineEdit.setEnabled(False)
+        self.ui.Cut1D_KEnd_lineEdit.setEnabled(False)
         self.ui.Cut1D_LEnd_lineEdit.setEnabled(False)
 
 
@@ -270,24 +282,8 @@ def plotItem(self,item):
     self.windows.append(fig)
 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+Cut1DManagerBase, Cut1DManagerForm = loadUI('Cut1D.ui')
 
-# try:
-#     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
-# except:
-#     Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(folder,"Cut1D_new.ui"))
-
-Cut1DManagerBase, Cut1DManagerForm = loadUI('Cut1D_new.ui')
-#try:
-#    Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Cut1D_new.ui"))
-#except:
-#    try:
-#        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Cut1D_new.ui"))
-#    except:
-#        Cut1DManagerBase, Cut1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Cut1D_new.ui"))
 class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):
         super(Cut1DManager, self).__init__(parent)
@@ -301,6 +297,7 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.Cut1D_SetTitle_button_function = lambda: Cut1D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.setupCut1D = lambda: setupCut1D(self.guiWindow)
         self.guiWindow.Cut1D_toggle_units_function = lambda: Cut1D_toggle_units_function(self.guiWindow)
+        self.guiWindow.Cut1D_toggle_CutDir_function = lambda: Cut1D_toggle_CutDir_function(self.guiWindow)
         self.guiWindow.Cut1D_Save_To_uFit = lambda location: Cut1D_Save_To_uFit(self.guiWindow,location)
 
         self.guiWindow.plotItem = lambda item: plotItem(self.guiWindow,item)
@@ -312,13 +309,14 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.update1DCutLabels = lambda:update1DCutLabels(self.guiWindow)
         self.guiWindow.Cut1D_Export1D_button_function = lambda:Cut1D_Export1D_button_function(self.guiWindow)
         for key,value in self.__dict__.items():
-                if 'Cut1D' in key:
-                    self.guiWindow.ui.__dict__[key] = value
+            if 'Cut1D' in key:
+                self.guiWindow.ui.__dict__[key] = value
         
     def setup(self):
         self.guiWindow.setupCut1D()
         self.guiWindow.ui.Cut1D_SelectUnits_RLU_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_units_function)
-        #self.guiWindow.ui.Cut1D_fit_button.clicked.connect(self.guiWindow.Cut1D_Save_To_uFit)
+        self.guiWindow.ui.Cut1D_SelectCut_Q_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_CutDir_function)
+        
         self.guiWindow.ui.Cut1D_Export1D_button.clicked.connect(self.guiWindow.Cut1D_Export1D_button_function)
 
         self.guiWindow.ui.Cut1D_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
