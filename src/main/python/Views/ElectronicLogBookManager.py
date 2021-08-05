@@ -42,6 +42,8 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
         self.checkDataSet()
 
     def initElectronicLogBookManager(self):
+        self.layout = QtWidgets.QVBoxLayout()
+        self.dummyWidget = QtWidgets.QWidget()
 
         for par in self.possibleParameters:
             horizontal = QtWidgets.QHBoxLayout()
@@ -57,9 +59,10 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
             setattr(self,par+'_checkBox',tickBox)
             horizontal.addWidget(label)
             horizontal.addWidget(tickBox)
+            self.layout.addLayout(horizontal)
 
-            self.parametersLayout.addLayout(horizontal)
-        
+        self.dummyWidget.setLayout(self.layout)
+        self.parametersLayout.setWidget(self.dummyWidget)
         self.ElectronicLogBook_load_button.clicked.connect(self.load)
         self.ElectronicLogBook_dataset_button.clicked.connect(self.loadFromDataSet)
         self.ElectronicLogBook_savetofile_radioButton.toggled.connect(self.saveToFileChanged)
@@ -124,7 +127,7 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
         returnString = ['\n'.join([x for x in returnString])]
         return returnString[0]
 
-    def returnResult(self,pars,result):
+    def returnResult(self,pars,result): # function to return result to user (either file or log)
         result = self.beautify(pars,result)
         if self.ElectronicLogBook_savetofile_radioButton.isChecked():
             saveLocation,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',None,"Text (*.txt)")
@@ -134,6 +137,8 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
                 f.writelines(result)
         else:
             self.guiWindow.writeToStatus(result)
+        # After successful return, close window
+        self.close()
 
     def checkDataSet(self):
         if self.guiWindow.DataSetModel.getCurrentDatasetIndex() is None:
