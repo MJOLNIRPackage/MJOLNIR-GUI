@@ -34,7 +34,7 @@ def QPlane_plot_button_function(self):
     xBinTolerance = float(self.ui.QPlane_xBinTolerance_lineEdit.text())           
     yBinTolerance = float(self.ui.QPlane_yBinTolerance_lineEdit.text())           
 
-    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu)
+    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap)
     
     self.QPlane=ax    
     

@@ -108,7 +108,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
-        
+        self.colormap = 'viridis'
         
         #if guiSettings is None:
         #    self.theme = 'light'
@@ -527,7 +527,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
-                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings,'logbookPreset':logbookPreset}
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,
+                      'predictionSettings':predictionSettings,'logbookPreset':logbookPreset}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -694,14 +695,14 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def guiSettings(self):
         boxStates = [b.state for b in self.boxContainers]
-        settingsDict = {'boxStates':boxStates}
+        settingsDict = {'boxStates':boxStates,'colormap':self.colormap}
         return settingsDict
         
     def loadGuiSettings(self,file=None):
         
         if file is None:
             file = self.settingsFile
-        print('File:',file)
+        
         guiSettings = loadSetting(file,'guiSettings')
         if not guiSettings is None:
             boxStates = guiSettings['boxStates']
@@ -713,7 +714,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                             box.on_pressed()
                     except AttributeError:
                         pass
-
+            if 'colormap' in guiSettings:
+                self.colormap = guiSettings['colormap']
+            else:
+                self.colormap = 'viridis'
+        
 
     def loadLineEdits(self,file=None):
         if file is None:
@@ -828,7 +833,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         # Create a widget holding check boxes for all possible settings
 
         dFIMLayout = QtWidgets.QVBoxLayout()
-        dFIMTitleLabel = QtWidgets.QLabel(text='Select infos to be shown for selected file(s)')
+        dFIMTitleLabel = QtWidgets.QLabel(text='DataFile intormation \nSelect infos to be shown for selected file(s)')
         dFIMTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
         # Add title to layout
         dFIMLayout.addWidget(dFIMTitleLabel)
@@ -854,12 +859,23 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         # Create layout for gui settings
         guiSettingsLayout = QtWidgets.QVBoxLayout()
- 
+        labelTitle = QtWidgets.QLabel(text = 'Color map:')
+
+        cmapBox = QtWidgets.QComboBox()
+        cmaps = plt.colormaps()
+        current = cmaps.index(self.colormap)
+        cmapBox.addItems(cmaps)
+        cmapBox.setCurrentIndex(current)
+        
+        guiSettingsLayout.addWidget(labelTitle)
+        guiSettingsLayout.addWidget(cmapBox)
+
 
         # Create radiobuttons
         
-        def guiSettingsAcceptFunction(self,layout):
-            length = layout.count()-1 # first entry is QLabel
+        def guiSettingsAcceptFunction(self,layout,guiWindow=self):
+            cmapBox = layout.itemAt(1).widget()
+            guiWindow.colormap = cmapBox.currentText()
             
  
         # settings holds a list of possible settings for all setting fields

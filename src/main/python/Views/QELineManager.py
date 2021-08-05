@@ -71,7 +71,7 @@ def QELine_plot_button_function(self):
         ax,DataLists,Bins,BinCenters,Offsets = \
         ds.plotCutQELine(QPoints=QPoints, width=width, \
                                         minPixel=minPixel, EnergyBins=EnergyBins,\
-                                            rlu=rlu,log=log,constantBins=constantBins)
+                                            rlu=rlu,log=log,constantBins=constantBins,cmap=self.colormap)
     
         # Make some final changes to the plot
         self.QELine=ax    
