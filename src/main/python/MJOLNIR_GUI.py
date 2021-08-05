@@ -831,8 +831,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         dataFileInfoModelPossibleSettings,dataFileInfoModelInitial = self.DataFileInfoModel.settingsDialog()
         # Create a widget holding check boxes for all possible settings
+        dFIMLayout = QtWidgets.QVBoxLayout() # Outer most layout
+        dFIMLayoutScrollArea = QtWidgets.QScrollArea() # scrollarea layout
+        dummyWidget = QtWidgets.QWidget() # Dummy widget to insert layout into scroll area
 
-        dFIMLayout = QtWidgets.QVBoxLayout()
+        dFIMLayout_settings = QtWidgets.QVBoxLayout()
         dFIMTitleLabel = QtWidgets.QLabel(text='DataFile intormation \nSelect infos to be shown for selected file(s)')
         dFIMTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
         # Add title to layout
@@ -846,13 +849,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             name = setting.location
             checkBox.setText(name)
             checkBox.setChecked(setting in dataFileInfoModelInitial)
-            dFIMLayout.addWidget(checkBox)
+            dFIMLayout_settings.addWidget(checkBox)
+        dummyWidget.setLayout(dFIMLayout_settings)
+        dFIMLayoutScrollArea.setWidget(dummyWidget)
+        
+        dFIMLayout.addWidget(dFIMLayoutScrollArea)
+
 
         # accept function arguments: self (dialog), layout which was passed in
         def dFIMAcceptFunction(self,layout,possibleSettings=dataFileInfoModelPossibleSettings):
             self.dMFIASettings = []
             for idx,setting in enumerate(possibleSettings.values()): # Loop through all the possible settings
-                box = layout.itemAt(idx+1).widget() # Skip 0 as it is a QLabel
+                box = layout.itemAt(1).widget().widget().layout().itemAt(idx).widget() # Skip 0 as it is a QLabel
                 if box.isChecked():# If checked add the corresponding setting to list of loaded settings
                     self.dMFIASettings.append(setting.location)
 
