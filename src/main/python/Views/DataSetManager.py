@@ -278,6 +278,10 @@ def setupDataFileInfoModel(self):
         
         position = event.globalPos()
         idx = view.currentIndex()
+        if idx is None:
+            return
+        if idx.row()>=self.DataFileInfoModel.rowCount(None):
+            return
     
         if event.type() == QtCore.QEvent.ContextMenu:
             menu = QtWidgets.QMenu()

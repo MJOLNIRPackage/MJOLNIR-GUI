@@ -854,6 +854,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         dFIMLayoutScrollArea.setWidget(dummyWidget)
         
         dFIMLayout.addWidget(dFIMLayoutScrollArea)
+        # Overview: dFIMLayout -> dFIMLayoutScrollArea -> dummyWidget -> dFIMLayout_settings -> checkBox
+        #     Type:   layout             widget              widget            layout            widget
 
 
         # accept function arguments: self (dialog), layout which was passed in
