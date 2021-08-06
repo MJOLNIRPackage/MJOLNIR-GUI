@@ -11,6 +11,7 @@ except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.Qt import QApplication
 import numpy as np
 from os import path
 
@@ -254,10 +255,55 @@ def DataSet_binning_comboBoxReset(self):
 
 ############### Setup of info panel
 
+def DataSet_DataFileInfo_copy(self,idx,clipboard=True):
+    """Copy text in currently selected item to either clipboard or log"""
+    
+    text = self.DataFileInfoModel.data(idx,QtCore.Qt.DisplayRole)
+    if clipboard:
+        QApplication.clipboard().setText(text)
+    else:
+        self.writeToStatus(text)
+    
+def DataSet_DataFileInfo_remove(self,idx):
+    currentInfos = self.DataFileInfoModel.infos
+    del currentInfos[idx.row()]
+    self.DataFileInfoModel.layoutChanged.emit()
+    
+
 def setupDataFileInfoModel(self):
     
     self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
+    def contextMenuDataFilesInfo(view,event,gui):
+        # Generate a context menu that opens on right click
+        
+        position = event.globalPos()
+        idx = view.currentIndex()
     
+        if event.type() == QtCore.QEvent.ContextMenu:
+            menu = QtWidgets.QMenu()
+            copyCB = QtWidgets.QAction('Copy to clipboard')
+            copyCB.setToolTip('Copy Current information to clipboard') 
+            copyCB.setStatusTip(copyCB.toolTip())
+            copyCB.triggered.connect(lambda: self.DataSet_DataFileInfo_copy(idx,clipboard=True))
+
+            copyLog = QtWidgets.QAction('Copy to log')
+            copyLog.setToolTip('Copy Current information to log') 
+            copyLog.setStatusTip(copyLog.toolTip())
+            copyLog.triggered.connect(lambda: self.DataSet_DataFileInfo_copy(idx,clipboard=False))
+
+            currentInfo = self.DataFileInfoModel.infos[idx.row()].baseText.split(':')[0] # base text has ': ' at the end
+            removeInfo = QtWidgets.QAction("Remove '{}'".format(currentInfo))
+            removeInfo.setToolTip("Remove '{}' from overview".format(currentInfo)) 
+            removeInfo.setStatusTip(removeInfo.toolTip())
+            removeInfo.triggered.connect(lambda: self.DataSet_DataFileInfo_remove(idx))
+
+            
+
+            menu.addAction(copyCB)
+            menu.addAction(copyLog)
+            menu.addAction(removeInfo)
+            return menu.exec_(position)
+    self.ui.DataSet_fileAttributs_listView.contextMenuEvent = lambda event: contextMenuDataFilesInfo(self.ui.DataSet_fileAttributs_listView,event,self)
 
 # if platform.system() == 'Darwin':
 #     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
@@ -312,6 +358,8 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataSet = lambda:setupDataSet(self.guiWindow)
         self.guiWindow.setupDataFile =  lambda:setupDataFile(self.guiWindow)
         self.guiWindow.setupDataFileInfoModel = lambda:setupDataFileInfoModel(self.guiWindow)
+        self.guiWindow.DataSet_DataFileInfo_copy = lambda idx,clipboard:DataSet_DataFileInfo_copy(self.guiWindow,idx,clipboard)
+        self.guiWindow.DataSet_DataFileInfo_remove = lambda idx: DataSet_DataFileInfo_remove(self.guiWindow, idx)
         self.guiWindow.setupDataSet_binning_comboBox = lambda:setupDataSet_binning_comboBox(self.guiWindow)
         self.guiWindow.updateBinningComboBox = lambda: updateBinningComboBox(self.guiWindow)
         self.guiWindow.DataSet_binning_comboBox_Changed = lambda:DataSet_binning_comboBox_Changed(self.guiWindow)
