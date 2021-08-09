@@ -112,20 +112,29 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
             localReturnString = []
             for par,res in zip(pars,fileResult):
                 if hasattr(res,'shape'):
-                    if len(res) == 1:
-                        localReturnString.append(' '+par+': '+str(res[0]))
+                    if res.size == 1:
+                        try:
+                            localReturnString.append(' '+par+': '+str(res[0]))
+                        except IndexError: # res = np.array(None) and the above throws an error!
+                            localReturnString.append(' '+par+': None')
                     else:
-                        m,M = [f(res) for f in [np.min,np.max]]
-                        if np.isclose(m,M):
+                        try:
+                            m = np.min(res)
+                            M = np.max(res)
+                        except TypeError:
                             localReturnString.append(' '+par+': '+str(res[0]))
                         else:
-                            localReturnString.append(' '+par+': [{} - {}]'.format(str(m),str(M)))
+                            if np.isclose(m,M):
+                                localReturnString.append(' '+par+': '+str(res[0]))
+                            else:
+                                localReturnString.append(' '+par+': [{} - {}]'.format(str(m),str(M)))
                 else:
                     localReturnString.append(' '+par+': '+str(res))
             returnString.append(' '.join(localReturnString))
 
-        returnString = ['\n'.join([x for x in returnString])]
-        return returnString[0]
+        returnString = '\n'.join([x for x in returnString])
+
+        return returnString
 
     def returnResult(self,pars,result): # function to return result to user (either file or log)
         result = self.beautify(pars,result)
