@@ -960,7 +960,7 @@
           <item>
            <widget class="QPushButton" name="scan_curratAxe_pushButton">
             <property name="text">
-             <string>Currat Axe List</string>
+             <string>Currat-Axe List</string>
             </property>
            </widget>
           </item>
@@ -1025,7 +1025,7 @@
           <item>
            <widget class="QCheckBox" name="scan_curratAxe_checkBox">
             <property name="text">
-             <string>Plot Currat Axe</string>
+             <string>Plot Currat-AxeSpurions</string>
             </property>
            </widget>
           </item>

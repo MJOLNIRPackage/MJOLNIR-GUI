@@ -508,10 +508,18 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def curratAxeList(self):
         if hasattr(self,'BraggListWindow'): # If a window is open, use it
             self.braggPoints = self.BraggListWindow.BraggListModel.data
-        
-        self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
-        self.guiWindow.windows.append(self.BraggListWindow)
-        self.BraggListWindow.show()
+            if self.BraggListWindow.isVisible(): # if not visible, the window was closed
+                getattr(self.BraggListWindow,'raise')()
+                self.BraggListWindow.activateWindow()
+            else:
+                self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
+            self.guiWindow.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
+
+        else:
+            self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
+            self.guiWindow.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
 
 
     def closeEvent(self, event):
