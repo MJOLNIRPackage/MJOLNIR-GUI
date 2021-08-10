@@ -361,10 +361,31 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>5</height>
+         <height>40</height>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="View3D_CurratAxe_button">
+         <property name="statusTip">
+          <string>Create list of Bragg peaks from which Currat-Axe spurions are calcualted</string>
+         </property>
+         <property name="text">
+          <string>Currat-Axe List</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="View3D_CurratAxe_checkBox">
+         <property name="text">
+          <string>Plot Currat-Axe spurions</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="View3D_plot_button">
@@ -398,8 +419,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

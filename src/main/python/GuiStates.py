@@ -56,7 +56,7 @@ def RawEnabled(StateMachine):
     enabled = np.ones(len(names))
     enabledNames = ['DataSet_NewDataSet_button','DataSet_DeleteDataSet_button',
     'DataSet_AddFiles_button','DataSet_DeleteFiles_button','DataSet_convertData_button','DataSet_binning_comboBox',
-    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
+    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button','View3D_CurratAxe_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
@@ -75,7 +75,7 @@ def PartialEnabled(StateMachine):
     enabled = np.ones(len(names))
     enabledNames = ['DataSet_NewDataSet_button','DataSet_DeleteDataSet_button',
     'DataSet_AddFiles_button',
-    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
+    'View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button','View3D_CurratAxe_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
@@ -93,7 +93,7 @@ def PartialEnabled(StateMachine):
 def EmptyEnabled(StateMachine):
     names = [item.objectName() for item in StateMachine.guiWindow.blockItems]
     enabled = np.ones(len(names))
-    enabledNames = ['DataSet_NewDataSet_button','View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button']
+    enabledNames = ['DataSet_NewDataSet_button','View3D_plot_button','QELine_plot_button','QPlane_plot_button','Raw1D_plot_button','Cut1D_plot_button','View3D_CurratAxe_button']
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):

@@ -9,8 +9,10 @@ except:
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 try:
     import _tools as _guitools
+    from Views import BraggListManager
 except ImportError:
     import MJOLNIRGui.src.main.python._tools as _guitools
+    from MJOLNIRGui.src.main.python.Views import BraggListManager
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -209,6 +211,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.progressBar._oldText = self.ui.progressBar.text
         self.ui.progressBar.text = lambda: text(self.ui.progressBar)
 
+        self.braggPoints = None
 
         self.update()
         initGenerateScript(self)
@@ -361,6 +364,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionSubtraction_Of_DataSets.triggered.connect(self.subtractionManager)
         self.ui.actionSubtraction_Of_DataSets.setShortcut("Ctrl+D")
 
+        self.ui.View3D_CurratAxe_button.clicked.connect(self.openBraggListWindow)
+
     def getProgressBarValue(self):
         return self.ui.progressBar.value
 
@@ -426,7 +431,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return 0
 
     def closeEvent(self, event):
-
         if self.loadedGuiSettings is None:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
@@ -490,6 +494,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not saveSettings.split('.')[-1] == 'MJOLNIRGuiSettings':
             saveSettings+='.MJOLNIRGuiSettings'
 
+        if os.path.exists(saveSettings): # if file already exists user has been asked to delete it
+            os.remove(saveSettings)
         for key,value in settingsDict.items():
             updateSetting(saveSettings,key,value)
         self.loadedGuiSettings = self.generateCurrentGuiSettings()
@@ -673,7 +679,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 self.DataSetModel.layoutChanged.emit()
                 self.update()
                 self.addProgressBarValue(1)
-            
+        else:
+            self.setProgressBarLabelText('')
         DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
@@ -681,8 +688,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
         self.loadRadioButtons(file=settingsFile)
-        # self.loadSpinBoxes(file=settingsFile)
-        # self.loadCheckBoxes(file=settingsFile)
+        self.loadSpinBoxes(file=settingsFile)
+        self.loadCheckBoxes(file=settingsFile)
         self.loadPredictionSettings(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
@@ -696,6 +703,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     def guiSettings(self):
         boxStates = [b.state for b in self.boxContainers]
         settingsDict = {'boxStates':boxStates,'colormap':self.colormap}
+        if not hasattr(self,'BraggListWindow'):
+           settingsDict['braggPoints'] = self.braggPoints
+        else:
+            settingsDict['braggPoints'] = self.BraggListWindow.BraggListModel.data
         return settingsDict
         
     def loadGuiSettings(self,file=None):
@@ -714,6 +725,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                             box.on_pressed()
                     except AttributeError:
                         pass
+
+            if 'braggPoints' in guiSettings:
+                self.braggPoints = guiSettings['braggPoints']
+                if hasattr(self,'BraggListWindow'):
+                    self.BraggListWindow.BraggListModel.data = self.braggPoints.copy()
+                    self.BraggListWindow.BraggListModel.layoutChanged.emit()
             if 'colormap' in guiSettings:
                 self.colormap = guiSettings['colormap']
             else:
@@ -933,6 +950,36 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         subtractionManager = SubtractionManager(parent=None,guiWindow=self)
         self.windows.append(subtractionManager)
         subtractionManager.show()
+
+    def getBraggPoints(self):
+        if hasattr(self,'BraggListWindow'):
+            return self.BraggListWindow.BraggListModel.data
+        else:
+            return self.braggPoints
+
+    def openBraggListWindow(self):
+        if hasattr(self,'BraggListWindow'): # If a window is open, use it
+            if self.BraggListWindow.isVisible(): # if not visible, the window was closed
+                getattr(self.BraggListWindow,'raise')()
+                self.BraggListWindow.activateWindow()
+            else:
+                if self.braggPoints is None:
+                    bL = []
+                else:
+                    bL = self.braggPoints.copy()
+                self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+                #self.braggPoints = self.BraggListWindow.BraggListModel.data
+            self.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
+
+        else:
+            if self.braggPoints is None:
+                bL = []
+            else:
+                bL = self.braggPoints.copy()
+            self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+            self.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
 
 class settingsBoxDialog(QtWidgets.QDialog):
 

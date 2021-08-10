@@ -3,9 +3,11 @@ sys.path.append('..')
 
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
+    from MJOLNIRGui.src.main.python.Views import BraggListManager
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
+    from Views import BraggListManager
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic
@@ -88,23 +90,16 @@ def View3D_plot_button_function(self):
     else:
         grid=False
     
-    if self.ui.View3D_LogScale_checkBox.isChecked():
-        log=True
+    log = self.ui.View3D_LogScale_checkBox.isChecked()
+    customSlicer = not self.ui.View3D_Mode_Viewer3D_radioButton.isChecked()
+    counts = self.ui.View3D_RawCounts_checkBox.isChecked()
+    plotCurratAxe = self.ui.View3D_CurratAxe_checkBox.isChecked()
+    if plotCurratAxe:
+        braggList = self.getBraggPoints()
     else:
-        log=False        
+        braggList = None
     
-    if self.ui.View3D_Mode_Viewer3D_radioButton.isChecked():
-        customSlicer = False
-    else:
-        customSlicer = True
-
-    if self.ui.View3D_RawCounts_checkBox.isChecked():
-        counts = True
-    else:
-        counts = False
-
-    #try:
-    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,outputFunction=self.writeToStatus,cmap=self.colormap)
+    self.V = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList)
 
     if customSlicer:
         self.windows.append(self.V.parent())
@@ -218,3 +213,11 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
     def CAxisChanged(self):
         if self.guiWindow.ui.View3D_setCAxis_button.isEnabled():
             self.guiWindow.View3D_setCAxis_button_function()
+
+    def curratAxeList(self):
+        if hasattr(self,'BraggListWindow'): # If a window is open, use it
+            self.braggPoints = self.BraggListWindow.BraggListModel.data
+        else:
+            self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
+            self.guiWindow.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
