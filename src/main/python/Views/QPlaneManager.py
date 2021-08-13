@@ -71,25 +71,7 @@ def QPlane_SetTitle_button_function(self):
         fig.canvas.draw()
     
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
-# except:
-#     QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(folder,"QPlane.ui"))
-
 QPlaneManagerBase, QPlaneManagerForm = loadUI('QPlane.ui')
-
-# try:
-#     QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"QPlane.ui"))
-# except:
-#     try:
-#         QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"QPlane.ui"))
-#     except:
-#         QPlaneManagerBase, QPlaneManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"QPlane.ui"))
 
 class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
     def __init__(self, parent=None, guiWindow=None):

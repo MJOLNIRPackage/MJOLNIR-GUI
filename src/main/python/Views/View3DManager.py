@@ -175,28 +175,8 @@ def View3D_Grid_checkBox_toggled_function(self):
             self.V.gridZOrder=9
         for ax in self.V._axes:
             ax.grid(self.V.grid,zorder=self.V.gridZOrder)
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
-# except:
-#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(folder,"View3D.ui"))
-
-
 
 View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
-
-# try:
-#     View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"View3D.ui"))
-# except:
-#     try:
-#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"View3D.ui"))
-#     except:
-#         View3DManagerBase, View3DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"View3D.ui"))
-# All of this connects the buttons and their functions to the main window.
 
 class View3DManager(View3DManagerBase, View3DManagerForm):
     def __init__(self, parent=None, guiWindow=None):

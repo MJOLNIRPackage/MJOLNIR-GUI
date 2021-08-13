@@ -153,7 +153,7 @@ def DataSet_AddFiles_button_function(self):
     if not self.stateMachine.requireStateByName('Partial'):
         return False
     
-    folder = self.getCurrentDirectory()
+    folder = self.currentFolder
     files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
     if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
         self.DataSet_NewDataSet_button_function()
@@ -303,31 +303,9 @@ def setupDataFileInfoModel(self):
             return menu.exec_(position)
     self.ui.DataSet_fileAttributs_listView.contextMenuEvent = lambda event: contextMenuDataFilesInfo(self.ui.DataSet_fileAttributs_listView,event,self)
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-# except:
-#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(folder,"loadFile.ui"))
 
 DataSetManagerBase, DataSetManagerForm = loadUI('loadFile.ui')
-
-#try:
-#    # needed when freezing app
-#    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-#    
-#except:
-#    try:
-#        # needed when running app local through fbs
-#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
-#        
-#    except:
-#        # needed when running app after pip install
-#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
-        
+       
         
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):

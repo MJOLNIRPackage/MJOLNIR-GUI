@@ -231,6 +231,7 @@ def Cut1D_toggle_CutDir_function(self):
         self.ui.Cut1D_StopLabel.setText('Stop')
         self.ui.Cut1D_HEnd_lineEdit.setEnabled(True)
         self.ui.Cut1D_KEnd_lineEdit.setEnabled(True)
+        self.ui.Cut1D_MinPixel_label.setText('Min Pixel [1/AA]')
         if self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked(): # If RLU units
             self.ui.Cut1D_LEnd_lineEdit.setEnabled(True)
     else: # Changing to AA
@@ -239,6 +240,7 @@ def Cut1D_toggle_CutDir_function(self):
         self.ui.Cut1D_HEnd_lineEdit.setEnabled(False)
         self.ui.Cut1D_KEnd_lineEdit.setEnabled(False)
         self.ui.Cut1D_LEnd_lineEdit.setEnabled(False)
+        self.ui.Cut1D_MinPixel_label.setText('Min Pixel [meV]')
 
 
 #@ProgressBarDecoratorArguments(runningText='Saving to file',completedText='Saving Done')
@@ -251,13 +253,6 @@ def Cut1D_Save_To_uFit(self,saveFile):
     datasets = self.Cut1DModel.dataCuts1D
     for data in datasets:
         data.ufit.meta['title'] = data.name
-    
-    #if not hasattr(self,'ufitsaveFile'):
-    #    folder = path.dirname(self.loadedSettingsFile)
-    #    fileName = path.join(folder,datasets[0].uFitDataset.meta['title']+'.ufit')
-    #self.ufitsaveFile = fileName
-    #
-    #saveFile,_ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File',self.ufitsaveFile)
 
     self.ufitsaveFile = saveFile
     session = UfitSession()

@@ -1,14 +1,6 @@
 import sys
 sys.path.append('..')
 
-# try:
-#     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
-#     import MJOLNIRGui.src.main.python._tools as _GUItools
-# except ImportError:
-#     from _tools import ProgressBarDecoratorArguments
-#     import _tools as _GUItools
-# from PyQt5 import QtWidgets,uic,QtGui,QtCore
-
 from MJOLNIR._tools import EnergyK,WavelengthK,WavelengthEnergy,EnergyWavelength,KEnergy,KWavelength
 try:
     from _tools import loadUI
@@ -19,27 +11,9 @@ from PyQt5 import QtGui
 
 # Handles all functionality related to the CalculatorGeneralManager. 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_General.ui"))
-# except:
-#     CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = uic.loadUiType(path.join(folder,"Calculator_General.ui"))
-
 
 CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = loadUI('Calculator_General.ui')
 
-#try:
-#    CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_General.ui"))
-#except:
-#    try:
-#        CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator_General.ui"))
-#    except:
-#        CalculatorGeneralManagerBase, CalculatorGeneralManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator_General.ui"))
-# All of this connects the buttons and their functions to the main window.
        
 
 def textChangedWavelength(manager):

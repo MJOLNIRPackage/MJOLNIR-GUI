@@ -111,15 +111,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
         self.colormap = 'viridis'
-        
-        #if guiSettings is None:
-        #    self.theme = 'light'
-        #else:
-        #    if not 'theme' in guiSettings:
-        #        self.theme = 'light'
-        #    else:
-        #        self.theme = guiSettings['theme']
-                
+        self.currentFolder = ''
 
         
         self.ui.setupUi(self)
@@ -523,7 +515,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         radioButtonString = self.generateCurrentRadioButtonSettings()
         spinBoxString = self.generateCurrentSpinBoxSettings()
         checkBoxString = self.generateCurrentcheckBoxSettings()
-        fileDir = self.getCurrentDirectory()
+        fileDir = ''
         logbookPreset = self.logbookPreset.copy()
         if hasattr(self,'predictionSettings'):
             predictionSettings  = self.predictionSettings
@@ -804,12 +796,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                     pass
 
 
-    def getCurrentDirectory(self):
-        return self.ui.DataSet_path_lineEdit.text()
-
     def setCurrentDirectory(self,folder):
         self.currentFolder = folder
-        self.ui.DataSet_path_lineEdit.setText(folder)
         
     def writeToStatus(self,text):
         self.log.append(text)

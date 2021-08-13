@@ -16,24 +16,10 @@ except ModuleNotFoundError:
 
 # Handles all functionality related to the CalculatorAdvancedManager. 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_Advanced.ui"))
-# except:
-#     CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = uic.loadUiType(path.join(folder,"Calculator_Advanced.ui"))
 
 CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = loadUI('Calculator_Advanced.ui')
-#try:
-#    CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator_Advanced.ui"))
-#except:
-#    try:
-#        CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator_Advanced.ui"))
-#    except:
-#        CalculatorAdvancedManagerBase, CalculatorAdvancedManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator_Advanced.ui"))
+
+
 # All of this connects the buttons and their functions to the main window.
        
 

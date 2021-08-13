@@ -20,29 +20,10 @@ import pyperclip
 
 # Handles all functionality related to the PredictionToolManager. 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
-# except:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(folder,"Prediction.ui"))
-
 
 PredictionToolManagerBase, PredictionToolManagerForm = loadUI('Prediction.ui')
 
-# try:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
-# except:
-#     try:
-#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Prediction.ui"))
-#     except:
-#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Prediction.ui"))
 # All of this connects the buttons and their functions to the main window.
-       
-
 
 def FocusOut(self,event,manager):
     """Custom function to overwrite default FocusOut event"""
@@ -507,8 +488,4 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
 
     def closeEvent(self, event):
-        #if hasattr(self.guiWindow,'BraggListWindow'):
-        #    self.guiWindow.braggPoints = self.guiWindow.BraggListWindow.BraggListModel.data
-        #else:
-        #    self.guiWindow.braggPoints = None
         self.updateSettings()
