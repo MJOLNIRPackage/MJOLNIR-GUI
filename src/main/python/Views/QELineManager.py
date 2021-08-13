@@ -93,6 +93,13 @@ def QELine_plot_button_function(self):
         _GUItools.dialog(text='QELine cut could not be made. Check the limits for the cut and try again!')
         return False
 
+def QELine_Grid_checkBox_toggled_function(self):
+    if hasattr(self,'QELine'):
+        if self.ui.QELine_Grid_checkBox.isChecked():
+            self.QELine.grid(True)
+        else:
+            self.QELine.grid(False)
+        
 def QELine_toggle_units_function(self):
     if self.ui.QELine_SelectUnits_RLU_radioButton.isChecked(): # changed to RLU
         # Change titles
@@ -118,10 +125,20 @@ def QELine_setCAxis_button_function(self):
 
 def QELine_SetTitle_button_function(self):
     if hasattr(self, 'QELine'):
-        TitleText=self.ui.QELine_SetTitle_lineEdit.text()        
+        TitleText=self.ui.QELine_SetTitle_lineEdit.text()
+        if TitleText == '':
+            TitleText = self.ui.QELine_SetTitle_lineEdit.placeholderText()
         self.QELine.set_title(TitleText)
         fig = self.QELine.get_figure()
         fig.canvas.draw()
+
+def QELine_DataSet_selectionChanged_function(self):
+    ds = self.DataSetModel.getCurrentDataSet()
+    if not ds is None:
+        title = ds.name
+    else:
+        title = ''
+    self.ui.QELine_SetTitle_lineEdit.setPlaceholderText(title)
 
 QELineManagerBase, QELineManagerForm = loadUI('QELine.ui')
 
@@ -137,6 +154,8 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
         self.guiWindow.QELine_setCAxis_button_function = lambda: QELine_setCAxis_button_function(self.guiWindow)
         self.guiWindow.QELine_SetTitle_button_function = lambda: QELine_SetTitle_button_function(self.guiWindow)
         self.guiWindow.QELine_toggle_units_function = lambda: QELine_toggle_units_function(self.guiWindow)
+        self.guiWindow.QELine_DataSet_selectionChanged_function = lambda: QELine_DataSet_selectionChanged_function(self.guiWindow)
+        self.guiWindow.QELine_Grid_checkBox_toggled_function = lambda: QELine_Grid_checkBox_toggled_function(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'QELine' in key:
@@ -151,8 +170,11 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
 
         self.guiWindow.ui.QELine_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
         self.guiWindow.ui.QELine_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
-
+        self.guiWindow.ui.QELine_Grid_checkBox.toggled.connect(self.guiWindow.QELine_Grid_checkBox_toggled_function)
         self.guiWindow.ui.QELine_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
+
+        self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.QELine_DataSet_selectionChanged_function)
+        self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.QELine_DataSet_selectionChanged_function)
 
     def CAxisChanged(self):
         if self.guiWindow.ui.QELine_setCAxis_button.isEnabled():

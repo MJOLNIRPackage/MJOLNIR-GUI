@@ -202,8 +202,9 @@ def Cut1D_Generate1D_button_function(self):
 
 def Cut1D_SetTitle_button_function(self):
     TitleText=self.ui.Cut1D_SetTitle_lineEdit.text()        
+    if TitleText == '':
+            TitleText = self.ui.Cut1D_SetTitle_lineEdit.getPlaceholderText()
     if hasattr(self, 'Cut1D'):
-        TitleText=self.ui.Cut1D_SetTitle_lineEdit.text()        
         self.Cut1D.set_title(TitleText)
         fig = self.Cut1D.get_figure()
         fig.canvas.draw()
@@ -277,6 +278,14 @@ def plotItem(self,item):
     self.windows.append(fig)
 
 
+def Cut1D_DataSet_selectionChanged_function(self):
+    ds = self.DataSetModel.getCurrentDataSet()
+    if not ds is None:
+        title = ds.name
+    else:
+        title = ''
+    self.ui.Cut1D_SetTitle_lineEdit.setPlaceholderText(title)
+
 Cut1DManagerBase, Cut1DManagerForm = loadUI('Cut1D.ui')
 
 class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
@@ -294,6 +303,7 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.Cut1D_toggle_units_function = lambda: Cut1D_toggle_units_function(self.guiWindow)
         self.guiWindow.Cut1D_toggle_CutDir_function = lambda: Cut1D_toggle_CutDir_function(self.guiWindow)
         self.guiWindow.Cut1D_Save_To_uFit = lambda location: Cut1D_Save_To_uFit(self.guiWindow,location)
+        self.guiWindow.Cut1D_DataSet_selectionChanged_function = lambda: Cut1D_DataSet_selectionChanged_function(self.guiWindow)
 
         self.guiWindow.plotItem = lambda item: plotItem(self.guiWindow,item)
 
@@ -315,6 +325,9 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.ui.Cut1D_Export1D_button.clicked.connect(self.guiWindow.Cut1D_Export1D_button_function)
 
         self.guiWindow.ui.Cut1D_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
+
+        self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
+        self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
     
     
     def TitleChanged(self):

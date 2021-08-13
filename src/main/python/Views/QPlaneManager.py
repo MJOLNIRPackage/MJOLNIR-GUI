@@ -64,12 +64,29 @@ def QPlane_setCAxis_button_function(self):
     
 def QPlane_SetTitle_button_function(self):
     TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
+    if TitleText == '':
+        TitleText = self.ui.QPlane_SetTitle_lineEdit.placeholderText()
     if hasattr(self, 'QPlane'):
-        TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
+        
         self.QPlane.set_title(TitleText)
         fig = self.QPlane.get_figure()
         fig.canvas.draw()
     
+
+def QPlane_Grid_checkBox_toggled_function(self):
+    if hasattr(self,'QPlane'):
+        if self.ui.QPlane_Grid_checkBox.isChecked():
+            self.QPlane.grid(True)
+        else:
+            self.QPlane.grid(False)
+
+def QPlane_DataSet_selectionChanged_function(self):
+    ds = self.DataSetModel.getCurrentDataSet()
+    if not ds is None:
+        title = ds.name
+    else:
+        title = ''
+    self.ui.QPlane_SetTitle_lineEdit.setPlaceholderText(title)
 
 QPlaneManagerBase, QPlaneManagerForm = loadUI('QPlane.ui')
 
@@ -84,6 +101,8 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.QPlane_plot_button_function = lambda: QPlane_plot_button_function(self.guiWindow)
         self.guiWindow.QPlane_setCAxis_button_function = lambda: QPlane_setCAxis_button_function(self.guiWindow)
         self.guiWindow.QPlane_SetTitle_button_function = lambda: QPlane_SetTitle_button_function(self.guiWindow)
+        self.guiWindow.QPlane_Grid_checkBox_toggled_function = lambda: QPlane_Grid_checkBox_toggled_function(self.guiWindow)
+        self.guiWindow.QPlane_DataSet_selectionChanged_function = lambda: QPlane_DataSet_selectionChanged_function(self.guiWindow)
         for key,value in self.__dict__.items():
             if 'QPlane' in key:
                 self.guiWindow.ui.__dict__[key] = value
@@ -97,7 +116,11 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.ui.QPlane_CAxisMax_lineEdit.returnPressed.connect(self.CAxisChanged)
         self.guiWindow.ui.QPlane_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
 
+        self.guiWindow.ui.QPlane_Grid_checkBox.toggled.connect(self.guiWindow.QPlane_Grid_checkBox_toggled_function)
         self.guiWindow.ui.QPlane_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
+
+        self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.QPlane_DataSet_selectionChanged_function)
+        self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.QPlane_DataSet_selectionChanged_function)
 
     def CAxisChanged(self):
         if self.guiWindow.ui.QPlane_setCAxis_button.isEnabled():
