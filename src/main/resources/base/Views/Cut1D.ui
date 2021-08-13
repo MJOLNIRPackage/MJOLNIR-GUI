@@ -7,19 +7,37 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>340</height>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QPushButton" name="Cut1D_Generate1D_button">
+         <property name="toolTip">
+          <string>Generate 1D cut and add to list</string>
+         </property>
+         <property name="statusTip">
+          <string>Generate 1D cut and add to list</string>
+         </property>
          <property name="text">
           <string>Generate 1D cut</string>
          </property>
@@ -27,6 +45,12 @@
        </item>
        <item row="0" column="1">
         <widget class="QPushButton" name="Cut1D_plot_button">
+         <property name="toolTip">
+          <string>Generate and plot 1D cut and add to list</string>
+         </property>
+         <property name="statusTip">
+          <string>Generate and plot 1D cut and add to list</string>
+         </property>
          <property name="text">
           <string>Plot 1D cut</string>
          </property>
@@ -34,6 +58,12 @@
        </item>
        <item row="1" column="0">
         <widget class="QPushButton" name="Cut1D_Delete1D_button">
+         <property name="toolTip">
+          <string>Delete current cut(s) from list</string>
+         </property>
+         <property name="statusTip">
+          <string>Delete current cut(s) from list</string>
+         </property>
          <property name="text">
           <string>Delete 1D cut</string>
          </property>
@@ -43,6 +73,12 @@
      </item>
      <item row="1" column="0">
       <widget class="QListView" name="Cut1D_listView">
+       <property name="toolTip">
+        <string>List of generated cuts</string>
+       </property>
+       <property name="statusTip">
+        <string>List of generated cuts</string>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
@@ -55,6 +91,12 @@
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="0">
         <widget class="QLabel" name="Cut1D_StartLabel">
+         <property name="toolTip">
+          <string>Start position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Start position for cut</string>
+         </property>
          <property name="text">
           <string>Start</string>
          </property>
@@ -62,6 +104,12 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="Cut1D_StopLabel">
+         <property name="toolTip">
+          <string>End position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>End position for cut</string>
+         </property>
          <property name="text">
           <string>End</string>
          </property>
@@ -69,6 +117,12 @@
        </item>
        <item row="2" column="1">
         <widget class="QLineEdit" name="Cut1D_HEnd_lineEdit">
+         <property name="toolTip">
+          <string>End position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>End position for cut</string>
+         </property>
          <property name="text">
           <string>-1</string>
          </property>
@@ -76,6 +130,12 @@
        </item>
        <item row="1" column="1">
         <widget class="QLineEdit" name="Cut1D_HStart_lineEdit">
+         <property name="toolTip">
+          <string>Start position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Start position for cut</string>
+         </property>
          <property name="text">
           <string>-1</string>
          </property>
@@ -83,6 +143,12 @@
        </item>
        <item row="0" column="2">
         <widget class="QLabel" name="Cut1D_Klabel">
+         <property name="toolTip">
+          <string>Unit of 1D cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Unit of 1D cut</string>
+         </property>
          <property name="text">
           <string>K</string>
          </property>
@@ -93,6 +159,12 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="Cut1D_Hlabel">
+         <property name="toolTip">
+          <string>Unit of 1D cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Unit of 1D cut</string>
+         </property>
          <property name="text">
           <string>H</string>
          </property>
@@ -103,6 +175,12 @@
        </item>
        <item row="0" column="3">
         <widget class="QLabel" name="Cut1D_Llabel">
+         <property name="toolTip">
+          <string>Unit of 1D cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Unit of 1D cut</string>
+         </property>
          <property name="text">
           <string>L</string>
          </property>
@@ -113,6 +191,12 @@
        </item>
        <item row="1" column="2">
         <widget class="QLineEdit" name="Cut1D_KStart_lineEdit">
+         <property name="toolTip">
+          <string>Start position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Start position for cut</string>
+         </property>
          <property name="text">
           <string>0</string>
          </property>
@@ -120,6 +204,12 @@
        </item>
        <item row="2" column="2">
         <widget class="QLineEdit" name="Cut1D_KEnd_lineEdit">
+         <property name="toolTip">
+          <string>End position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>End position for cut</string>
+         </property>
          <property name="text">
           <string>0</string>
          </property>
@@ -127,6 +217,12 @@
        </item>
        <item row="1" column="3">
         <widget class="QLineEdit" name="Cut1D_LStart_lineEdit">
+         <property name="toolTip">
+          <string>Start position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Start position for cut</string>
+         </property>
          <property name="text">
           <string>-1</string>
          </property>
@@ -134,6 +230,12 @@
        </item>
        <item row="2" column="3">
         <widget class="QLineEdit" name="Cut1D_LEnd_lineEdit">
+         <property name="toolTip">
+          <string>End position for cut</string>
+         </property>
+         <property name="statusTip">
+          <string>End position for cut</string>
+         </property>
          <property name="text">
           <string>1</string>
          </property>
@@ -145,6 +247,12 @@
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="1" column="1">
         <widget class="QLineEdit" name="Cut1D_EMin_lineEdit">
+         <property name="toolTip">
+          <string>Minimum energy in meV</string>
+         </property>
+         <property name="statusTip">
+          <string>Minimum energy in meV</string>
+         </property>
          <property name="text">
           <string>4</string>
          </property>
@@ -152,6 +260,12 @@
        </item>
        <item row="1" column="2">
         <widget class="QLineEdit" name="Cut1D_EMax_lineEdit">
+         <property name="toolTip">
+          <string>Maximum energy in meV</string>
+         </property>
+         <property name="statusTip">
+          <string>Maximum energy in meV</string>
+         </property>
          <property name="text">
           <string>5</string>
          </property>
@@ -168,6 +282,12 @@
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QLabel" name="label_3">
+           <property name="toolTip">
+            <string>Units used for cut</string>
+           </property>
+           <property name="statusTip">
+            <string>Units used for cut</string>
+           </property>
            <property name="text">
             <string>Units</string>
            </property>
@@ -178,6 +298,12 @@
          </item>
          <item>
           <widget class="QRadioButton" name="Cut1D_SelectUnits_RLU_radioButton">
+           <property name="toolTip">
+            <string>Units used for cut</string>
+           </property>
+           <property name="statusTip">
+            <string>Units used for cut</string>
+           </property>
            <property name="text">
             <string>RLU</string>
            </property>
@@ -191,6 +317,12 @@
          </item>
          <item>
           <widget class="QRadioButton" name="Cut1D_SelectUnits_AA_radioButton">
+           <property name="toolTip">
+            <string>Units used for cut</string>
+           </property>
+           <property name="statusTip">
+            <string>Units used for cut</string>
+           </property>
            <property name="text">
             <string>AA-1</string>
            </property>
@@ -216,6 +348,12 @@
        </item>
        <item row="3" column="2">
         <widget class="QRadioButton" name="Cut1D_SelectCut_Q_radioButton_2">
+         <property name="toolTip">
+          <string>Perform cut along E for constant Q</string>
+         </property>
+         <property name="statusTip">
+          <string>Perform cut along E for constant Q</string>
+         </property>
          <property name="text">
           <string>Cut along E</string>
          </property>
@@ -226,6 +364,12 @@
        </item>
        <item row="2" column="2">
         <widget class="QRadioButton" name="Cut1D_SelectCut_Q_radioButton">
+         <property name="toolTip">
+          <string>Perform cut along Q for constant E</string>
+         </property>
+         <property name="statusTip">
+          <string>Perform cut along Q for constant E</string>
+         </property>
          <property name="text">
           <string>Cut along Q</string>
          </property>
@@ -239,6 +383,12 @@
        </item>
        <item row="2" column="1">
         <widget class="QLineEdit" name="Cut1D_Width_lineEdit">
+         <property name="toolTip">
+          <string>Width orthogonal to cut over which integration is performed</string>
+         </property>
+         <property name="statusTip">
+          <string>Width orthogonal to cut over which integration is performed</string>
+         </property>
          <property name="text">
           <string>0.2</string>
          </property>
@@ -246,6 +396,12 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="label_2">
+         <property name="toolTip">
+          <string>Minimum energy in meV</string>
+         </property>
+         <property name="statusTip">
+          <string>Minimum energy in meV</string>
+         </property>
          <property name="text">
           <string>Min</string>
          </property>
@@ -257,10 +413,23 @@
        <item row="5" column="0">
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QLineEdit" name="Cut1D_SetTitle_lineEdit"/>
+          <widget class="QLineEdit" name="Cut1D_SetTitle_lineEdit">
+           <property name="toolTip">
+            <string>Set title of current figure</string>
+           </property>
+           <property name="statusTip">
+            <string>Set title of current figure</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="Cut1D_SetTitle_button">
+           <property name="toolTip">
+            <string>Set title of current figure</string>
+           </property>
+           <property name="statusTip">
+            <string>Set title of current figure</string>
+           </property>
            <property name="text">
             <string>Set Title</string>
            </property>
@@ -283,6 +452,12 @@
        </item>
        <item row="0" column="2">
         <widget class="QLabel" name="label_8">
+         <property name="toolTip">
+          <string>Maximum energy in meV</string>
+         </property>
+         <property name="statusTip">
+          <string>Maximum energy in meV</string>
+         </property>
          <property name="text">
           <string>Max</string>
          </property>
@@ -292,7 +467,13 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="Cut1D_MinPixel_label">
+         <property name="toolTip">
+          <string>Integration step size along cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Integration step size along cut</string>
+         </property>
          <property name="text">
           <string>Min Pixel [1/AA]</string>
          </property>
@@ -300,6 +481,12 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_10">
+         <property name="toolTip">
+          <string>Width orthogonal to cut over which integration is performed</string>
+         </property>
+         <property name="statusTip">
+          <string>Width orthogonal to cut over which integration is performed</string>
+         </property>
          <property name="text">
           <string>Q width [1/AA]</string>
          </property>
@@ -307,6 +494,12 @@
        </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="Cut1D_MinPixel_lineEdit">
+         <property name="toolTip">
+          <string>Integration step size along cut</string>
+         </property>
+         <property name="statusTip">
+          <string>Integration step size along cut</string>
+         </property>
          <property name="text">
           <string>0.03</string>
          </property>
@@ -318,6 +511,12 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="toolTip">
+      <string>Export current list of cuts</string>
+     </property>
+     <property name="statusTip">
+      <string>Export current list of cuts</string>
+     </property>
      <property name="title">
       <string>Export</string>
      </property>
@@ -364,6 +563,12 @@
       </item>
       <item>
        <widget class="QLineEdit" name="Cut1D_ExportName_lineEdit">
+        <property name="toolTip">
+         <string>Name of exported file(s) - Include a '#' to insert given name of cut</string>
+        </property>
+        <property name="statusTip">
+         <string>Name of exported file(s) - Include a '#' to insert given name of cut</string>
+        </property>
         <property name="text">
          <string>1DCut_#.csv</string>
         </property>
@@ -409,8 +614,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>233</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,8 +20,26 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="PropertiesView3D">
+     <property name="toolTip">
+      <string>Properties for current figure</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for current figure</string>
+     </property>
      <property name="title">
       <string>Properties</string>
      </property>
@@ -29,10 +47,23 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QLineEdit" name="View3D_SetTitle_lineEdit"/>
+         <widget class="QLineEdit" name="View3D_SetTitle_lineEdit">
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="View3D_SetTitle_button">
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
           <property name="text">
            <string>Set Title</string>
           </property>
@@ -44,6 +75,12 @@
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="2" column="0">
              <widget class="QLabel" name="label_7">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
               <property name="text">
                <string>C Axis max</string>
               </property>
@@ -51,6 +88,12 @@
             </item>
             <item row="3" column="0">
              <widget class="QLabel" name="label_6">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
               <property name="text">
                <string>C Axis min</string>
               </property>
@@ -58,6 +101,12 @@
             </item>
             <item row="3" column="2">
              <widget class="QLineEdit" name="View3D_CAxisMin_lineEdit">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
               <property name="text">
                <string>0</string>
               </property>
@@ -65,6 +114,12 @@
             </item>
             <item row="2" column="2">
              <widget class="QLineEdit" name="View3D_CAxisMax_lineEdit">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
               <property name="text">
                <string>1e-5</string>
               </property>
@@ -76,6 +131,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="View3D_setCAxis_button">
+          <property name="toolTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
           <property name="text">
            <string>Set C Axis</string>
           </property>
@@ -95,6 +156,12 @@
           </item>
           <item>
            <widget class="QCheckBox" name="View3D_CurratAxe_checkBox">
+            <property name="toolTip">
+             <string>Show or hide Currat-Axe spurions in current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Show or hide Currat-Axe spurions in current figure</string>
+            </property>
             <property name="text">
              <string>Plot Currat-Axe spurions</string>
             </property>
@@ -123,6 +190,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QGroupBox" name="slecetView_groupBox">
+            <property name="toolTip">
+             <string>Select view direction of current figure (Use also 0,1, and 2)</string>
+            </property>
+            <property name="statusTip">
+             <string>Select view direction of current figure (Use also 0,1, and 2)</string>
+            </property>
             <property name="title">
              <string>Select View</string>
             </property>
@@ -177,6 +250,12 @@
           </item>
           <item>
            <widget class="QCheckBox" name="View3D_Grid_checkBox">
+            <property name="toolTip">
+             <string>Show/hide grid on current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Show/hide grid on current figure</string>
+            </property>
             <property name="text">
              <string>Grid</string>
             </property>
@@ -207,6 +286,12 @@
    </item>
    <item>
     <widget class="QGroupBox" name="CreateNewView3D_groupBox">
+     <property name="toolTip">
+      <string>Properties for new plot</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for new plot</string>
+     </property>
      <property name="title">
       <string>Create View3D</string>
      </property>
@@ -356,6 +441,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QCheckBox" name="View3D_RawCounts_checkBox">
+          <property name="toolTip">
+           <string>Use neutron counts in stead of intensity</string>
+          </property>
+          <property name="statusTip">
+           <string>Use neutron counts in stead of intensity</string>
+          </property>
           <property name="text">
            <string>Raw Counts</string>
           </property>
@@ -363,6 +454,12 @@
         </item>
         <item>
          <widget class="QCheckBox" name="View3D_LogScale_checkBox">
+          <property name="toolTip">
+           <string>Use log scale of intensity when plotting</string>
+          </property>
+          <property name="statusTip">
+           <string>Use log scale of intensity when plotting</string>
+          </property>
           <property name="text">
            <string>Log Scale</string>
           </property>
@@ -385,6 +482,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="View3D_plot_button">
+        <property name="toolTip">
+         <string>Generate 3D Viewer</string>
+        </property>
+        <property name="statusTip">
+         <string>Generate 3D Viewer</string>
+        </property>
         <property name="text">
          <string>Plot View 3D</string>
         </property>
@@ -411,8 +514,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

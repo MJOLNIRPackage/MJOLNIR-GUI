@@ -7,94 +7,132 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>90</height>
+    <height>67</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="verticalSpacing">
-      <number>6</number>
-     </property>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="Raw1D_Analyzer_spinBox">
-       <property name="maximum">
-        <number>7</number>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="verticalSpacing">
+        <number>6</number>
        </property>
-      </widget>
+       <item row="1" column="0">
+        <widget class="QLabel" name="Raw1D_Detector_label">
+         <property name="text">
+          <string>Detector number (A4 = +0.00 deg)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="Raw1D_Analyzer_Original_label">
+         <property name="toolTip">
+          <string>Analyzer Selected in DataFile</string>
+         </property>
+         <property name="statusTip">
+          <string>Analyzer Selected in DataFile</string>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Original N/A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="Raw1D_Detector_Original_label">
+         <property name="toolTip">
+          <string>Detector Selected in DataFile</string>
+         </property>
+         <property name="statusTip">
+          <string>Detector Selected in DataFile</string>
+         </property>
+         <property name="text">
+          <string>Original N/A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="Raw1D_Analyzer_spinBox">
+         <property name="toolTip">
+          <string>Analyzer selection</string>
+         </property>
+         <property name="statusTip">
+          <string>Analyzer to use for plot</string>
+         </property>
+         <property name="maximum">
+          <number>7</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="Raw1D_Analyzer_label">
+         <property name="text">
+          <string>Analyzer number (Ef = 0.00 meV)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
+         <property name="toolTip">
+          <string>Detector selection</string>
+         </property>
+         <property name="statusTip">
+          <string>Detector to use for plot</string>
+         </property>
+         <property name="maximum">
+          <number>103</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="Raw1D_Analyzer_label">
-       <property name="text">
-        <string>Analyzer number (Ef = 0.00 meV)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="Raw1D_Analyzer_Original_label">
-       <property name="text">
-        <string>Original N/A</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="Raw1D_Detector_label">
-       <property name="text">
-        <string>Detector number (A4 = +0.00 deg)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="Raw1D_Detector_spinBox">
-       <property name="maximum">
-        <number>103</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="Raw1D_Detector_Original_label">
-       <property name="text">
-        <string>Original N/A</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <spacer name="verticalSpacer">
+     <item>
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>20</width>
-         <height>5</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
      </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QPushButton" name="Raw1D_plot_button">
+         <property name="toolTip">
+          <string>Plot selected detector and analyzer</string>
+         </property>
+         <property name="statusTip">
+          <string>Plot selected detector and analyzer</string>
+         </property>
          <property name="text">
           <string>Plot raw data</string>
          </property>
@@ -102,6 +140,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="Raw1D_fit_button">
+         <property name="toolTip">
+          <string>Fit selected detector and analyzer</string>
+         </property>
+         <property name="statusTip">
+          <string>Fit selected detector and analyzer</string>
+         </property>
          <property name="text">
           <string>Fit raw data</string>
          </property>

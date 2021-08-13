@@ -35,6 +35,12 @@
        </property>
        <item>
         <widget class="QPushButton" name="DataSet_NewDataSet_button">
+         <property name="toolTip">
+          <string>Create new DataSet</string>
+         </property>
+         <property name="statusTip">
+          <string>Create new DataSet</string>
+         </property>
          <property name="text">
           <string>New Data Set</string>
          </property>
@@ -42,6 +48,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="DataSet_DeleteDataSet_button">
+         <property name="toolTip">
+          <string>Delete selected DataSet</string>
+         </property>
+         <property name="statusTip">
+          <string>Delete selected DataSet</string>
+         </property>
          <property name="text">
           <string>Delete Data Set</string>
          </property>
@@ -49,6 +61,12 @@
        </item>
        <item>
         <widget class="QListView" name="DataSet_DataSets_listView">
+         <property name="toolTip">
+          <string>List of DataSets</string>
+         </property>
+         <property name="statusTip">
+          <string>List of DataSets</string>
+         </property>
          <property name="dragEnabled">
           <bool>false</bool>
          </property>
@@ -72,12 +90,18 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,1">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QPushButton" name="DataSet_AddFiles_button">
+         <property name="toolTip">
+          <string>Add DataFile(s)</string>
+         </property>
+         <property name="statusTip">
+          <string>Add DataFile(s)</string>
+         </property>
          <property name="text">
           <string>Add Files</string>
          </property>
@@ -85,20 +109,25 @@
        </item>
        <item>
         <widget class="QPushButton" name="DataSet_DeleteFiles_button">
+         <property name="toolTip">
+          <string>Delete selected DataFile(s)</string>
+         </property>
+         <property name="statusTip">
+          <string>Delete selected DataFile(s)</string>
+         </property>
          <property name="text">
           <string>Delete Files</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="DataSet_path_lineEdit">
-         <property name="text">
-          <string>/path/to/data</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QListView" name="DataSet_filenames_listView">
+         <property name="toolTip">
+          <string>List of DataFIle(s) in selected DataSet</string>
+         </property>
+         <property name="statusTip">
+          <string>List of DataFIle(s) in selected DataSet</string>
+         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
          </property>
@@ -121,6 +150,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="toolTip">
+            <string>Select binning for conversion of DataSet</string>
+           </property>
+           <property name="statusTip">
+            <string>Select binning for conversion of DataSet</string>
+           </property>
            <property name="text">
             <string>Select Binning</string>
            </property>
@@ -128,6 +163,12 @@
          </item>
          <item>
           <widget class="QComboBox" name="DataSet_binning_comboBox">
+           <property name="toolTip">
+            <string>Select binning for conversion of DataSet</string>
+           </property>
+           <property name="statusTip">
+            <string>Select binning for conversion of DataSet</string>
+           </property>
            <property name="currentIndex">
             <number>2</number>
            </property>
@@ -150,6 +191,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="DataSet_convertData_button">
+           <property name="toolTip">
+            <string>Convert selected DataSet</string>
+           </property>
+           <property name="statusTip">
+            <string>Convert selected DataSet</string>
+           </property>
            <property name="text">
             <string>Convert</string>
            </property>
@@ -164,6 +211,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>List of properties of selected DataFile(s)</string>
+         </property>
+         <property name="statusTip">
+          <string>List of properties of selected DataFile(s)</string>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustIgnored</enum>
