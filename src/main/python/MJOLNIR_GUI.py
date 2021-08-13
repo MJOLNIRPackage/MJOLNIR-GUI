@@ -968,6 +968,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 else:
                     bL = self.braggPoints.copy()
                 self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+                self.BraggListWindow.BraggListModel.layoutChanged.connect(self.View3D_changed_CurratAxeList_function)
+
                 #self.braggPoints = self.BraggListWindow.BraggListModel.data
             self.windows.append(self.BraggListWindow)
             self.BraggListWindow.show()
@@ -978,6 +980,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             else:
                 bL = self.braggPoints.copy()
             self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+            self.BraggListWindow.BraggListModel.layoutChanged.connect(self.View3D_changed_CurratAxeList_function)
             self.windows.append(self.BraggListWindow)
             self.BraggListWindow.show()
 

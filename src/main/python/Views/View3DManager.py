@@ -53,6 +53,8 @@ def View3D_SelectView_QxQy_radioButton_function(self):
 def View3D_SetTitle_button_function(self):        
     if hasattr(self, 'V'):
         TitleText=self.ui.View3D_SetTitle_lineEdit.text()
+        if TitleText == '':
+            TitleText = self.ui.View3D_SetTitle_lineEdit.placeholderText()
         if isinstance(self.V,Viewer3D.Viewer3D):
             self.V.ax.set_title(TitleText)
             
@@ -147,7 +149,32 @@ def View3D_toggle_mode_function(self):
         self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(False)
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
         
-        
+def View3D_toggle_plotCurratAxe_function(self):
+    if hasattr(self,'V'):
+        self.V.plotCurratAxe = self.ui.View3D_CurratAxe_checkBox.isChecked()
+
+def View3D_changed_CurratAxeList_function(self):
+    if hasattr(self,'V'):
+        self.V.CurratAxeBraggList = self.getBraggPoints()
+
+def View3D_DataSet_selectionChanged_function(self):
+    ds = self.DataSetModel.getCurrentDataSet()
+    if not ds is None:
+        title = ds.name
+    else:
+        title = ''
+    self.ui.View3D_SetTitle_lineEdit.setPlaceholderText(title)
+    
+def View3D_Grid_checkBox_toggled_function(self):
+    if hasattr(self,'V'):
+        if self.ui.View3D_Grid_checkBox.isChecked():
+            self.V.grid = True
+            self.V.gridZOrder=9
+        else:
+            self.V.grid = False
+            self.V.gridZOrder=9
+        for ax in self.V._axes:
+            ax.grid(self.V.grid,zorder=self.V.gridZOrder)
 # if platform.system() == 'Darwin':
 #     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
 # else: 
@@ -186,6 +213,10 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.View3D_SetTitle_button_function = lambda:View3D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.View3D_plot_button_function = lambda:View3D_plot_button_function(self.guiWindow)
         self.guiWindow.View3D_toggle_mode_function = lambda: View3D_toggle_mode_function(self.guiWindow)
+        self.guiWindow.View3D_toggle_plotCurratAxe_function = lambda: View3D_toggle_plotCurratAxe_function(self.guiWindow)
+        self.guiWindow.View3D_changed_CurratAxeList_function = lambda: View3D_changed_CurratAxeList_function(self.guiWindow)
+        self.guiWindow.View3D_DataSet_selectionChanged_function = lambda: View3D_DataSet_selectionChanged_function(self.guiWindow)
+        self.guiWindow.View3D_Grid_checkBox_toggled_function = lambda: View3D_Grid_checkBox_toggled_function(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'View3D' in key:
@@ -205,6 +236,13 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
         self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)
         self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
+        self.guiWindow.ui.View3D_CurratAxe_checkBox.toggled.connect(self.guiWindow.View3D_toggle_plotCurratAxe_function)
+        self.guiWindow.ui.View3D_Grid_checkBox.toggled.connect(self.guiWindow.View3D_Grid_checkBox_toggled_function)
+
+        self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.View3D_DataSet_selectionChanged_function)
+        self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.View3D_DataSet_selectionChanged_function)
+        
+        
 
     def titleEnterPressed(self):
         if self.guiWindow.ui.View3D_SetTitle_button.isEnabled():

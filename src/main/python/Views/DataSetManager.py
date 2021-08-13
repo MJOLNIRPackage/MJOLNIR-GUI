@@ -42,7 +42,6 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
     self.ui.DataSet_DataSets_listView.setSelectionModel(self.DataSetSelectionModel)
     
-    self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
     def checkUpdatedName(self,index,*args):
         ds = self.model().data(index)
         suggestedName = self.model().generateValidName(ds)
@@ -91,7 +90,7 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     self.ui.DataSet_DeleteFiles_button.setToolTip('Delete selected Datafile')
     self.ui.DataSet_DeleteFiles_button.setStatusTip(self.ui.DataSet_DeleteFiles_button.toolTip())
 
-    self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
+    
 
     self.DataFileInfoModel = DataFileInfoModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,
     DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,dataFileModel=self.DataFileModel,guiWindow=self)
@@ -140,19 +139,14 @@ def DataSet_NewDataSet_button_function(self):
     self.stateMachine.run()
 
 def DataSet_DeleteDataSet_button_function(self):
-    self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
+    idx = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+    self.DataSetModel.delete(idx)
     self.DataFileModel.layoutChanged.emit()
     self.stateMachine.run()
     
 def DataSet_DeleteFiles_button_function(self):
     self.DataFileModel.delete()
     self.stateMachine.run()
-
-def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
-    self.ui.DataSet_DataSets_listView.edit(index)
-
-def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
-    self.ui.DataSet_filenames_listView.edit(index)
 
 @ProgressBarDecoratorArguments(runningText='Adding Data Files',completedText='Data Files Added')
 def DataSet_AddFiles_button_function(self):
@@ -349,8 +343,6 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.DataSet_NewDataSet_button_function = lambda:DataSet_NewDataSet_button_function(self.guiWindow)
         self.guiWindow.DataSet_DeleteDataSet_button_function = lambda:DataSet_DeleteDataSet_button_function(self.guiWindow)
         self.guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(self.guiWindow)
-        self.guiWindow.DataSet_DoubleClick_Selection_function = lambda index:DataSet_DoubleClick_Selection_function(self.guiWindow,index)
-        self.guiWindow.DataFile_DoubleClick_Selection_function = lambda index:DataFile_DoubleClick_Selection_function(self.guiWindow,index)
 
         self.guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(self.guiWindow)
 
@@ -367,6 +359,7 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataSet_binning_comboBox = lambda:setupDataSet_binning_comboBox(self.guiWindow)
         self.guiWindow.updateBinningComboBox = lambda: updateBinningComboBox(self.guiWindow)
         self.guiWindow.DataSet_binning_comboBox_Changed = lambda:DataSet_binning_comboBox_Changed(self.guiWindow)
+        
         
         
         for key,value in self.__dict__.items():
