@@ -105,6 +105,8 @@ def EmptyEnabled(StateMachine):
             item.setStyleSheet(highlightStyle)
         else:
             item.setStyleSheet(normalStyle)
+    if hasattr(StateMachine.guiWindow.ui,'View3D_SetTitle_lineEdit'):
+        StateMachine.guiWindow.ui.View3D_SetTitle_lineEdit.setPlaceholderText('')
     
 
 ## Transition functions

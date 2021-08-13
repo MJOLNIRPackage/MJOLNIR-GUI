@@ -131,6 +131,11 @@ class DataSetModel(QtCore.QAbstractListModel):
         else:
             if index.row()==self.rowCount(None):
                 self.selectLastDataSet()
+            else:
+                idx = self.index(index.row(),0)# Hack to force index changed emit
+                self.DataSet_DataSets_listView.setCurrentIndex(self.index(-1,0))
+                self.DataSet_DataSets_listView.setCurrentIndex(idx)
+
 
     def item(self,index):
         if not index is None:
