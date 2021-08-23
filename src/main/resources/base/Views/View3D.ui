@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>215</height>
+    <height>239</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,6 +44,18 @@
       <string>Properties</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
@@ -121,7 +133,7 @@
                <string>Set color scale axis of current figure</string>
               </property>
               <property name="text">
-               <string>1e-5</string>
+               <string>0.02</string>
               </property>
              </widget>
             </item>
@@ -168,6 +180,29 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="text">
+           <string>Current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="View3D_figureList_comboBox">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_2">
@@ -272,7 +307,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -296,6 +331,18 @@
       <string>Create View3D</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="1">
@@ -499,16 +546,27 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>View3D_SetTitle_lineEdit</tabstop>
+  <tabstop>View3D_SetTitle_button</tabstop>
   <tabstop>View3D_CAxisMax_lineEdit</tabstop>
   <tabstop>View3D_CAxisMin_lineEdit</tabstop>
+  <tabstop>View3D_setCAxis_button</tabstop>
+  <tabstop>View3D_CurratAxe_button</tabstop>
+  <tabstop>View3D_CurratAxe_checkBox</tabstop>
   <tabstop>View3D_SelectView_QxE_radioButton</tabstop>
   <tabstop>View3D_SelectView_QyE_radioButton</tabstop>
   <tabstop>View3D_SelectView_QxQy_radioButton</tabstop>
-  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
-  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_Grid_checkBox</tabstop>
+  <tabstop>View3D_figureList_comboBox</tabstop>
   <tabstop>View3D_QXBin_lineEdit</tabstop>
   <tabstop>View3D_QYBin_lineEdit</tabstop>
   <tabstop>View3D_EBin_lineEdit</tabstop>
+  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_Mode_Viewer3D_radioButton</tabstop>
+  <tabstop>View3D_Mode_Custom_radioButton</tabstop>
+  <tabstop>View3D_RawCounts_checkBox</tabstop>
+  <tabstop>View3D_LogScale_checkBox</tabstop>
   <tabstop>View3D_plot_button</tabstop>
  </tabstops>
  <resources/>

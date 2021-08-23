@@ -82,12 +82,25 @@ def update1DCutLabels(self):
         self.ui.Cut1D_ExporUFIT_radioButton.setEnabled(True)
 
 def extractCutParameters(self):
+    rlu = self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked()
+    cutQ = self.ui.Cut1D_SelectCut_Q_radioButton.isChecked()
+    
     HStart = self.ui.Cut1D_HStart_lineEdit.text()
-    HEnd = self.ui.Cut1D_HEnd_lineEdit.text()
+    if cutQ: 
+        HEnd = self.ui.Cut1D_HEnd_lineEdit.text()
+        KEnd = self.ui.Cut1D_KEnd_lineEdit.text()
+    else:
+        HEnd = KEnd = LEnd = 0.0
     KStart = self.ui.Cut1D_KStart_lineEdit.text()
-    KEnd = self.ui.Cut1D_KEnd_lineEdit.text()
-    LStart = self.ui.Cut1D_LStart_lineEdit.text()
-    LEnd = self.ui.Cut1D_LEnd_lineEdit.text()
+    
+    if rlu:
+        LStart = self.ui.Cut1D_LStart_lineEdit.text()
+        if cutQ: 
+            LEnd = self.ui.Cut1D_LEnd_lineEdit.text()
+    else:
+        LStart = 0.0
+
+    
 
     EMax = float(self.ui.Cut1D_EMax_lineEdit.text())
     EMin = float(self.ui.Cut1D_EMin_lineEdit.text())
@@ -96,7 +109,7 @@ def extractCutParameters(self):
     minPixel = float(self.ui.Cut1D_MinPixel_lineEdit.text())
 
     ds = self.DataSetModel.getCurrentDataSet()
-    rlu = self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked()
+    
     if rlu:
         q1 = np.array([HStart,KStart,LStart],dtype=float)
         q2 = np.array([HEnd,KEnd,LEnd],dtype=float)
@@ -104,7 +117,6 @@ def extractCutParameters(self):
         q1 = np.array([HStart,KStart],dtype=float)
         q2 = np.array([HEnd,KEnd],dtype=float)
 
-    cutQ = self.ui.Cut1D_SelectCut_Q_radioButton.isChecked()
 
     return ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
 

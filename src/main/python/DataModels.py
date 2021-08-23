@@ -9,7 +9,7 @@ import sys
 import warnings
 
 from MJOLNIR import _tools as M_tools
-
+import matplotlib.pyplot as plt
 try:
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile
 except ImportError:
@@ -1123,4 +1123,152 @@ class DataFileInfoModel(QtCore.QAbstractListModel):
     def settingsDialog(self):
         return self.possibleSettings,self.infos
 
+ValidColour =  QtGui.QColor(255, 255, 255, 0)
+InvalidColour = QtGui.QColor(255, 0, 0, 120)
+class MatplotlibFigureListDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None, *args):
+        """Delegate colouring the background of data files with the BG colour given by df.BGColor, default is ValidColor"""
+        QtWidgets.QStyledItemDelegate.__init__(self, parent, *args)
 
+
+    def paint(self, painter, option, index):
+        super(MatplotlibFigureListDelegate,self).paint(painter, option, index)
+        if True:
+            
+            figure = index.model().data(index,Qt.ItemDataRole)
+            #print(figure._title,option._state)
+            painter.save()
+            painter.setPen(QtGui.QPen(Qt.NoPen))
+            if not hasattr(figure,'closed'):
+                c = ValidColour
+            elif figure.closed: # If figure is closed, color the backgroud red
+                c = InvalidColour
+            else:
+                c = ValidColour
+            painter.setBrush(QtGui.QBrush(c))
+
+            # Draw the background rectangle            
+            painter.drawRect(option.rect)
+            painter.restore()
+
+class MatplotlibFigureList(QtCore.QAbstractListModel):
+    def __init__(self, *args, combobox=None, **kwargs):
+        super(MatplotlibFigureList, self).__init__(*args, **kwargs)
+        self.figures = []
+        
+        self.view = combobox
+        
+    
+    def setup(self):
+        self.view.setModel(self)
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            if hasattr(self.figures[index.row()],'_title'):
+                text = self.figures[index.row()]._title
+            else:
+                text = 'NoTitle...'
+            return text
+
+        if role == Qt.ItemDataRole:
+            return self.figures[index.row()]
+
+    def getData(self,*args,**kwargs):
+        return self.data(*args,**kwargs)
+
+    def rowCount(self, index=None):
+        return len(self.figures)
+        
+
+    def append(self,figure):
+        if not hasattr(figure,'closed'):
+            figure.closed = False
+        self.figures.append(figure)
+
+        self.selectLastFigure()
+        self.layoutChanged.emit()
+
+    
+    #def delete(self,index):
+    #    indices = [ind.row() for ind in index] # Extract numeric index, sort decending
+    #    indices.sort(reverse=True)
+    #    for ind in indices:
+    #        try:
+    #            del self.figures[ind]
+    #            self.layoutChanged.emit()
+    #        except:
+    #            pass
+
+    #    QtWidgets.QApplication.processEvents()
+    #    index = self.getCurrentFigureIndex()
+    #   
+    #    if index is None:
+    #        self.selectLastCut1D()
+    #    else:
+    #        if index.row()==self.rowCount(None):
+    #            self.selectLastFigure()
+
+    #def item(self,index,figureType=None):
+    #    if not index is None:
+    #        return self.figure[index.row()]
+
+    def flags(self,index):
+        #figure = self.figures[index.row()]
+        #if figure.closed:
+        #    return QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled #QtCore.Qt.ItemIsEditable  | 
+
+    def getCurrentFigureIndex(self):
+        index = self.view.currentIndex()
+        if index is None:
+            return None
+        else:
+            if index<self.rowCount(None):
+                return index
+            else:
+                return None
+        
+    def getCurrentFigure(self):
+        index = self.view.currentIndex()
+        if index is None:
+            return None
+        else:
+            if index<self.rowCount(None) and index>-1:
+                return self.figures[index]
+            else:
+                return None
+
+    #def getCurrentCut1DIndexRow(self):
+    #    currentIndex = self.getCurrentCut1DIndex()
+    #    if currentIndex is None:
+    #        return None
+    #    else:
+    #        return currentIndex.row()
+
+    #def getCurrentCut1D(self):
+    #    index = self.getCurrentCut1DIndex()
+    #    return self.item(index)
+
+    def selectLastFigure(self):
+        figures = self.rowCount(None)
+        if figures!=0:
+            index = self.index(self.rowCount(None)-1,0)
+            self.view.setCurrentIndex(index.row())
+
+    def closeAll(self):
+        for fig in self.figures:
+            self.close(fig)
+
+    def close(self,figure):
+        if hasattr(figure,'ax'):
+            plt.close(figure.ax.get_figure())
+            figure.closed = True
+        else:
+            try:
+                plt.close(figure)
+                figure.closed = True
+            except:
+                figure.parent().close()
+                figure.closed = True
+        self.layoutChanged.emit()
+        #del figure

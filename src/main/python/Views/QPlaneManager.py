@@ -3,8 +3,10 @@ sys.path.append('..')
 
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
+    from MJOLNIRGui.src.main.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
 except ImportError:
     from _tools import ProgressBarDecoratorArguments, loadUI
+    from DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
 
 from os import path
 from PyQt5 import QtWidgets, uic
@@ -35,18 +37,42 @@ def QPlane_plot_button_function(self):
     yBinTolerance = float(self.ui.QPlane_yBinTolerance_lineEdit.text())           
 
     Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap)
+    currentFigure = ax.get_figure()
+    self.QPlane=ax   
     
-    self.QPlane=ax    
+    self.figureListQPlane.append(currentFigure) 
     
-    fig = self.QPlane.get_figure()
-    fig.colorbar(ax.pmeshs[0])
-    fig.set_size_inches(8,6)
+    
+    currentFigure.colorbar(ax.pmeshs[0])
+    currentFigure.set_size_inches(8,6)
+    grid = self.ui.QPlane_Grid_checkBox.isChecked()
+    ax.grid(grid)
+    TitleText=self.ui.QPlane_SetTitle_lineEdit.text()
+    if TitleText == '':
+        TitleText = self.ui.QPlane_SetTitle_lineEdit.placeholderText()
+    CAxisMin=float(self.ui.QPlane_CAxisMin_lineEdit.text())
+    CAxisMax=float(self.ui.QPlane_CAxisMax_lineEdit.text())
 
-    if self.ui.QPlane_Grid_checkBox.isChecked():
-        ax.grid(True)
-    else:
-        ax.grid(False)
-    
+    currentFigure.settings = {'QPlane_SelectUnits_RLU_radioButton':rlu,
+                    'QPlane_SelectUnits_AA_radioButton': not rlu,
+                    'QPlane_Grid_checkBox':grid!=False,
+                    'QPlane_LogScale_checkBox':log,
+                    #'View3D_CurratAxe_checkBox':plotCurratAxe,
+                    'QPlane_xBinTolerance_lineEdit':xBinTolerance,
+                    'QPlane_yBinTolerance_lineEdit':yBinTolerance,
+                    'QPlane_EMax_lineEdit':EMax,
+                    'QPlane_EMin_lineEdit':EMin,
+                    'QPlane_SetTitle_lineEdit':TitleText,
+                    'QPlane_CAxisMax_lineEdit':CAxisMax,
+                    'QPlane_CAxisMin_lineEdit':CAxisMin,
+                    'QPlane_SetTitle_lineEdit':TitleText}
+
+    def setClosed(fig):
+        fig.closed=True
+
+    closeFunction = lambda event: setClosed(currentFigure)
+    currentFigure.canvas.mpl_connect('close_event', closeFunction)
+                    
     self.QPlane_setCAxis_button_function()
     self.QPlane_SetTitle_button_function()
     self.windows.append(self.QPlane.get_figure())
@@ -57,28 +83,31 @@ def QPlane_plot_button_function(self):
 def QPlane_setCAxis_button_function(self):
     CAxisMin=float(self.ui.QPlane_CAxisMin_lineEdit.text())
     CAxisMax=float(self.ui.QPlane_CAxisMax_lineEdit.text())
-
-    self.QPlane.set_clim(CAxisMin,CAxisMax)
-    fig = self.QPlane.get_figure()
-    fig.canvas.draw()
+    currentFigure = self.figureListQPlane.getCurrentFigure()
+    if not currentFigure is None:
+        currentFigure.gca().set_clim(CAxisMin,CAxisMax)
+    
+        currentFigure.settings['QPlane_CAxisMax_lineEdit'] = CAxisMax
+        currentFigure.settings['QPlane_CAxisMin_lineEdit'] = CAxisMin
     
 def QPlane_SetTitle_button_function(self):
     TitleText=self.ui.QPlane_SetTitle_lineEdit.text()        
     if TitleText == '':
         TitleText = self.ui.QPlane_SetTitle_lineEdit.placeholderText()
-    if hasattr(self, 'QPlane'):
-        
-        self.QPlane.set_title(TitleText)
-        fig = self.QPlane.get_figure()
-        fig.canvas.draw()
+    
+    currentFigure = self.figureListQPlane.getCurrentFigure()
+    if not currentFigure is None:
+        currentFigure._title = TitleText
+        currentFigure.gca().set_title(TitleText)
+        currentFigure.settings['QPlane_SetTitle_lineEdit'] = TitleText
     
 
 def QPlane_Grid_checkBox_toggled_function(self):
-    if hasattr(self,'QPlane'):
-        if self.ui.QPlane_Grid_checkBox.isChecked():
-            self.QPlane.grid(True)
-        else:
-            self.QPlane.grid(False)
+    currentFigure = self.figureListQPlane.getCurrentFigure()
+    if not currentFigure is None:
+        grid = self.ui.QPlane_Grid_checkBox.isChecked()
+        currentFigure.gca().grid(grid)
+        currentFigure.settings['QPlane_Grid_checkBox'] = grid
 
 def QPlane_DataSet_selectionChanged_function(self):
     ds = self.DataSetModel.getCurrentDataSet()
@@ -87,6 +116,16 @@ def QPlane_DataSet_selectionChanged_function(self):
     else:
         title = ''
     self.ui.QPlane_SetTitle_lineEdit.setPlaceholderText(title)
+
+def indexChanged(self,index):
+    figure = self.figureListQPlane.figures[index]
+    if hasattr(figure,'settings'):
+        for setting,value in figure.settings.items():
+            if 'radio' in setting or 'checkBox' in setting:
+                getattr(getattr(self.ui,setting),'setChecked')(value)
+            else:
+                getattr(getattr(self.ui,setting),'setText')(str(value))
+
 
 QPlaneManagerBase, QPlaneManagerForm = loadUI('QPlane.ui')
 
@@ -103,9 +142,17 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.QPlane_SetTitle_button_function = lambda: QPlane_SetTitle_button_function(self.guiWindow)
         self.guiWindow.QPlane_Grid_checkBox_toggled_function = lambda: QPlane_Grid_checkBox_toggled_function(self.guiWindow)
         self.guiWindow.QPlane_DataSet_selectionChanged_function = lambda: QPlane_DataSet_selectionChanged_function(self.guiWindow)
+        self.guiWindow.QPlane_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+
         for key,value in self.__dict__.items():
             if 'QPlane' in key:
                 self.guiWindow.ui.__dict__[key] = value
+
+        self.guiWindow.figureListQPlane = MatplotlibFigureList(combobox=self.QPlane_figureList_comboBox)
+        self.guiWindow.figureList.append(self.guiWindow.figureListQPlane)
+        self.QPlane_figureList_comboBox.setModel(self.guiWindow.figureListQPlane)
+
+        self.mplListDelegate = MatplotlibFigureListDelegate()
 
     def setup(self):
         
@@ -121,6 +168,9 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
 
         self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.QPlane_DataSet_selectionChanged_function)
         self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.QPlane_DataSet_selectionChanged_function)
+
+        self.guiWindow.figureListQPlane.view.currentIndexChanged.connect(self.guiWindow.QPlane_indexChanged)
+        self.guiWindow.ui.QPlane_figureList_comboBox.setItemDelegate(self.mplListDelegate)
 
     def CAxisChanged(self):
         if self.guiWindow.ui.QPlane_setCAxis_button.isEnabled():

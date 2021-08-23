@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>232</height>
+    <height>223</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,21 @@
       <string>Properties</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
@@ -74,7 +89,7 @@
              <string>Set color scale axis of current figure</string>
             </property>
             <property name="text">
-             <string>1e-5</string>
+             <string>0.02</string>
             </property>
            </widget>
           </item>
@@ -149,6 +164,29 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_3">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="text">
+           <string>Current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="QELine_figureList_comboBox">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -178,6 +216,21 @@
       <string>Create 2D plot</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
@@ -529,8 +582,13 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>QELine_SetTitle_lineEdit</tabstop>
+  <tabstop>QELine_SetTitle_button</tabstop>
   <tabstop>QELine_CAxisMax_lineEdit</tabstop>
   <tabstop>QELine_CAxisMin_lineEdit</tabstop>
+  <tabstop>QELine_setCAxis_button</tabstop>
+  <tabstop>QELine_Grid_checkBox</tabstop>
+  <tabstop>QELine_figureList_comboBox</tabstop>
   <tabstop>QELine_HStart_lineEdit</tabstop>
   <tabstop>QELine_KStart_lineEdit</tabstop>
   <tabstop>QELine_LStart_lineEdit</tabstop>
@@ -539,6 +597,14 @@
   <tabstop>QELine_LEnd_lineEdit</tabstop>
   <tabstop>QELine_Width_lineEdit</tabstop>
   <tabstop>QELine_MinPixel_lineEdit</tabstop>
+  <tabstop>QELine_EMax_lineEdit</tabstop>
+  <tabstop>QELine_EMin_lineEdit</tabstop>
+  <tabstop>QELine_NPoints_lineEdit</tabstop>
+  <tabstop>QELine_ConstantBins_checkBox</tabstop>
+  <tabstop>QELine_LogScale_checkBox</tabstop>
+  <tabstop>QELine_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>QELine_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>QELine_plot_button</tabstop>
  </tabstops>
  <resources/>
  <connections/>

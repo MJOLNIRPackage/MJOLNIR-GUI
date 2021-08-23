@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>805</width>
-    <height>188</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,21 @@
       <string>Properties</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLineEdit" name="QPlane_SetTitle_lineEdit">
         <property name="toolTip">
@@ -146,6 +161,29 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="toolTip">
+         <string>Current Figure</string>
+        </property>
+        <property name="statusTip">
+         <string>Current Figure</string>
+        </property>
+        <property name="text">
+         <string>Current figure</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="QPlane_figureList_comboBox">
+        <property name="toolTip">
+         <string>Current Figure</string>
+        </property>
+        <property name="statusTip">
+         <string>Current Figure</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -161,6 +199,21 @@
       <string>Create QPlane</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -282,7 +335,7 @@
              <string>Units used when plotting</string>
             </property>
             <property name="title">
-             <string>GroupBox</string>
+             <string>Units</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
@@ -348,18 +401,40 @@
         </property>
        </widget>
       </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>QPlane_SetTitle_lineEdit</tabstop>
+  <tabstop>QPlane_SetTitle_button</tabstop>
   <tabstop>QPlane_CAxisMax_lineEdit</tabstop>
   <tabstop>QPlane_CAxisMin_lineEdit</tabstop>
+  <tabstop>QPlane_setCAxis_button</tabstop>
+  <tabstop>QPlane_Grid_checkBox</tabstop>
+  <tabstop>QPlane_figureList_comboBox</tabstop>
   <tabstop>QPlane_EMax_lineEdit</tabstop>
   <tabstop>QPlane_EMin_lineEdit</tabstop>
   <tabstop>QPlane_xBinTolerance_lineEdit</tabstop>
   <tabstop>QPlane_yBinTolerance_lineEdit</tabstop>
+  <tabstop>QPlane_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>QPlane_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>QPlane_LogScale_checkBox</tabstop>
+  <tabstop>QPlane_plot_button</tabstop>
  </tabstops>
  <resources/>
  <connections/>

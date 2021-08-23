@@ -133,6 +133,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.update()
         self.views.append(self.ui.dataSetManager)
 
+        self.windows = [] # Holder for generated plotting windows
+        self.figureList = [] # Holder for selectable window list
+
         # Lists of views in shown order
         self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
         self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D] # NormalizationManager
@@ -159,8 +162,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         vlay.setAlignment(QtCore.Qt.AlignTop)
         self.maskingManager = MaskManager(self)
-
-        self.windows = [] # Holder for generated plotting windows
 
         self.dataSets = []
 
@@ -448,6 +449,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                         window.close()
                     except:
                         pass
+            for figureList in self.figureList:
+                figureList.closeAll()
         return True
 
     def about(self):
