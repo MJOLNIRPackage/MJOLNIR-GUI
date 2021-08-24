@@ -6,7 +6,7 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
+    from MJOLNIRGui.src.main.python.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
 except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
