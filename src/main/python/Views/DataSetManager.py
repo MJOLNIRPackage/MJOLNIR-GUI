@@ -67,8 +67,16 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                 delete.setToolTip('Delete DataSet') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(lambda: deleteFunction(self,gui,idx))
-
                 menu.addAction(delete)
+
+                ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+                if len(ds)>0:
+                    recalibrate = QtWidgets.QAction('Update Calibration')
+                    recalibrate.setToolTip("Update calibration file(s)")
+                    recalibrate.setStatusTip(recalibrate.toolTip())
+                    recalibrate.triggered.connect(lambda: gui.DataSet_recalibrateFunction(gui,idx))
+                    menu.addAction(recalibrate)
+
                 return menu.exec_(position)
 
     self.ui.DataSet_DataSets_listView.contextMenuEvent = lambda event: contextMenu(self.ui.DataSet_DataSets_listView,event,self)
@@ -135,6 +143,8 @@ def DataSet_NewDataSet_button_function(self):
     #ds.currentNormalizationSettings.update(normalizationParams)
 
     self.DataSetModel.append(ds)
+    idx = self.DataSetModel.getCurrentDatasetIndex()
+    self.ui.DataSet_DataSets_listView.edit(idx)
     self.update()
     self.stateMachine.run()
 
@@ -181,6 +191,47 @@ def DataSet_convertData_button_function(self):
     self.DataFileInfoModel.layoutChanged.emit()
     return val
     
+
+def recalibrateFunction(gui,idx):
+    folder = gui.currentFolder
+    calibrationFiles, _ = QtWidgets.QFileDialog.getOpenFileNames(gui,"Open Calibration File(s)", folder,"calbiration (*.calib);;All Files (*)")
+    
+    # Find the folder of the data files, using last data file
+    if len(calibrationFiles)==0:
+        return False
+    folder = path.dirname(calibrationFiles[-1])
+    gui.setCurrentDirectory(folder)
+
+    ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+    
+    length = len(ds)+1 # Files + 1 for loading of calibration files
+    gui.setProgressBarMaximum(length)
+    progress = 0
+    gui.setProgressBarValue(progress)
+    gui.setProgressBarLabelText('Loading calibration file'+'s'*(len(calibrationFiles)>1))
+    ds.updateCalibration(calibrationFiles,overwrite=True)
+    progress += 1
+    gui.setProgressBarValue(progress)
+
+    files = []
+    dataSetName = ds.name
+    gui.setProgressBarLabelText('Updating calibration')
+    for d in ds:
+        files.append(d.fileLocation)
+        d.saveHDF(d.fileLocation)
+        progress += 1
+        gui.setProgressBarValue(progress)
+
+    gui.DataSetModel.delete(idx[0])
+
+    ds = GuiDataSet(name=dataSetName)
+    gui.setProgressBarLabelText('Reloading data file'+'s'*(len(files)>1))
+    gui.DataSetModel.append(ds)
+    gui.DataFileModel.add(files,guiWindow=gui)
+    gui.setProgressBarLabelText('Calibration Updated')
+    gui.update()
+    gui.resetProgressBarTimed()
+    return True
     
 def convert(self):
     ds = self.DataSetModel.getCurrentDataSet()
@@ -323,6 +374,7 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(self.guiWindow)
 
         self.guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(self.guiWindow)
+        self.guiWindow.DataSet_recalibrateFunction = lambda gui,idx: recalibrateFunction(gui,idx=idx)
 
         self.guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(self.guiWindow)
         self.guiWindow.convert = lambda: convert(self.guiWindow)
