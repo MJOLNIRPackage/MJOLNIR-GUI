@@ -25,6 +25,10 @@ From this point, the visualization parts can be used to create plots in various 
 <h2>Saving GuiStates</h2>
 Instead of going through the hoops described above, save the gui state into a file by entering files>Save GUI state or ctrl+s. This file can then later be loaded. Notice that this file does not contain the data, but only a description of the file location and conversion. Thus, the saved states cannot be shared between computers. 
 
+<h2>Update Calibration Files</h2>
+When performing an experiment at CAMEA, the current calibration files holding the normalization of detector calibration as well as scattering angle and final energy for all detector pixels are added to the data file. However, sometimes it is benificial to add additional binnings, e.g. binning 5, or update these post experiment. This can be done by right clicking the DataSet, selecting "Update Calibration", and load the wanted calibration files, see figure below. Notes: The normalizations already present in the data files will be updated and the data files will be saved to disk when performing the update. If additional binnings have been added, it can be chosen across all files by either selecting all or no files for then to change the calbiration in the drop down menu located to the top right.
+<center><figure><img src="TutorialPictures\Calibration.png" alt="Creation of DataSet" style="width:75%"></figure></center>
+
 <h2>Useful Tools</h2>
 In addition to the direct handling of data and the conversion, MJOLNIRGui contains a set of tools useful within neutron scattering and specifically for experiment planning. All of these are found under the Tools tab in the menu.
 <center><figure><img src="TutorialPictures\ToolsFigure.png" alt="Tools tab in the menu" style="width:75%"></figure></center>
