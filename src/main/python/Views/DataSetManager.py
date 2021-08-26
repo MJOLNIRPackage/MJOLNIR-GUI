@@ -67,6 +67,7 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                 delete.setToolTip('Delete DataSet') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(lambda: deleteFunction(self,gui,idx))
+                delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
                 menu.addAction(delete)
 
                 ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
@@ -75,6 +76,8 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                     recalibrate.setToolTip("Update calibration file(s)")
                     recalibrate.setStatusTip(recalibrate.toolTip())
                     recalibrate.triggered.connect(lambda: gui.DataSet_recalibrateFunction(gui,idx))
+                    recalibrate.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
+                    
                     menu.addAction(recalibrate)
 
                 return menu.exec_(position)
@@ -116,6 +119,7 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
                 delete.setToolTip('Delete DataFile') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(self.DataSet_DeleteFiles_button_function)
+                delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
 
                 menu.addAction(delete)
                 return menu.exec_(position)

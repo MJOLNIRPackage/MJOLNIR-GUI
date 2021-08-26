@@ -52,11 +52,13 @@ def setupCut1D(self):
                 plot.setToolTip('Plot cut(s)') 
                 plot.setStatusTip(plot.toolTip())
                 plot.triggered.connect(lambda: [self.plotItem(it) for it in items])
+                plot.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/plot.png')))
 
                 delete = QtWidgets.QAction('Delete')
                 delete.setToolTip('Delete cut(s)') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(lambda: gui.Cut1DModel.delete(idx))
+                delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
 
                 menu.addAction(plot)
                 menu.addAction(delete)
