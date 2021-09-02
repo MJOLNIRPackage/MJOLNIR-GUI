@@ -9,12 +9,19 @@ Created on Thu Jan 10 10:31:10 2019
 import sys,os,json
 
 # update to new version in base.json
-settingsFile = os.path.join('src','build','settings','base.json')
+settingsDir = os.path.join('src','build','settings')
+installFile = 'setup.py'
 
+settingsFiles = os.listdir(settingsDir)
 
+settings = {}
 
-with open(settingsFile) as jsonFile:
-    settings = json.load(jsonFile)
+for f in settingsFiles:
+    file = os.path.join(settingsDir,f)
+    with open(file) as json_file:
+        _settings = json.load(json_file)
+        for item,val in _settings.items():
+            settings[item] = val
 
 if len(sys.argv)>1:
     version = sys.argv[1]
@@ -28,7 +35,23 @@ print('Updating version from {} to {}'.format(settings['version'],version))
 
 settings['version'] = version
 
-with open(settingsFile,'w') as jsonFile:
+with open(os.path.join('src','build','settings','base.json'),'w') as jsonFile:
     json.dump(settings,jsonFile,indent=4)
     
+with open(installFile) as f:
+    text = f.readlines()
+    startLine = -1
+    for i,line in enumerate(text):
+        if 'settings = ' in line:
+            startLine = i
+        if startLine > 0 and  "'}" in line:
+            endLine = i+1
+
+del settings['gpg_key']
+settingsStr = ['settings = '+str(settings).replace(', ',', \n')+'\n']
+
+finalText = text[:startLine]+settingsStr+text[endLine:]
+
+with open(installFile,'w') as f:
+    f.writelines(finalText)
 
