@@ -12,6 +12,7 @@ except ImportError:
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.Qt import QApplication
+from MJOLNIR.Data import DataFile
 import numpy as np
 from os import path
 
@@ -80,6 +81,18 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                     
                     menu.addAction(recalibrate)
 
+                    sort = QtWidgets.QAction('Auto Sort')
+                    sort.setToolTip("Sort data files according to ascending Ei, abs(2theta), scan dir, A3")
+                    sort.setStatusTip(sort.toolTip())
+                    def sorting(ds,gui):
+                        ds.autoSort()
+                        gui.DataSetModel.layoutChanged.emit()
+                        gui.DataFileModel.layoutChanged.emit()
+                    sort.triggered.connect(lambda: sorting(ds,gui))
+                    sort.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/arrow-circle-double-135.png')))
+                    
+                    menu.addAction(sort)
+
                 return menu.exec_(position)
 
     self.ui.DataSet_DataSets_listView.contextMenuEvent = lambda event: contextMenu(self.ui.DataSet_DataSets_listView,event,self)
@@ -124,6 +137,27 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
                 menu.addAction(delete)
                 return menu.exec_(position)
 
+    def dragEnterEvent(self, gui, event):
+        gui.stateMachine.requireStateByName('Partial')
+        if event.mimeData().hasUrls():
+            # returns (path and file name, '.'+extension)
+            check = [path.splitext(u.toLocalFile())[1][1:] in DataFile.supportedRawFormats for u in event.mimeData().urls()]
+            if np.all(check):
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.ignore()
+
+    def dropEvent(self, gui, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        gui._tempFiles = files
+        gui.DataSet_AddFiles_Decorated()
+        
+
+    self.ui.DataSet_filenames_listView.dragEnterEvent = lambda event: dragEnterEvent(self.ui.DataSet_filenames_listView.dragEnterEvent,self,event)
+    self.ui.DataSet_filenames_listView.dropEvent = lambda event: dropEvent(self.ui.DataSet_filenames_listView.dragEnterEvent,self,event)
+
     self.ui.DataSet_filenames_listView.contextMenuEvent = lambda event: contextMenuDataFiles(self.ui.DataSet_filenames_listView,event,self)
     
 
@@ -166,9 +200,11 @@ def DataSet_DeleteFiles_button_function(self):
 def DataSet_AddFiles_button_function(self):
     if not self.stateMachine.requireStateByName('Partial'):
         return False
-    
     folder = self.currentFolder
     files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
+    return self.DataSet_AddFiles(files)
+
+def DataSet_AddFiles(self,files):
     if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
         self.DataSet_NewDataSet_button_function()
     self.DataFileModel.add(files,guiWindow=self)
@@ -184,9 +220,12 @@ def DataSet_AddFiles_button_function(self):
     return True
 
 @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Conversion Done')
+def DataSet_AddFiles_Decorated(self):
+    return self.DataSet_AddFiles(self._tempFiles)
+
+@ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Conversion Done')
 def DataSet_convertData_button_function(self):    
     #  Should add a check if a data set is selected
-    
     if not self.stateMachine.requireStateByName('Raw'):
         return False
     
@@ -378,7 +417,9 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(self.guiWindow)
 
         self.guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(self.guiWindow)
+        self.guiWindow.DataSet_AddFiles = lambda files: DataSet_AddFiles(self.guiWindow,files)
         self.guiWindow.DataSet_recalibrateFunction = lambda gui,idx: recalibrateFunction(gui,idx=idx)
+        self.guiWindow.DataSet_AddFiles_Decorated = lambda : DataSet_AddFiles_Decorated(self.guiWindow)
 
         self.guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(self.guiWindow)
         self.guiWindow.convert = lambda: convert(self.guiWindow)
