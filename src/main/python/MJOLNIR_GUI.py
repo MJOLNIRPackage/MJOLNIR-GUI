@@ -21,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-
+from fbs_runtime import PUBLIC_SETTINGS
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -105,7 +105,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-        self.version = self.AppContext.build_settings['version']   
+        self.version = PUBLIC_SETTINGS['version']   
         ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
