@@ -12,6 +12,9 @@ from os import path
 from PyQt5 import QtWidgets, uic
 import numpy as np
 
+from MJOLNIR.Data.DraggableRectangle import extractCut1DProperties
+
+@ProgressBarDecoratorArguments(runningText='Generating QPlane plot',completedText='QPlane plotted')
 def QPlane_plot_button_function(self):
     # Make plot
     if not self.stateMachine.requireStateByName('Converted'):
@@ -36,7 +39,10 @@ def QPlane_plot_button_function(self):
     xBinTolerance = float(self.ui.QPlane_xBinTolerance_lineEdit.text())           
     yBinTolerance = float(self.ui.QPlane_yBinTolerance_lineEdit.text())           
 
-    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap)
+    cut1DFunctionLocal = lambda viewer,dr:cut1DFunction(self,viewer,dr)
+
+    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap,
+    cut1DFunction = cut1DFunctionLocal,outputFunction=self.writeToStatus)
     currentFigure = ax.get_figure()
     self.QPlane=ax   
     
@@ -126,6 +132,30 @@ def indexChanged(self,index):
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
 
+def cut1DFunction(self,ax,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(ax,'sample'):
+        sample = ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+    parameters = extractCut1DProperties(dr.rect,sample,rounding = rounding)
+    
+    
+    parameters['Emin']=ax.EMin
+    parameters['Emax']=ax.EMax
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [ax.ds,parameters['q1'],parameters['q2'],
+                           parameters['width'],parameters['minPixel'],ax.EMax,ax.EMin,True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+    
 
 QPlaneManagerBase, QPlaneManagerForm = loadUI('QPlane.ui')
 
