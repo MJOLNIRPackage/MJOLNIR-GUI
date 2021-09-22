@@ -6,15 +6,18 @@ try:
     from MJOLNIRGui.src.main.python.Views import BraggListManager
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import Gui1DCutObject
 except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
     from Views import BraggListManager
     import _tools as _GUItools
     from DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
+    from MJOLNIR_Data import Gui1DCutObject
 from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
 from MJOLNIR.Data import Viewer3D
+import matplotlib.pyplot as plt
 
 # Handles all functionality related to the View3D box. Each button has its own 
 # definition, which should be pretty selfexplanatory.
@@ -123,8 +126,10 @@ def View3D_plot_button_function(self):
         braggList = self.getBraggPoints()
     else:
         braggList = None
-    
-    figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList)
+
+    cut1DFunctionLocal = lambda viewer,dr:cut1DFunction(self,viewer,dr)    
+    figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,
+    outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,cut1DFunction=cut1DFunctionLocal)
     self.figureListView3D.append(figure)
     currentFigure = self.figureListView3D.getCurrentFigure()
 
@@ -252,6 +257,38 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setChecked')(value)
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
+
+## Function to connect draggable rectangles from interactive 1D cuts to the gui
+def cut1DFunction(self,viewer,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(viewer.ax,'sample'):
+        sample = viewer.ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+    parameters = Viewer3D.extractCut1DProperties(dr.rect,sample,rounding = rounding)
+    step = viewer.dQE[viewer.axis]
+    pos = np.zeros(3,dtype=int)
+    pos[viewer.axis]=viewer.Energy_slider.val
+    
+    # Find the correct energy bin for the current plot
+    EMin = viewer.bins[viewer.axis][pos[0],pos[1],pos[2]]
+    EMax = EMin+step
+    
+    parameters['Emin']=np.round(EMin,rounding)
+    parameters['Emax']=np.round(EMax,rounding)
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [viewer.ds,parameters['q1'],parameters['q2'],
+                           parameters['width'],parameters['minPixel'],EMax,EMin,True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+    
 
 View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
 
