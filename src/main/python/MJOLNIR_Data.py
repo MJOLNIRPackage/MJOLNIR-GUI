@@ -225,11 +225,11 @@ class Gui1DCutObject(object):
         if self.parameters['method'] == 'cut1D':
             #q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=False
             ax,*_ = plotFunction(q1=self.parameters['q1'],q2=self.parameters['q2'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
-            Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],data=[self.pdData,self.bins],constantBins=self.parameters['constantBins'],ufit=False,**kwargs)
+            Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],data=[self.pdData,self.bins],constantBins=self.parameters['constantBins'],ufit=False,label=self.name,**kwargs)
         else:
             # E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=False
             ax,*_ = plotFunction(q=self.parameters['q1'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
-            E1=self.parameters['EMin'],E2=self.parameters['EMax'],data=[self.pdData,self.bins],ufit=False,**kwargs)
+            E1=self.parameters['EMin'],E2=self.parameters['EMax'],data=[self.pdData,self.bins],ufit=False,label=self.name,**kwargs)
         return ax
     
     def save(self,location):
