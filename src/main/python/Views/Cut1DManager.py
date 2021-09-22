@@ -16,10 +16,12 @@ from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
 import matplotlib.pyplot as plt
 
+import itertools
+
 def Cut1D_Delete1D_button_function(self):
     self.Cut1DModel.delete(self.ui.Cut1D_listView.selectedIndexes())
-    self.update1DCutLabels()
     self.Cut1DModel.layoutChanged.emit()
+    self.update1DCutLabels()
     self.stateMachine.run()
 
 
@@ -48,8 +50,13 @@ def setupCut1D(self):
             items = [gui.Cut1DModel.item(i) for i in idx]
             if event.type() == QtCore.QEvent.ContextMenu:
                 menu = QtWidgets.QMenu()
-                plot = QtWidgets.QAction('Plot')
-                plot.setToolTip('Plot cut(s)') 
+                
+                if len(idx)==1:
+                    text = 'Plot cut'
+                else:
+                    text = 'Plot cuts individually'
+                plot = QtWidgets.QAction(text)
+                plot.setToolTip(text) 
                 plot.setStatusTip(plot.toolTip())
                 plot.triggered.connect(lambda: [self.plotItem(it) for it in items])
                 plot.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/plot.png')))
@@ -61,6 +68,13 @@ def setupCut1D(self):
                 delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
 
                 menu.addAction(plot)
+                if len(idx)>1: # multiple cuts selected at once
+                    plotTogether = QtWidgets.QAction('Plot Together')
+                    plotTogether.setToolTip('Plot cuts together') 
+                    plotTogether.setStatusTip(plot.toolTip())
+                    plotTogether.triggered.connect(self.Cut1D_cut1DPlotTogether)
+                    plotTogether.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/plotMany.png')))
+                    menu.addAction(plotTogether)
                 menu.addAction(delete)
                 return menu.exec_(position)
 
@@ -73,15 +87,33 @@ def selected1DCutChanged(self,*args,**kwargs):
 def update1DCutLabels(self):
     cuts = self.Cut1DModel.rowCount()
     if cuts == 0:
-        self.ui.Cut1D_Delete1D_button.setEnabled(False)
         self.ui.Cut1D_Export1D_button.setEnabled(False)
         self.ui.Cut1D_ExporCSV_radioButton.setEnabled(False)
         self.ui.Cut1D_ExporUFIT_radioButton.setEnabled(False)
     else:
-        self.ui.Cut1D_Delete1D_button.setEnabled(True)
         self.ui.Cut1D_Export1D_button.setEnabled(True)
         self.ui.Cut1D_ExporCSV_radioButton.setEnabled(True)
         self.ui.Cut1D_ExporUFIT_radioButton.setEnabled(True)
+
+        indices = self.Cut1DModel.Cut1D_listView.selectedIndexes()
+        
+        if len(indices)>1:
+            self.ui.Cut1D_plotTogether_button.setEnabled(True)
+        else:
+            self.ui.Cut1D_plotTogether_button.setEnabled(False)
+
+        if not len(indices) == 0: # If index is selected
+            self.Cut1D_indexChanged(indices[0])
+            self.ui.Cut1D_Delete1D_button.setEnabled(True)
+        else:
+            self.ui.Cut1D_Delete1D_button.setEnabled(False)
+
+def cut1DPlotTogether(self):
+    indices = self.Cut1DModel.Cut1D_listView.selectedIndexes()
+    ax = None
+    for idx in indices:
+        ax = self.plotItem(self.Cut1DModel.item(idx),ax=ax)
+    ax.legend()
 
 def extractCutParameters(self):
     rlu = self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked()
@@ -189,23 +221,58 @@ def Cut1D_Generate1D_button_function(self):
     if not self.stateMachine.requireStateByName('Converted'):
         return False
 
-    ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
+    if self.interactiveCut is None:
+        ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
+    else:
+        ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = self.interactiveCut
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
         return False
     try:
         if cutQ:
             pdData,bins = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=False)
             parameters = {'q1':q1,'q2':q2,'EMin':EMin,'EMax':EMax,'rlu':rlu,'width':width,'constantBins':False,'minPixel':minPixel,'method':'cut1D','dataset':ds}
+            
+            # add parameters to correct edits, loop through q. If rlu sizes matches otherwise len(q) = 2 and padding with 0.0
+            for q,field in itertools.zip_longest(q1,['Cut1D_HStart_lineEdit','Cut1D_KStart_lineEdit','Cut1D_LStart_lineEdit'],fillvalue=0.0):  
+                parameters[field] = q
+            for q,field in itertools.zip_longest(q2,['Cut1D_HEnd_lineEdit','Cut1D_KEnd_lineEdit','Cut1D_LEnd_lineEdit'],fillvalue=0.0):  
+                parameters[field] = q
+            
+            parameters['Cut1D_EMax_lineEdit'] = parameters['EMax']
+            parameters['Cut1D_EMin_lineEdit'] = parameters['EMin']
+            parameters['Cut1D_Width_lineEdit'] = width
+            parameters['Cut1D_MinPixel_lineEdit'] = minPixel
+            parameters['Cut1D_SelectCut_Q_radioButton'] = True
+            parameters['Cut1D_SelectCut_E_radioButton'] = False
+            parameters['Cut1D_SelectUnits_RLU_radioButton'] = rlu
+            parameters['Cut1D_SelectUnits_AA_radioButton'] = not rlu
+
+
         else: # else along E
             pdData,bins = ds.cut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=False)
             parameters = {'EMin':EMin,'EMax':EMax,'q1':q1,'q2':None,'rlu':rlu,'width':width,'minPixel':minPixel,'method':'cut1DE','dataset':ds}
             
-        
+            for q,field in itertools.zip_longest(q1,['Cut1D_HStart_lineEdit','Cut1D_KStart_lineEdit','Cut1D_LStart_lineEdit','Cut1D_HEnd_lineEdit','Cut1D_KEnd_lineEdit','Cut1D_LEnd_lineEdit'],fillvalue=0.0):  
+                parameters[field] = q
+            
+            parameters['Cut1D_EMax_lineEdit'] = parameters['EMax']
+            parameters['Cut1D_EMin_lineEdit'] = parameters['EMin']
+            parameters['Cut1D_Width_lineEdit'] = width
+            parameters['Cut1D_MinPixel_lineEdit'] = minPixel
+            parameters['Cut1D_SelectCut_Q_radioButton'] = False
+            parameters['Cut1D_SelectCut_E_radioButton'] = True
+            parameters['Cut1D_SelectUnits_RLU_radioButton'] = rlu
+            parameters['Cut1D_SelectUnits_AA_radioButton'] = not rlu
+
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
             self.cutNumber = 1
-        gui1DCut = Gui1DCutObject(name='Cut {}'.format(self.cutNumber),parameters=parameters,pdData=pdData,bins=bins)
+        title = 'Cut {}'.format(self.cutNumber)
+        parameters['Cut1D_SetTitle_lineEdit'] = title
+        gui1DCut = Gui1DCutObject(name=title,parameters=parameters,pdData=pdData,bins=bins)
         
+
+
         self.cutNumber+=1
         self.Cut1DModel.append(gui1DCut)
     except AttributeError as e:
@@ -283,13 +350,30 @@ def Cut1D_Save_To_uFit(self,saveFile):
     session.save()
 
 
-def plotItem(self,item):
+def plotItem(self,item,ax=None):
     #plot the selected Gui1DCutObject into a new window
-    fig = plt.figure()
-    ax = fig.gca()
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.gca()
+    else:
+        fig = ax.get_figure()
     item.plot(ax=ax)
     fig.tight_layout()
     self.windows.append(fig)
+    return ax
+
+#def Cut1D_Cut_SelectionChanged_function(self):
+#self.guiWindow.View3D_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+
+def indexChanged(self,index):
+    cut1D = self.Cut1DModel.item(index)
+    if hasattr(cut1D,'parameters'):
+        for setting,value in cut1D.parameters.items():
+            if 'radio' in setting or 'checkBox' in setting:
+                getattr(getattr(self.ui,setting),'setChecked')(value)
+            elif 'lineEdit' in setting:
+                getattr(getattr(self.ui,setting),'setText')(str(value))
+
 
 
 def Cut1D_DataSet_selectionChanged_function(self):
@@ -310,16 +394,19 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.initCut1DManager()
 
     def initCut1DManager(self):
+        self.guiWindow.interactiveCut = None # Used to pass in interactive cuts
         self.guiWindow.Cut1D_plot_button_function = lambda: Cut1D_plot_button_function(self.guiWindow)
         self.guiWindow.Cut1D_Generate1D_button_function = lambda: Cut1D_Generate1D_button_function(self.guiWindow)
         self.guiWindow.Cut1D_SetTitle_button_function = lambda: Cut1D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.setupCut1D = lambda: setupCut1D(self.guiWindow)
+        self.guiWindow.Cut1D_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+        self.guiWindow.Cut1D_cut1DPlotTogether = lambda: cut1DPlotTogether(self.guiWindow)
         self.guiWindow.Cut1D_toggle_units_function = lambda: Cut1D_toggle_units_function(self.guiWindow)
         self.guiWindow.Cut1D_toggle_CutDir_function = lambda: Cut1D_toggle_CutDir_function(self.guiWindow)
         self.guiWindow.Cut1D_Save_To_uFit = lambda location: Cut1D_Save_To_uFit(self.guiWindow,location)
         self.guiWindow.Cut1D_DataSet_selectionChanged_function = lambda: Cut1D_DataSet_selectionChanged_function(self.guiWindow)
 
-        self.guiWindow.plotItem = lambda item: plotItem(self.guiWindow,item)
+        self.guiWindow.plotItem = lambda item,ax=None: plotItem(self.guiWindow,item,ax)
 
         
         self.guiWindow.Cut1D_DoubleClick_Selection_function = lambda index:Cut1D_DoubleClick_Selection_function(self.guiWindow,index)
@@ -342,6 +429,7 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
 
         self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
         self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
+        self.guiWindow.ui.Cut1D_plotTogether_button.clicked.connect(self.guiWindow.Cut1D_cut1DPlotTogether)
     
     
     def TitleChanged(self):
