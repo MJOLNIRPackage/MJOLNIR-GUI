@@ -13,7 +13,7 @@ with open(os.path.join(_here, 'README.md'), encoding='utf-8') as f:
 settings = {'app_name': 'MJOLNIRGui', 
 'author': 'MJOLNIRPackage', 
 'main_module': 'src/main/python/main.py', 
-'version': '0.9.5', 
+'version': '0.9.7', 
 'gpg_name': 'MJOLNIRPackage', 
 'hidden_imports': ['cmath'], 
 'categories': 'Education;', 
@@ -46,7 +46,7 @@ setup(
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.src.main.python.MJOLNIR_GUI:main']
         },
     python_requires='>=3.5',
-    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR>=1.1.21','ufit>=1.4.0'], 
+    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR>=1.1.22','ufit>=1.4.0'], 
     
     classifiers=[
         'Development Status :: 3 - Alpha',
