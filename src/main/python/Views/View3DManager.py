@@ -17,6 +17,7 @@ from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
 from MJOLNIR.Data import Viewer3D
+from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle
 import matplotlib.pyplot as plt
 
 # Handles all functionality related to the View3D box. Each button has its own 
@@ -127,9 +128,11 @@ def View3D_plot_button_function(self):
     else:
         braggList = None
 
-    cut1DFunctionLocal = lambda viewer,dr:cut1DFunction(self,viewer,dr)    
+    cut1DFunctionRectangleLocal = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)    
+    cut1DFunctionCircleLocal = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)    
     figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,
-    outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,cut1DFunction=cut1DFunctionLocal)
+    outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,cut1DFunctionRectangle=cut1DFunctionRectangleLocal,
+    cut1DFunctionCircle=cut1DFunctionCircleLocal)
     self.figureListView3D.append(figure)
     currentFigure = self.figureListView3D.getCurrentFigure()
 
@@ -259,7 +262,7 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setText')(str(value))
 
 ## Function to connect draggable rectangles from interactive 1D cuts to the gui
-def cut1DFunction(self,viewer,dr):
+def cut1DFunctionRectangle(self,viewer,dr):
     # If there is no sample, i.e. 1/AA plot
     if hasattr(viewer.ax,'sample'):
         sample = viewer.ax.sample
@@ -268,14 +271,14 @@ def cut1DFunction(self,viewer,dr):
 
     # Extract the parameters
     rounding = 4 # Round to 4 digits
-    parameters = Viewer3D.extractCut1DProperties(dr.rect,sample,rounding = rounding)
+    parameters = extractCut1DPropertiesRectangle(dr.rect,sample,rounding = rounding)
     step = viewer.dQE[viewer.axis]
     pos = np.zeros(3,dtype=int)
     pos[viewer.axis]=viewer.Energy_slider.val
     
     # Find the correct energy bin for the current plot
-    EMin = viewer.bins[viewer.axis][pos[0],pos[1],pos[2]]
-    EMax = EMin+step
+    EMin = np.round(viewer.bins[viewer.axis][pos[0],pos[1],pos[2]],rounding)
+    EMax = np.round(EMin+step,rounding)
     
     parameters['Emin']=np.round(EMin,rounding)
     parameters['Emax']=np.round(EMax,rounding)
@@ -289,6 +292,31 @@ def cut1DFunction(self,viewer,dr):
     # Reset the interactiveCut flag
     self.interactiveCut = None
     
+## Function to connect draggable rectangles from interactive 1D cuts to the gui
+def cut1DFunctionCircle(self,viewer,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(viewer.ax,'sample'):
+        sample = viewer.ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+    parameters = extractCut1DPropertiesCircle(dr.circ,sample,rounding = rounding)
+    parameters['minPixel'] = np.round(viewer.dQE[viewer.axis])
+    
+    
+    parameters['Emin']=np.round(viewer.ds.energy.min(),rounding)
+    parameters['Emax']=np.round(viewer.ds.energy.max(),rounding)
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [viewer.ds,parameters['q'],None,
+                           parameters['width'],parameters['minPixel'],parameters['Emax'],parameters['Emin'],False,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
 
 View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
 

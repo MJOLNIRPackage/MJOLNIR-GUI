@@ -12,7 +12,7 @@ from os import path
 from PyQt5 import QtWidgets, uic
 import numpy as np
 
-from MJOLNIR.Data.DraggableRectangle import extractCut1DProperties
+from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle
 
 @ProgressBarDecoratorArguments(runningText='Generating QPlane plot',completedText='QPlane plotted')
 def QPlane_plot_button_function(self):
@@ -39,10 +39,11 @@ def QPlane_plot_button_function(self):
     xBinTolerance = float(self.ui.QPlane_xBinTolerance_lineEdit.text())           
     yBinTolerance = float(self.ui.QPlane_yBinTolerance_lineEdit.text())           
 
-    cut1DFunctionLocal = lambda viewer,dr:cut1DFunction(self,viewer,dr)
+    cut1DFunctionLocalRectangle = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)
+    cut1DFunctionLocalCircle = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)
 
     Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap,
-    cut1DFunction = cut1DFunctionLocal,outputFunction=self.writeToStatus)
+    cut1DFunctionRectangle = cut1DFunctionLocalRectangle, cut1DFunctionCircle=cut1DFunctionLocalCircle,outputFunction=self.writeToStatus)
     currentFigure = ax.get_figure()
     self.QPlane=ax   
     
@@ -132,7 +133,7 @@ def indexChanged(self,index):
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
 
-def cut1DFunction(self,ax,dr):
+def cut1DFunctionRectangle(self,ax,dr):
     # If there is no sample, i.e. 1/AA plot
     if hasattr(ax,'sample'):
         sample = ax.sample
@@ -141,7 +142,7 @@ def cut1DFunction(self,ax,dr):
 
     # Extract the parameters
     rounding = 4 # Round to 4 digits
-    parameters = extractCut1DProperties(dr.rect,sample,rounding = rounding)
+    parameters = extractCut1DPropertiesRectangle(dr.rect,sample,rounding = rounding)
     
     
     parameters['Emin']=ax.EMin
@@ -156,6 +157,31 @@ def cut1DFunction(self,ax,dr):
     # Reset the interactiveCut flag
     self.interactiveCut = None
     
+def cut1DFunctionCircle(self,ax,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(ax,'sample'):
+        sample = ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+    parameters = extractCut1DPropertiesCircle(dr.circ,ax.sample)
+    parameters['E1'] = ax.ds.energy.min()
+    parameters['E2'] = ax.ds.energy.max()
+    parameters['minPixel'] = np.min([ax.EMax-ax.EMin,0.15]) # Choose the smaller of the actual plane or 0.150 meV
+    
+    parameters['Emin']=ax.EMin
+    parameters['Emax']=ax.EMax
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [ax.ds,parameters['q'],None,
+                           parameters['width'],parameters['minPixel'],parameters['E2'],parameters['E1'],False,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
 
 QPlaneManagerBase, QPlaneManagerForm = loadUI('QPlane.ui')
 
