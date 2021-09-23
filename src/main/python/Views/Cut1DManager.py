@@ -18,9 +18,10 @@ import matplotlib.pyplot as plt
 
 import itertools
 
-def Cut1D_Delete1D_button_function(self):
+def Cut1D_Delete1D_btn_function(self):
     self.Cut1DModel.delete(self.ui.Cut1D_listView.selectedIndexes())
     self.Cut1DModel.layoutChanged.emit()
+    self.Cut1DModel.Cut1D_listView.clearSelection()
     self.update1DCutLabels()
     self.stateMachine.run()
 
@@ -31,7 +32,7 @@ def Cut1D_DoubleClick_Selection_function(self,index,*args,**kwargs):
 def setupCut1D(self):
     self.ui.Cut1D_plot_button.clicked.connect(self.Cut1D_plot_button_function)
     self.ui.Cut1D_Generate1D_button.clicked.connect(self.Cut1D_Generate1D_button_function)
-    self.ui.Cut1D_Delete1D_button.clicked.connect(self.Delete1D_button_function)
+    self.ui.Cut1D_Delete1D_btn.clicked.connect(self.Delete1D_button_function)
     self.ui.Cut1D_SetTitle_button.clicked.connect(self.Cut1D_SetTitle_button_function)
     
     self.Cut1DModel = Cut1DModel(Cut1D_listView=self.ui.Cut1D_listView)
@@ -87,29 +88,29 @@ def selected1DCutChanged(self,*args,**kwargs):
 def update1DCutLabels(self):
     cuts = self.Cut1DModel.rowCount()
     if cuts == 0:
-        self.ui.Cut1D_Export1D_button.setEnabled(False)
-        self.ui.Cut1D_ExporCSV_radioButton.setEnabled(False)
-        self.ui.Cut1D_ExporUFIT_radioButton.setEnabled(False)
+        self.ui.Cut1D_Export1D_btn.setEnabled(False)
+        self.ui.Cut1D_ExporCSV_radioBtn.setEnabled(False)
+        self.ui.Cut1D_ExporUFIT_radioBtn.setEnabled(False)
     else:
-        self.ui.Cut1D_Export1D_button.setEnabled(True)
-        self.ui.Cut1D_ExporCSV_radioButton.setEnabled(True)
-        self.ui.Cut1D_ExporUFIT_radioButton.setEnabled(True)
+        self.ui.Cut1D_Export1D_btn.setEnabled(True)
+        self.ui.Cut1D_ExporCSV_radioBtn.setEnabled(True)
+        self.ui.Cut1D_ExporUFIT_radioBtn.setEnabled(True)
 
-        indices = self.Cut1DModel.Cut1D_listView.selectedIndexes()
-        
-        if len(indices)>1:
-            self.ui.Cut1D_plotTogether_button.setEnabled(True)
-        else:
-            self.ui.Cut1D_plotTogether_button.setEnabled(False)
+    indices = self.Cut1DModel.Cut1D_listView.selectedIndexes()
+    if len(indices)>1:
+        self.ui.Cut1D_plotTogether_btn.setEnabled(True)
+    else:
+        self.ui.Cut1D_plotTogether_btn.setEnabled(False)
 
-        if not len(indices) == 0: # If index is selected
-            self.Cut1D_indexChanged(indices[0])
-            self.ui.Cut1D_Delete1D_button.setEnabled(True)
-        else:
-            self.ui.Cut1D_Delete1D_button.setEnabled(False)
+    if not len(indices) == 0: # If index is selected
+        self.Cut1D_indexChanged(indices[0])
+        self.ui.Cut1D_Delete1D_btn.setEnabled(True)
+    else:
+        self.ui.Cut1D_Delete1D_btn.setEnabled(False)
 
 def cut1DPlotTogether(self):
     indices = self.Cut1DModel.Cut1D_listView.selectedIndexes()
+    #if len(indices) == 0: return
     ax = None
     for idx in indices:
         ax = self.plotItem(self.Cut1DModel.item(idx),ax=ax)
@@ -155,9 +156,9 @@ def extractCutParameters(self):
     return ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
 
 @ProgressBarDecoratorArguments(runningText='Save Cut1D to folder',completedText='Cut1D saved')
-def Cut1D_Export1D_button_function(self):
+def Cut1D_Export1D_btn_function(self):
 
-    asCSV = self.ui.Cut1D_ExporCSV_radioButton.isChecked()
+    asCSV = self.ui.Cut1D_ExporCSV_radioBtn.isChecked()
     saveString = self.ui.Cut1D_ExportName_lineEdit.text()
 
     if asCSV:
@@ -410,10 +411,10 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
 
         
         self.guiWindow.Cut1D_DoubleClick_Selection_function = lambda index:Cut1D_DoubleClick_Selection_function(self.guiWindow,index)
-        self.guiWindow.Delete1D_button_function = lambda:Cut1D_Delete1D_button_function(self.guiWindow)
+        self.guiWindow.Delete1D_button_function = lambda:Cut1D_Delete1D_btn_function(self.guiWindow)
         self.guiWindow.selected1DCutChanged = lambda : selected1DCutChanged(self.guiWindow)
         self.guiWindow.update1DCutLabels = lambda:update1DCutLabels(self.guiWindow)
-        self.guiWindow.Cut1D_Export1D_button_function = lambda:Cut1D_Export1D_button_function(self.guiWindow)
+        self.guiWindow.Cut1D_Export1D_btn_function = lambda:Cut1D_Export1D_btn_function(self.guiWindow)
         for key,value in self.__dict__.items():
             if 'Cut1D' in key:
                 self.guiWindow.ui.__dict__[key] = value
@@ -423,13 +424,13 @@ class Cut1DManager(Cut1DManagerBase, Cut1DManagerForm):
         self.guiWindow.ui.Cut1D_SelectUnits_RLU_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_units_function)
         self.guiWindow.ui.Cut1D_SelectCut_Q_radioButton.toggled.connect(self.guiWindow.Cut1D_toggle_CutDir_function)
         
-        self.guiWindow.ui.Cut1D_Export1D_button.clicked.connect(self.guiWindow.Cut1D_Export1D_button_function)
+        self.guiWindow.ui.Cut1D_Export1D_btn.clicked.connect(self.guiWindow.Cut1D_Export1D_btn_function)
 
         self.guiWindow.ui.Cut1D_SetTitle_lineEdit.returnPressed.connect(self.TitleChanged)
 
         self.guiWindow.DataSetSelectionModel.selectionChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
         self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.Cut1D_DataSet_selectionChanged_function)
-        self.guiWindow.ui.Cut1D_plotTogether_button.clicked.connect(self.guiWindow.Cut1D_cut1DPlotTogether)
+        self.guiWindow.ui.Cut1D_plotTogether_btn.clicked.connect(self.guiWindow.Cut1D_cut1DPlotTogether)
     
     
     def TitleChanged(self):

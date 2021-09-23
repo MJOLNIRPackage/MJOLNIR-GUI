@@ -466,7 +466,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QPushButton" name="Cut1D_Delete1D_button">
+          <widget class="QPushButton" name="Cut1D_Delete1D_btn">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -482,7 +482,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QPushButton" name="Cut1D_plotTogether_button">
+          <widget class="QPushButton" name="Cut1D_plotTogether_btn">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -552,7 +552,10 @@
          <number>10</number>
         </property>
         <item>
-         <widget class="QRadioButton" name="Cut1D_ExporCSV_radioButton">
+         <widget class="QRadioButton" name="Cut1D_ExporCSV_radioBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>csv</string>
           </property>
@@ -565,7 +568,10 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="Cut1D_ExporUFIT_radioButton">
+         <widget class="QRadioButton" name="Cut1D_ExporUFIT_radioBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>uFit</string>
           </property>
@@ -600,9 +606,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="Cut1D_Export1D_button">
+       <widget class="QPushButton" name="Cut1D_Export1D_btn">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
-         <string>Export</string>
+         <string>Export All</string>
         </property>
        </widget>
       </item>
@@ -614,7 +623,7 @@
  <tabstops>
   <tabstop>Cut1D_Generate1D_button</tabstop>
   <tabstop>Cut1D_plot_button</tabstop>
-  <tabstop>Cut1D_Delete1D_button</tabstop>
+  <tabstop>Cut1D_Delete1D_btn</tabstop>
   <tabstop>Cut1D_HStart_lineEdit</tabstop>
   <tabstop>Cut1D_KStart_lineEdit</tabstop>
   <tabstop>Cut1D_LStart_lineEdit</tabstop>
