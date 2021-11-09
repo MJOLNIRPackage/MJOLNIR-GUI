@@ -303,7 +303,7 @@ def cut1DFunctionCircle(self,viewer,dr):
     # Extract the parameters
     rounding = 4 # Round to 4 digits
     parameters = extractCut1DPropertiesCircle(dr.circ,sample,rounding = rounding)
-    parameters['minPixel'] = np.round(viewer.dQE[viewer.axis])
+    parameters['minPixel'] = np.round(viewer.dQE[viewer.axis],rounding)
     
     
     parameters['Emin']=np.round(viewer.ds.energy.min(),rounding)

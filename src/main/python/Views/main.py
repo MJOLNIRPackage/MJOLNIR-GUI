@@ -209,7 +209,7 @@ class Ui_MainWindow(object):
         self.actionSave_GUI_state.setText(_translate("MainWindow", "Save GUI state"))
         self.actionLoad_GUI_state.setText(_translate("MainWindow", "Load GUI state"))
         self.actionGenerate_View3d_script.setText(_translate("MainWindow", "Generate View3D script"))
-        self.actionGenerate_QELine_script.setText(_translate("MainWindow", "Generate QELine script"))
+        self.actionGenerate_QELine_script.setText(_translate("MainWindow", "Generate QE Cut script"))
         self.actionGenerate_QPlane_script.setText(_translate("MainWindow", "Generate QPlane script"))
         self.actionGenerate_1d_script.setText(_translate("MainWindow", "Generate 1D script"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))

@@ -321,8 +321,8 @@ def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True,
     return '\n'.join(plotString)
 
 
-@ProgressBarDecoratorArguments(runningText='Generating QELine Script',completedText='Script Saved',failedText='Cancelled')
-def generateQELineScript(self):
+@ProgressBarDecoratorArguments(runningText='Generating QE Script',completedText='Script Saved',failedText='Cancelled')
+def generateQEScript(self):
     self.stateMachine.run()
     if not self.stateMachine.currentState.name in ['Raw','Converted']:
         _GUItools.dialog(text='It is not possible to generate a script without any data loaded.')
@@ -373,7 +373,7 @@ def generateQELineScript(self):
     RLU = self.ui.QELine_SelectUnits_RLU_radioButton.isChecked()
     
     
-    generatePlotQELineScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
+    generatePlotQEScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
                                 HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
                                 width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
                                 CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins,
@@ -382,7 +382,7 @@ def generateQELineScript(self):
     return True    
 
     
-def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None, 
+def generatePlotQEScript(saveFile,dataSetName,dataFiles,binning = None, 
                              HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                              width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
                              CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False,
@@ -392,7 +392,7 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
     saveString.append(startString())
     saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
 
-    saveString.append(plotQELineText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
+    saveString.append(plotQEText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
                width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
                 CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins,cmap=cmap))
 
@@ -402,7 +402,7 @@ def generatePlotQELineScript(saveFile,dataSetName,dataFiles,binning = None,
         file.write(saveString)
         
 
-def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+def plotQEText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False,cmap='viridis'):
 
@@ -425,6 +425,8 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
 
     if cmap != 'viridis':
         cmapArgument = ', cmap = "'+cmap+'"'
+    else:
+        cmapArgument = ''
 
     args = rluArgument+logArgument+constantBinsArgument+cmapArgument
 
@@ -437,9 +439,6 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
     plotString.append('Q1 = np.array([' + HStart + ',' + KStart + ',' + LStart + '])')
     plotString.append('Q2 = np.array([' + HEnd + ',' + KEnd + ',' + LEnd + '])')
     
-    plotString.append('# Collect them into one array')
-    plotString.append('QPoints = np.array([Q1,Q2])')
-    
     plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
     plotString.append('width = ' + width + ' # 1/AA')
     plotString.append('minPixel = ' + minPixel + ' # 1/AA')
@@ -451,7 +450,7 @@ def plotQELineText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1
     plotString.append('fig = plt.figure(figsize=(14,6))')
     plotString.append('ax = fig.gca()')
     plotString.append("ax,DataLists,Bins,BinCenters,Offsets = \\" )
-    plotString.append('        ' + dataSetName + '.plotCutQELine(QPoints=QPoints, width=width, minPixel=minPixel, \\')
+    plotString.append('        ' + dataSetName + '.plotCutQE(q1=Q1, q2=Q2, width=width, minPixel=minPixel, \\')
     plotString.append('        ' +'ax=ax, EnergyBins=EnergyBins' +args +')')
 
     plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
@@ -757,7 +756,7 @@ def plotCut1DTextSingle(dataSetName, cut):
 
 # Teach the main window how to call the functions in here.
 def initGenerateScript(guiWindow):
-    guiWindow.generateQELineScript = lambda: generateQELineScript(guiWindow)
+    guiWindow.generateQEScript = lambda: generateQEScript(guiWindow)
     guiWindow.generate3DScript = lambda: generate3DScript(guiWindow)
     guiWindow.generateQPlaneScript = lambda: generateQPlaneScript(guiWindow)
     guiWindow.generateCut1DScript = lambda: generateCut1DScript(guiWindow)

@@ -93,7 +93,7 @@ home = str(Path.home())
 # E.g.: View3D_plot_button and View3D_plot_button_function
 
 #Headlines so far are:
-#DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
+#DataSet, View3D, QE Cut, QPlane, Cut1D, Raw1D
 
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
@@ -137,7 +137,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.figureList = [] # Holder for selectable window list
 
         # Lists of views in shown order
-        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
+        self.nameList = ['View3D','QE cuts','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
         self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D] # NormalizationManager
         self.startState = [True,False,False,False,True,False] # If not collapsed #False
 
@@ -280,9 +280,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QE.png')))
-        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QE Cut Script') 
         self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
-        self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQELineScript)
+        self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQEScript)
         
         self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QP.png')))
         self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
@@ -798,6 +798,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 except AttributeError:
                     pass
 
+    def getCurrentDirectory(self):
+        return self.currentFolder
 
     def setCurrentDirectory(self,folder):
         self.currentFolder = folder

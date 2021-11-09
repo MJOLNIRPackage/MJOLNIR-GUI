@@ -14,6 +14,7 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets, uic
 import numpy as np
+from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectanglePerpendicular,extractCut1DPropertiesRectangleHorizontal, extractCut1DPropertiesRectangleVertical
 
 
 @ProgressBarDecoratorArguments(runningText='Generating QELine plot',completedText='QELine plot generated')
@@ -55,8 +56,9 @@ def QELine_plot_button_function(self):
     # Define energy bins
     EMin=float(self.ui.QELine_EMin_lineEdit.text())
     EMax=float(self.ui.QELine_EMax_lineEdit.text())
-    NPoints=int(self.ui.QELine_NPoints_lineEdit.text())        
-    EnergyBins=np.linspace(EMin,EMax,NPoints)
+    NPoints=int(self.ui.QELine_NPoints_lineEdit.text())       
+    dE = (EMax-EMin)/(NPoints+1)
+    #EnergyBins=np.linspace(EMin,EMax,NPoints)
 
     # Check various plot settings
 
@@ -70,67 +72,72 @@ def QELine_plot_button_function(self):
     else:
         constantBins=False              
 
+    cut1DrectanglePerpendicularLocal = lambda viewer,dr:cut1DrectanglePerpendicular(self,viewer,dr)
+    cut1DFunctionRectangleHorizontalLocal = lambda viewer,dr:cut1DFunctionRectangleHorizontal(self,viewer,dr)
+    cut1DFunctionRectangleVerticalLocal = lambda viewer,dr: cut1DFunctionRectangleVertical(self,viewer,dr)
+    #try:
+    # Make plot
+    ax,DataLists,Bins,BinCenters = \
+    ds.plotCutQE(q1=QPoints[0],q2=QPoints[1], width=width, \
+                                    minPixel=minPixel, EMin=EMin,EMax=EMax,dE = dE,\
+                                    rlu=rlu,cmap=self.colormap,cut1DFunctionRectanglePerpendicular=cut1DrectanglePerpendicularLocal,
+                                    cut1DFunctionRectangleHorizontal=cut1DFunctionRectangleHorizontalLocal,
+                                    cut1DFunctionRectangleVertical = cut1DFunctionRectangleVerticalLocal,
+                                    outputFunction=self.writeToStatus) # log!constantBins=constantBins,
 
-    try:
-        # Make plot
-        ax,DataLists,Bins,BinCenters,Offsets = \
-        ds.plotCutQELine(QPoints=QPoints, width=width, \
-                                        minPixel=minPixel, EnergyBins=EnergyBins,\
-                                            rlu=rlu,log=log,constantBins=constantBins,cmap=self.colormap)
+    currentFigure = ax.get_figure()
+    self.figureListQELine.append(currentFigure)
 
-        currentFigure = ax.get_figure()
-        self.figureListQELine.append(currentFigure)
-
-        grid = self.ui.QELine_Grid_checkBox.isChecked()
-        
-        TitleText=self.ui.QELine_SetTitle_lineEdit.text()
-        if TitleText == '':
-            TitleText = self.ui.QELine_SetTitle_lineEdit.placeholderText()
-        CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
-        CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
-
-        currentFigure.settings = {'QELine_SelectUnits_RLU_radioButton':rlu,
-                       'QELine_SelectUnits_AA_radioButton': not rlu,
-                       'QELine_Grid_checkBox':grid!=False,
-                       'QELine_LogScale_checkBox':log,
-                       'QELine_ConstantBins_checkBox':constantBins,
-                       #'View3D_CurratAxe_checkBox':plotCurratAxe,
-                       'QELine_HStart_lineEdit':HStart,
-                       'QELine_KStart_lineEdit':KStart,
-                       'QELine_LStart_lineEdit':LStart,
-                       'QELine_HEnd_lineEdit':HEnd,
-                       'QELine_KEnd_lineEdit':KEnd,
-                       'QELine_LEnd_lineEdit':LEnd,
-                       'QELine_Width_lineEdit':width,
-                       'QELine_MinPixel_lineEdit':minPixel,
-                       'QELine_EMax_lineEdit':EMax,
-                       'QELine_EMin_lineEdit':EMin,
-                       'QELine_NPoints_lineEdit':NPoints,
-                       'QELine_SetTitle_lineEdit':TitleText,
-                       'QELine_CAxisMax_lineEdit':CAxisMax,
-                       'QELine_CAxisMin_lineEdit':CAxisMin}
+    grid = self.ui.QELine_Grid_checkBox.isChecked()
     
-        def setClosed(fig):
-            fig.closed=True
+    TitleText=self.ui.QELine_SetTitle_lineEdit.text()
+    if TitleText == '':
+        TitleText = self.ui.QELine_SetTitle_lineEdit.placeholderText()
+    CAxisMin=float(self.ui.QELine_CAxisMin_lineEdit.text())
+    CAxisMax=float(self.ui.QELine_CAxisMax_lineEdit.text())
 
-        closeFunction = lambda event: setClosed(currentFigure)
-        currentFigure.canvas.mpl_connect('close_event', closeFunction)
-        # Make some final changes to the plot
-        self.QELine=ax    
-        
-        currentFigure.set_size_inches(8,6)
+    currentFigure.settings = {'QELine_SelectUnits_RLU_radioButton':rlu,
+                    'QELine_SelectUnits_AA_radioButton': not rlu,
+                    'QELine_Grid_checkBox':grid!=False,
+                    'QELine_LogScale_checkBox':log,
+                    'QELine_ConstantBins_checkBox':constantBins,
+                    #'View3D_CurratAxe_checkBox':plotCurratAxe,
+                    'QELine_HStart_lineEdit':HStart,
+                    'QELine_KStart_lineEdit':KStart,
+                    'QELine_LStart_lineEdit':LStart,
+                    'QELine_HEnd_lineEdit':HEnd,
+                    'QELine_KEnd_lineEdit':KEnd,
+                    'QELine_LEnd_lineEdit':LEnd,
+                    'QELine_Width_lineEdit':width,
+                    'QELine_MinPixel_lineEdit':minPixel,
+                    'QELine_EMax_lineEdit':EMax,
+                    'QELine_EMin_lineEdit':EMin,
+                    'QELine_NPoints_lineEdit':NPoints,
+                    'QELine_SetTitle_lineEdit':TitleText,
+                    'QELine_CAxisMax_lineEdit':CAxisMax,
+                    'QELine_CAxisMin_lineEdit':CAxisMin}
+
+    def setClosed(fig):
+        fig.closed=True
+
+    closeFunction = lambda event: setClosed(currentFigure)
+    currentFigure.canvas.mpl_connect('close_event', closeFunction)
+    # Make some final changes to the plot
+    self.QELine=ax    
     
-        if self.ui.QELine_Grid_checkBox.isChecked():
-            ax.grid(True)
-        else:
-            ax.grid(False)
-        self.QELine_setCAxis_button_function()
-        self.QELine_SetTitle_button_function()
-    
-        return True
-    except:
-        _GUItools.dialog(text='QELine cut could not be made. Check the limits for the cut and try again!')
-        return False
+    currentFigure.set_size_inches(8,6)
+
+    if self.ui.QELine_Grid_checkBox.isChecked():
+        ax.grid(True)
+    else:
+        ax.grid(False)
+    self.QELine_setCAxis_button_function()
+    self.QELine_SetTitle_button_function()
+
+    return True
+    #except:
+    #    _GUItools.dialog(text='QELine cut could not be made. Check the limits for the cut and try again!')
+    #    return False
 
 def QELine_Grid_checkBox_toggled_function(self):
     currentFigure = self.figureListQELine.getCurrentFigure()
@@ -193,6 +200,89 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setChecked')(value)
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
+
+def cut1DrectanglePerpendicular(self,ax,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(ax,'sample'):
+        sample = ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+    parameters = extractCut1DPropertiesRectanglePerpendicular(dr.rect,sample)
+
+    offset = ax.convertPlotAxisReal(parameters['center'][0]).T[0]
+    
+    del parameters['center'] # remove the 'center' as it is not allowed in plotCut1D
+
+    # transform the orthogonal vector if needed 
+    if not sample is None:
+        orthogonalVector = sample.calculateQxQyToHKL(*ax.orthovec)
+    else:
+        orthogonalVector = ax.orthovec
+    
+    # find actual offset along current cut
+    offset -= np.dot(orthogonalVector,offset)*orthogonalVector/np.dot(orthogonalVector.T,orthogonalVector)
+    
+    parameters['q1'] = [np.round(x,rounding) for x in ax.minOrthoPosition+offset]
+    parameters['q2'] = [np.round(x,rounding) for x in ax.maxOrthoPosition+offset]
+
+    parameters['minPixel'] = np.round(ax.minPixel,rounding)
+
+    
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [ax.ds,parameters['q1'],parameters['q2'],
+                           np.round(parameters['width'],rounding),parameters['minPixel'],np.round(parameters['Emax'],rounding),np.round(parameters['Emin'],rounding),True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+
+def cut1DFunctionRectangleHorizontal(self,ax,dr):
+    rounding = 4
+    if hasattr(ax,'sample'):
+        sample = ax.sample
+    else:
+        sample = None
+    parameters = extractCut1DPropertiesRectangleHorizontal(dr.rect,sample)
+    
+    # Convert center point into actual position in Q
+    parameters['q1'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q1'][0]).T[0]]
+    parameters['q2'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q2'][0]).T[0]]
+    
+    parameters['minPixel'] = np.round(ax.minPixel,rounding)
+    parameters['width'] = np.round(ax.width,rounding)
+    self.interactiveCut = [ax.ds,parameters['q1'],parameters['q2'],
+                           parameters['width'],parameters['minPixel'],np.round(parameters['Emax'],rounding),np.round(parameters['Emin'],rounding),True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+
+def cut1DFunctionRectangleVertical(self,ax,dr):
+    rounding = 4
+    if hasattr(ax,'sample'):
+        sample = ax.sample
+    else:
+        sample = None
+    parameters = extractCut1DPropertiesRectangleVertical(dr.rect,sample)
+    
+    # Convert center point into actual position in Q
+    parameters['q'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q']).T[0]]
+    parameters['q2'] = None
+    
+    parameters['minPixel'] = np.round(ax.minPixel,rounding)
+    parameters['width'] = np.round(ax.width,rounding)
+    self.interactiveCut = [ax.ds,parameters['q'],None,
+                           parameters['width'],parameters['minPixel'],np.round(parameters['E2'],rounding),np.round(parameters['E1'],rounding),False,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
 
 QELineManagerBase, QELineManagerForm = loadUI('QELine.ui')
 
