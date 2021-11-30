@@ -230,8 +230,8 @@ def Cut1D_Generate1D_button_function(self):
         return False
     try:
         if cutQ:
-            pdData,bins = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=False)
-            parameters = {'q1':q1,'q2':q2,'EMin':EMin,'EMax':EMax,'rlu':rlu,'width':width,'constantBins':False,'minPixel':minPixel,'method':'cut1D','dataset':ds}
+            pdData,bins = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=True,ufit=False)
+            parameters = {'q1':q1,'q2':q2,'EMin':EMin,'EMax':EMax,'rlu':rlu,'width':width,'constantBins':True,'minPixel':minPixel,'method':'cut1D','dataset':ds}
             
             # add parameters to correct edits, loop through q. If rlu sizes matches otherwise len(q) = 2 and padding with 0.0
             for q,field in itertools.zip_longest(q1,['Cut1D_HStart_lineEdit','Cut1D_KStart_lineEdit','Cut1D_LStart_lineEdit'],fillvalue=0.0):  
@@ -250,8 +250,8 @@ def Cut1D_Generate1D_button_function(self):
 
 
         else: # else along E
-            pdData,bins = ds.cut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width, minPixel = minPixel,ufit=False)
-            parameters = {'EMin':EMin,'EMax':EMax,'q1':q1,'q2':None,'rlu':rlu,'width':width,'minPixel':minPixel,'method':'cut1DE','dataset':ds}
+            pdData,bins = ds.cut1DE(E1=EMin,E2=EMax,q=q1,rlu=rlu,width=width,constantBins=True, minPixel = minPixel,ufit=False)
+            parameters = {'EMin':EMin,'EMax':EMax,'q1':q1,'q2':None,'rlu':rlu,'width':width,'constantBins':True,'minPixel':minPixel,'method':'cut1DE','dataset':ds}
             
             for q,field in itertools.zip_longest(q1,['Cut1D_HStart_lineEdit','Cut1D_KStart_lineEdit','Cut1D_LStart_lineEdit','Cut1D_HEnd_lineEdit','Cut1D_KEnd_lineEdit','Cut1D_LEnd_lineEdit'],fillvalue=0.0):  
                 parameters[field] = q
