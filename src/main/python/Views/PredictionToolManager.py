@@ -13,7 +13,7 @@ from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
-from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy
+from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy,predictionInstrumentSupport
 from MJOLNIR.Data import Sample
 import MJOLNIR 
 import pyperclip
@@ -89,6 +89,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
 
     def setup(self):
+
+        ## Add supported instruments to combobox
+        self.instrument_comboBox.addItems(predictionInstrumentSupport)
+
+        
         # Update all boxes with check on out focus
 
         self.cell_a_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
@@ -269,7 +274,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         cell = np.array(self.getCell())
 
-        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,points=points,outputFunction=self.guiWindow.writeToStatus)
+        instrument = str(self.instrument_comboBox.currentText())
+
+        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,
+        points=points,outputFunction=self.guiWindow.writeToStatus, instrument=instrument)
 
         self.predictionAx = ax
         self.guiWindow.windows.append(ax[0].get_figure())
