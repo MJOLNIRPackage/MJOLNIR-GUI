@@ -201,7 +201,13 @@ def DataSet_AddFiles_button_function(self):
     if not self.stateMachine.requireStateByName('Partial'):
         return False
     folder = self.currentFolder
-    files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
+    ## generate string for raw, converted, and all files
+    allowedRawFilesString = 'Raw ('+' '.join(['*.'+str(x) for x in DataFile.supportedRawFormats])+')'
+    allowedConvertedFilesString = 'Converted ('+' '.join(['*.'+str(x) for x in DataFile.supportedConvertedFormats])+')'
+    allowedAllFilesString = 'All Files (*)'
+    
+    allowedString = ';;'.join([allowedRawFilesString,allowedConvertedFilesString,allowedAllFilesString])
+    files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,allowedString)
     return self.DataSet_AddFiles(files)
 
 def DataSet_AddFiles(self,files):
