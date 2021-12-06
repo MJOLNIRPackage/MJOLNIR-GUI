@@ -21,7 +21,13 @@ from time import sleep
 
 from os import path
 import os
-from fbs_runtime import PUBLIC_SETTINGS
+try:
+    from fbs_runtime import PUBLIC_SETTINGS
+except:
+    import json
+    fileLocation = path.abspath(path.join(path.dirname(__file__),'..','..','build','settings','base.json'))
+    with open(fileLocation) as jfile:
+        PUBLIC_SETTINGS = json.load(jfile)
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
