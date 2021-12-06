@@ -73,25 +73,28 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
 
                 ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
                 if len(ds)>0:
-                    recalibrate = QtWidgets.QAction('Update Calibration')
-                    recalibrate.setToolTip("Update calibration file(s)")
-                    recalibrate.setStatusTip(recalibrate.toolTip())
-                    recalibrate.triggered.connect(lambda: gui.DataSet_recalibrateFunction(gui,idx))
-                    recalibrate.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
-                    
-                    menu.addAction(recalibrate)
+                    currentDS = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+                    if len(currentDS)!=0: # If it contains data files
+                        if currentDS[0].instrument=='CAMEA': ## Only CAMEA data can be recallibrated
+                            recalibrate = QtWidgets.QAction('Update Calibration')
+                            recalibrate.setToolTip("Update calibration file(s)")
+                            recalibrate.setStatusTip(recalibrate.toolTip())
+                            recalibrate.triggered.connect(lambda: gui.DataSet_recalibrateFunction(gui,idx))
+                            recalibrate.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
+                            
+                            menu.addAction(recalibrate)
 
-                    sort = QtWidgets.QAction('Auto Sort')
-                    sort.setToolTip("Sort data files according to ascending Ei, abs(2theta), scan dir, A3")
-                    sort.setStatusTip(sort.toolTip())
-                    def sorting(ds,gui):
-                        ds.autoSort()
-                        gui.DataSetModel.layoutChanged.emit()
-                        gui.DataFileModel.layoutChanged.emit()
-                    sort.triggered.connect(lambda: sorting(ds,gui))
-                    sort.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/arrow-circle-double-135.png')))
-                    
-                    menu.addAction(sort)
+                        sort = QtWidgets.QAction('Auto Sort')
+                        sort.setToolTip("Sort data files according to ascending Ei, abs(2theta), scan dir, A3")
+                        sort.setStatusTip(sort.toolTip())
+                        def sorting(ds,gui):
+                            ds.autoSort()
+                            gui.DataSetModel.layoutChanged.emit()
+                            gui.DataFileModel.layoutChanged.emit()
+                        sort.triggered.connect(lambda: sorting(ds,gui))
+                        sort.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/arrow-circle-double-135.png')))
+                        
+                        menu.addAction(sort)
 
                 return menu.exec_(position)
 
