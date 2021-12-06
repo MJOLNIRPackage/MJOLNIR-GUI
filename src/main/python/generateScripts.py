@@ -642,12 +642,13 @@ def generateCut1DScript(self):
     else:
         
         for cut in self.Cut1DModel.dataCuts1D:
-            method = cut.method
+            method = cut.parameters['method']
             params = {}
             for param in cut.parameters:
-                if param == 'method':
+                if param == 'method' or param == 'dataset' or 'Cut1D_' in param:
                     continue
-                val = getattr(cut,param)
+                #print(cut.name,param,cut.parameters)
+                val = cut.parameters[param]
                 if isinstance(val,(list,np.ndarray)):
                     val = '['+','.join([str(x) for x in val])+']'
                 params[param] = val
@@ -670,14 +671,14 @@ def generateCut1DScript(self):
         
         
 def plotCut1DTextSingle(dataSetName, cut):
-    if cut.method.find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
-        q = cut.q
-        EMin,EMax = cut.E1,cut.E2
-        rlu,width = cut.rlu,cut.width
-        minPixel = cut.minPixel
-        constantBins = cut.constantBins
-        ufit = True
-        method = cut.method
+    if cut.parameters['method'].find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
+        q = cut.parameters['q1']
+        EMin,EMax = cut.parameters['EMin'],cut.parameters['EMax']
+        rlu,width = cut.parameters['rlu'],cut.parameters['width']
+        minPixel = cut.parameters['minPixel']
+        constantBins = cut.parameters['constantBins']
+        ufit = not cut._ufit is None
+        method = cut.parameters['method']
 
         
         plotString = []
@@ -696,7 +697,7 @@ def plotCut1DTextSingle(dataSetName, cut):
         plotString.append('# Define energies')
         plotString.append('EMin='+str(EMin))
         plotString.append('EMax='+str(EMax))
-        if cut.method.find('plot')>-1:
+        if cut.parameters['method'].find('plot')>-1:
             returnPars = 'ax,'
         else:
             returnPars = ''
@@ -707,13 +708,13 @@ def plotCut1DTextSingle(dataSetName, cut):
         plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(EMin=EMin,EMax=EMax,q=Q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
         
     else:
-        q1,q2 = cut.q1, cut.q2
-        EMin,EMax = cut.Emin,cut.Emax
-        rlu,width = cut.rlu,cut.width
-        minPixel = cut.minPixel
-        constantBins = cut.constantBins
-        ufit = True
-        method = cut.method
+        q1,q2 = cut.parameters['q1'], cut.parameters['q2']
+        EMin,EMax = cut.parameters['EMin'],cut.parameters['EMin']
+        rlu,width = cut.parameters['rlu'],cut.parameters['width']
+        minPixel = cut.parameters['minPixel']
+        constantBins = cut.parameters['constantBins']
+        ufit = not cut._ufit is None
+        method = cut.parameters['method']
 
         plotString = []
 
@@ -735,7 +736,7 @@ def plotCut1DTextSingle(dataSetName, cut):
         plotString.append('EMin='+str(EMin))
         plotString.append('EMax='+str(EMax))
 
-        if cut.method.find('plot')>-1:
+        if method.find('plot')>-1:
             returnPars = 'ax,'
         else:
             returnPars = ''
@@ -745,7 +746,7 @@ def plotCut1DTextSingle(dataSetName, cut):
             returnPars+='data,bins'
         plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
 
-    if cut.method.find('plot')>-1:
+    if method.find('plot')>-1:
         title = cut.name
         plotString.append('# Set title of plot')
         plotString.append('ax.set_title("{}")\n'.format(title))
