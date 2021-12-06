@@ -81,7 +81,10 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
     def load(self):
         pars = self.getPars()
         folder = self.guiWindow.getCurrentDirectory()
-        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;All Files (*)")
+        allowedRawFilesString = 'Raw ('+' '.join(['*.'+str(x) for x in DataFile.supportedRawFormats])+')'
+        allowedAllFilesString = 'All Files (*)'
+        allowedString = ';;'.join([allowedRawFilesString,allowedAllFilesString])
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,allowedString)
         if files is None:
             return False
         if len(files) == 0:
