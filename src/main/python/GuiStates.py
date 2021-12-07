@@ -26,7 +26,7 @@ def AllEnabled(StateMachine):
     enabled = np.ones(len(names))
     #enabledNames = ['DataSet_NewDataSet_button',]
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
-        item.setEnabled(enable)
+        item.setEnabled(int(enable))
 
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
@@ -42,7 +42,7 @@ def ConvertedEnabled(StateMachine):
     
     enabled = AllTrueBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
-        item.setEnabled(enable)
+        item.setEnabled(int(enable))
 
     blue = AllFalseBut(['View3D_plot_button','QELine_plot_button','QPlane_plot_button','Cut1D_plot_button','Cut1D_Generate1D_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
@@ -60,7 +60,7 @@ def RawEnabled(StateMachine):
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
-        item.setEnabled(enable)
+        item.setEnabled(int(enable))
 
     blue = AllFalseBut(['DataSet_convertData_button','Raw1D_plot_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
@@ -79,7 +79,7 @@ def PartialEnabled(StateMachine):
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
-        item.setEnabled(enable)
+        item.setEnabled(int(enable))
 
     blue = AllFalseBut(['DataSet_AddFiles_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
@@ -97,7 +97,7 @@ def EmptyEnabled(StateMachine):
     
     enabled = AllFalseBut(enabledNames,enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,enabled):
-        item.setEnabled(enable)
+        item.setEnabled(int(enable))
 
     blue = AllFalseBut(['DataSet_NewDataSet_button'],enabled,names)
     for item,enable in zip(StateMachine.guiWindow.blockItems,blue):
