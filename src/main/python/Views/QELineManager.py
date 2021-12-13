@@ -77,7 +77,7 @@ def QELine_plot_button_function(self):
     cut1DFunctionRectangleVerticalLocal = lambda viewer,dr: cut1DFunctionRectangleVertical(self,viewer,dr)
     #try:
     # Make plot
-    ax,DataLists,Bins,BinCenters = \
+    ax,Data,bins = \
     ds.plotCutQE(q1=QPoints[0],q2=QPoints[1], width=width, \
                                     minPixel=minPixel, EMin=EMin,EMax=EMax,dE = dE,\
                                     rlu=rlu,cmap=self.colormap,cut1DFunctionRectanglePerpendicular=cut1DrectanglePerpendicularLocal,
