@@ -210,15 +210,10 @@ def generate3DScript(self):
 
     RLU = self.ui.View3D_SelectUnits_RLU_radioButton.isChecked()
 
-    radioState = [self.ui.View3D_SelectView_QxE_radioButton.isChecked(),
-    self.ui.View3D_SelectView_QyE_radioButton.isChecked(),self.ui.View3D_SelectView_QxQy_radioButton.isChecked()]
-    selectView = np.arange(3)[radioState]
-    selectView = selectView[0]
-
     # And generate the script
     generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
                                 RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
-                                title=title, selectView=selectView,customViewer=customViewer,counts=counts,convertBeforeSubtract=convertBeforeSubtract,
+                                title=title,customViewer=customViewer,counts=counts,convertBeforeSubtract=convertBeforeSubtract,
                                 backgroundFiles=backgroundFiles,cmap=self.colormap,CurratAxeBraggList=CurratAxeBraggList)
 
     return True
@@ -418,17 +413,12 @@ def plotQEText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KE
     else:
         logArgument = ''
 
-    if constantBins == True:
-        constantBinsArgument = ', constantBins = True'
-    else:
-        constantBinsArgument = ''
-
     if cmap != 'viridis':
         cmapArgument = ', cmap = "'+cmap+'"'
     else:
         cmapArgument = ''
 
-    args = rluArgument+logArgument+constantBinsArgument+cmapArgument
+    args = rluArgument+logArgument+cmapArgument
 
     plotString.append('# Plotting a cut through data in Q and E is done using this code')
     
@@ -447,11 +437,9 @@ def plotQEText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KE
     plotString.append('EnergyBins=np.linspace(' + EMin + ',' + EMax + ',' + NPoints +')')  
         
     
-    plotString.append('fig = plt.figure(figsize=(14,6))')
-    plotString.append('ax = fig.gca()')
-    plotString.append("ax,DataLists,Bins,BinCenters,Offsets = \\" )
+    plotString.append("ax,Data,Bins = \\" )
     plotString.append('        ' + dataSetName + '.plotCutQE(q1=Q1, q2=Q2, width=width, minPixel=minPixel, \\')
-    plotString.append('        ' +'ax=ax, EnergyBins=EnergyBins' +args +')')
+    plotString.append('        ' +'EnergyBins=EnergyBins' +args +')')
 
     plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
                         +"# This is countered by specifying min and max for colour by the call below.\n"\
@@ -566,7 +554,8 @@ def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
 
     if cmap != 'viridis':
         cmapArgument = ', cmap = "'+cmap+'"'
-
+    else:
+        cmapArgument = ''
     args = rluArgument+logArgument+cmapArgument
 
     plotString.append('# Plotting a Q plane done using this code')
@@ -638,31 +627,12 @@ def generateCut1DScript(self):
 
     if self.Cut1DModel.rowCount() == 1:
         cut = self.Cut1DModel.dataCuts1D[0]
-        saveString.append(plotCut1DTextSingle(dataSetName,cut))
+        saveString.append(plotCut1DText(dataSetName,cut,single=True))
     else:
-        
-        for cut in self.Cut1DModel.dataCuts1D:
-            method = cut.parameters['method']
-            params = {}
-            for param in cut.parameters:
-                if param == 'method' or param == 'dataset' or 'Cut1D_' in param:
-                    continue
-                #print(cut.name,param,cut.parameters)
-                val = cut.parameters[param]
-                if isinstance(val,(list,np.ndarray)):
-                    val = '['+','.join([str(x) for x in val])+']'
-                params[param] = val
-            
-            name = cut.name.replace(' ','_').replace('.','_').replace(',','_')
 
-            if method.find('plot')>-1:
-                returnValues = ','.join([name+'_'+x for x in ['ax','data','bins']])
-            else:
-                returnValues = ','.join([name+'_'+x for x in ['data','bins']])
-            line = returnValues+' = '+dataSetName+'.'+method+'('
-            line += ', '.join([param+' = ' + str(value) for param,value in params.items()])+')\n'
-            saveString.append(line)
-            
+        for cut in self.Cut1DModel.dataCuts1D:
+            saveString.append(plotCut1DText(dataSetName,cut,single=False))
+            saveString.append('\n')
         
     saveString.append('\n\n#If a ufit object is needed, add "ufit=True" to the above method calls and change "_data" and "_bins" to "_ufit".')
     with open(saveFile,'w') as file:
@@ -670,7 +640,7 @@ def generateCut1DScript(self):
     return True    
         
         
-def plotCut1DTextSingle(dataSetName, cut):
+def plotCut1DText(dataSetName, cut,single=True):
     if cut.parameters['method'].find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
         q = cut.parameters['q1']
         EMin,EMax = cut.parameters['EMin'],cut.parameters['EMax']
@@ -680,23 +650,6 @@ def plotCut1DTextSingle(dataSetName, cut):
         ufit = not cut._ufit is None
         method = cut.parameters['method']
 
-        
-        plotString = []
-
-        plotString.append('# Plotting a 1D cut for constant q through data is done using this code')
-        plotString.append('# First define the positions to be cut through.')
-        
-        plotString.append('Q = np.array(['+','.join([str(x) for x in q])+ '])')
-        
-        plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
-        plotString.append('width = ' + str(width) + ' # 1/AA')
-        plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
-        plotString.append('rlu = ' + str(rlu))
-        plotString.append('constantBins = ' + str(constantBins))
-
-        plotString.append('# Define energies')
-        plotString.append('EMin='+str(EMin))
-        plotString.append('EMax='+str(EMax))
         if cut.parameters['method'].find('plot')>-1:
             returnPars = 'ax,'
         else:
@@ -705,11 +658,32 @@ def plotCut1DTextSingle(dataSetName, cut):
             returnPars+='cut'
         else:
             returnPars+='data,bins'
-        plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(EMin=EMin,EMax=EMax,q=Q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
+
+        plotString = []
+        if single:
+            plotString.append('# Plotting a 1D cut for constant q through data is done using this code')
+            plotString.append('# First define the positions to be cut through.')
+            
+            plotString.append('q = np.array(['+','.join([str(x) for x in q])+ '])')
+            
+            plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+            plotString.append('width = ' + str(width) + ' # 1/AA')
+            plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
+            plotString.append('rlu = ' + str(rlu))
+            plotString.append('constantBins = ' + str(constantBins))
+
+            plotString.append('# Define energies')
+            plotString.append('E1='+str(EMin))
+            plotString.append('E2='+str(EMax))
+            
+            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(E1=E1,E2=E2,q=q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
+        else:
+            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(E1={},E2={},q={},width={},minPixel={},rlu={},constantBins={},ufit={})'.format(
+            EMin,EMax,'['+','.join([str(x) for x in q])+ ']',width,minPixel,rlu,constantBins,ufit))
         
     else:
         q1,q2 = cut.parameters['q1'], cut.parameters['q2']
-        EMin,EMax = cut.parameters['EMin'],cut.parameters['EMin']
+        EMin,EMax = cut.parameters['EMin'],cut.parameters['EMax']
         rlu,width = cut.parameters['rlu'],cut.parameters['width']
         minPixel = cut.parameters['minPixel']
         constantBins = cut.parameters['constantBins']
@@ -717,24 +691,6 @@ def plotCut1DTextSingle(dataSetName, cut):
         method = cut.parameters['method']
 
         plotString = []
-
-        plotString.append('# Plotting a 1D cut through data is done using this code')
-        
-        
-        plotString.append('# First define the positions to be cut through.')
-        
-        plotString.append('Q1 = np.array(['+','.join([str(x) for x in q1])+ '])')
-        plotString.append('Q2 = np.array(['+','.join([str(x) for x in q2])+ '])')
-        
-        plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
-        plotString.append('width = ' + str(width) + ' # 1/AA')
-        plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
-        plotString.append('rlu = ' + str(rlu))
-        plotString.append('constantBins = ' + str(constantBins))
-
-        plotString.append('# Define energies')
-        plotString.append('EMin='+str(EMin))
-        plotString.append('EMax='+str(EMax))
 
         if method.find('plot')>-1:
             returnPars = 'ax,'
@@ -744,7 +700,31 @@ def plotCut1DTextSingle(dataSetName, cut):
             returnPars+='cut'
         else:
             returnPars+='data,bins'
-        plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
+
+        if single:
+            plotString.append('# Plotting a 1D cut through data is done using this code')
+            
+            
+            plotString.append('# First define the positions to be cut through.')
+            
+            plotString.append('Q1 = np.array(['+','.join([str(x) for x in q1])+ '])')
+            plotString.append('Q2 = np.array(['+','.join([str(x) for x in q2])+ '])')
+            
+            plotString.append('# Define orthogonal width and minimum pixel size along Q-cut')
+            plotString.append('width = ' + str(width) + ' # 1/AA')
+            plotString.append('minPixel = ' + str(minPixel) + ' # 1/AA')
+            plotString.append('rlu = ' + str(rlu))
+            plotString.append('constantBins = ' + str(constantBins))
+
+            plotString.append('# Define energies')
+            plotString.append('EMin='+str(EMin))
+            plotString.append('EMax='+str(EMax))
+
+            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
+        else:
+            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1={},q2={},width={},minPixel={},Emin={},Emax={},rlu={},constantBins={},ufit={})'.format(
+                '['+','.join([str(x) for x in q1])+ ']','['+','.join([str(x) for x in q2])+ ']',width,minPixel,EMin,EMax,rlu,constantBins,ufit
+            ))
 
     if method.find('plot')>-1:
         title = cut.name

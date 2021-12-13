@@ -46,7 +46,7 @@ setup(
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.src.main.python.MJOLNIR_GUI:main']
         },
     python_requires='>=3.5',
-    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR>=1.1.22','ufit>=1.4.0'], 
+    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5-Qt5','MJOLNIR>=1.1.22','ufit>=1.4.0'], 
     
     classifiers=[
         'Development Status :: 3 - Alpha',
