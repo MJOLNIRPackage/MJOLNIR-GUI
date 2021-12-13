@@ -38,33 +38,7 @@ def View3D_setCAxis_button_function(self):
         currentFigure.settings['View3D_CAxisMin_lineEdit'] = str(CAxisMin)
     
 
-def View3D_SelectView_QxE_radioButton_function(self):
-    currentFigure = self.figureListView3D.getCurrentFigure()
-    if not currentFigure is None:
-        currentFigure.setAxis(1)
-        # Redraw the title, then change the viewing plane to render properly
-        self.View3D_SetTitle_button_function()
-        currentFigure.setPlane(1)
-        currentFigure.setPlane(0)
-            
-def View3D_SelectView_QyE_radioButton_function(self):
-    currentFigure = self.figureListView3D.getCurrentFigure()
-    if not currentFigure is None:
-        currentFigure.setAxis(0)
-        # Redraw the title, then change the viewing plane to render properly
-        self.View3D_SetTitle_button_function()
-        currentFigure.setPlane(1)
-        currentFigure.setPlane(0)
-    
-def View3D_SelectView_QxQy_radioButton_function(self):
-    currentFigure = self.figureListView3D.getCurrentFigure()
-    if not currentFigure is None:
-        currentFigure.setAxis(2)
-        # Redraw the title, then change the viewing plane to render properly
-        self.View3D_SetTitle_button_function()
-        currentFigure.setPlane(1)
-        currentFigure.setPlane(0)
-    
+
 def View3D_SetTitle_button_function(self):        
     currentFigure = self.figureListView3D.getCurrentFigure()
     if not currentFigure is None:
@@ -175,14 +149,6 @@ def View3D_plot_button_function(self):
         
         currentFigure.ax.get_figure().canvas.mpl_connect('close_event', closeFunction)
     
-        # Select the correct view
-        if self.ui.View3D_SelectView_QxE_radioButton.isChecked():
-            self.View3D_SelectView_QyE_radioButton_function()
-        if self.ui.View3D_SelectView_QyE_radioButton.isChecked():
-            self.View3D_SelectView_QxE_radioButton_function()
-        if self.ui.View3D_SelectView_QxQy_radioButton.isChecked():
-            self.View3D_SelectView_QxQy_radioButton_function()
-
         self.View3D_SetTitle_button_function()
         currentFigure.setPlane(1)
         currentFigure.setPlane(0)
@@ -199,19 +165,13 @@ def View3D_plot_button_function(self):
 def View3D_toggle_mode_function(self):
     if self.ui.View3D_Mode_Viewer3D_radioButton.isChecked(): # changed to Viewer3D
         # Change titles
-        self.ui.View3D_SelectView_QxQy_radioButton.setEnabled(True)
-        self.ui.View3D_SelectView_QxE_radioButton.setEnabled(True)
-        self.ui.View3D_SelectView_QyE_radioButton.setEnabled(True)
         self.ui.View3D_Grid_checkBox.setEnabled(True)
 
         self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(True)
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(True)
 
     else: # Changing to AA
-        self.ui.View3D_SelectView_QxQy_radioButton.setEnabled(False)
-        self.ui.View3D_SelectView_QxE_radioButton.setEnabled(False)
-        self.ui.View3D_SelectView_QyE_radioButton.setEnabled(False)
-        self.ui.View3D_Grid_checkBox.setEnabled(False)
+        self.ui.View3D_Grid_checkBox.setEnabled(True)
 
         self.ui.View3D_SelectUnits_RLU_radioButton.setEnabled(False)
         self.ui.View3D_SelectUnits_AA_radioButton.setEnabled(False)
@@ -329,9 +289,6 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         
     def initView3DManager(self):    
         self.guiWindow.View3D_setCAxis_button_function = lambda:View3D_setCAxis_button_function(self.guiWindow)
-        self.guiWindow.View3D_SelectView_QxE_radioButton_function = lambda:View3D_SelectView_QxE_radioButton_function(self.guiWindow)
-        self.guiWindow.View3D_SelectView_QyE_radioButton_function = lambda:View3D_SelectView_QyE_radioButton_function(self.guiWindow)
-        self.guiWindow.View3D_SelectView_QxQy_radioButton_function = lambda:View3D_SelectView_QxQy_radioButton_function(self.guiWindow)
         self.guiWindow.View3D_SetTitle_button_function = lambda:View3D_SetTitle_button_function(self.guiWindow)
         self.guiWindow.View3D_plot_button_function = lambda:View3D_plot_button_function(self.guiWindow)
         self.guiWindow.View3D_toggle_mode_function = lambda: View3D_toggle_mode_function(self.guiWindow)
@@ -363,9 +320,6 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_CAxisMin_lineEdit.returnPressed.connect(self.CAxisChanged)
         
         # Radiobutton to select viewing type
-        self.guiWindow.ui.View3D_SelectView_QxE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxE_radioButton_function)
-        self.guiWindow.ui.View3D_SelectView_QyE_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QyE_radioButton_function)
-        self.guiWindow.ui.View3D_SelectView_QxQy_radioButton.clicked.connect(self.guiWindow.View3D_SelectView_QxQy_radioButton_function)
         self.guiWindow.ui.View3D_Mode_Viewer3D_radioButton.toggled.connect(self.guiWindow.View3D_toggle_mode_function)
         self.guiWindow.ui.View3D_CurratAxe_checkBox.toggled.connect(self.guiWindow.View3D_toggle_plotCurratAxe_function)
         self.guiWindow.ui.View3D_Grid_checkBox.toggled.connect(self.guiWindow.View3D_Grid_checkBox_toggled_function)
