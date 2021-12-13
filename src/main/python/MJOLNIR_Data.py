@@ -160,6 +160,9 @@ class GuiDataFile(DataFile.DataFile):
         elif self.type == 'FlatCone':
             EPrDetector = 1
             detectors = 31
+        elif self.type == 'Babus':
+            EPrDetector = 1
+            detectors = 20
         else:
 
             totalDetectors = np.array(self.instrumentCalibrations[calibrationIndex][0].shape[:-1])
@@ -222,7 +225,7 @@ class Gui1DCutObject(object):
         # redo to capitalize only first letter of the saved method (cut1D -> plotCut1D)
         plotName = 'plot'+self.parameters['method'][0].capitalize()+self.parameters['method'][1:]
         plotFunction = getattr(self.parameters['dataset'],plotName)
-        if self.parameters['method'] == 'cut1D':
+        if self.parameters['method'].find('cut1DE')==-1:
             #q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=False,ufit=False
             ax,*_ = plotFunction(q1=self.parameters['q1'],q2=self.parameters['q2'],rlu=self.parameters['rlu'],width=self.parameters['width'],minPixel=self.parameters['width'],
             Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],data=[self.pdData,self.bins],constantBins=self.parameters['constantBins'],ufit=False,label=self.name,**kwargs)
