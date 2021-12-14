@@ -223,8 +223,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def loadEnergies(self,instrument='CAMEA'):
         if instrument == 'CAMEA':
-            MJOLNIRDir = os.path.dirname(MJOLNIR.__file__)
-            calibPath = os.path.join(MJOLNIRDir,'Normalization_1.calib')
+            calibPath = MJOLNIR.__CAMEANormalization__
 
             calib = np.loadtxt(calibPath,delimiter=',',skiprows=3)
 
