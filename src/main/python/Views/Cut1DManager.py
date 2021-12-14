@@ -353,14 +353,16 @@ def Cut1D_Save_To_uFit(self,saveFile):
 
 def plotItem(self,item,ax=None):
     #plot the selected Gui1DCutObject into a new window
-    if ax is None:
-        fig = plt.figure()
-        ax = fig.gca()
-    else:
+    if not ax is None:
         fig = ax.get_figure()
-    item.plot(ax=ax)
+        Append = False # Do not append as it is already appended
+    else:
+        Append = True
+    ax = item.plot(ax=ax)
+    fig = ax.get_figure()
     fig.tight_layout()
-    self.windows.append(fig)
+    if Append:
+        self.windows.append(fig)
     return ax
 
 #def Cut1D_Cut_SelectionChanged_function(self):

@@ -624,23 +624,26 @@ def generateCut1DScript(self):
     saveString.append(startString())
     saveString.append('\n\n')
     saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
-
+    self.appendPLTSHOW = False # Flag to keep track of the need for a plt.show() command
     if self.Cut1DModel.rowCount() == 1:
         cut = self.Cut1DModel.dataCuts1D[0]
-        saveString.append(plotCut1DText(dataSetName,cut,single=True))
+        saveString.append(plotCut1DText(dataSetName,cut,single=True,self=self))
     else:
-
-        for cut in self.Cut1DModel.dataCuts1D:
-            saveString.append(plotCut1DText(dataSetName,cut,single=False))
-            saveString.append('\n')
         
+        for cut in self.Cut1DModel.dataCuts1D:
+            saveString.append(plotCut1DText(dataSetName,cut,single=False,self=self))
+            saveString.append('\n')
+
+    if self.appendPLTSHOW:
+        saveString.append('\nplt.show()')
     saveString.append('\n\n#If a ufit object is needed, add "ufit=True" to the above method calls and change "_data" and "_bins" to "_ufit".')
     with open(saveFile,'w') as file:
         file.write(''.join(saveString))
     return True    
         
         
-def plotCut1DText(dataSetName, cut,single=True):
+def plotCut1DText(dataSetName, cut,single=True,self=None):
+    title = cut.name.replace(' ','_')
     if cut.parameters['method'].find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
         q = cut.parameters['q1']
         EMin,EMax = cut.parameters['EMin'],cut.parameters['EMax']
@@ -651,13 +654,13 @@ def plotCut1DText(dataSetName, cut,single=True):
         method = cut.parameters['method']
 
         if cut.parameters['method'].find('plot')>-1:
-            returnPars = 'ax,'
+            returnPars = title+'_ax,'
         else:
             returnPars = ''
         if ufit:
-            returnPars+='cut'
+            returnPars+=title+'_cut'
         else:
-            returnPars+='data,bins'
+            returnPars+=title+'_data,'+title+'_bins'
 
         plotString = []
         if single:
@@ -693,13 +696,13 @@ def plotCut1DText(dataSetName, cut,single=True):
         plotString = []
 
         if method.find('plot')>-1:
-            returnPars = 'ax,'
+            returnPars = title+'_ax,'
         else:
             returnPars = ''
         if ufit:
-            returnPars+='cut'
+            returnPars+=title+'_cut'
         else:
-            returnPars+='data,bins'
+            returnPars+=title+'_data,'+title+'_bins'
 
         if single:
             plotString.append('# Plotting a 1D cut through data is done using this code')
@@ -727,11 +730,10 @@ def plotCut1DText(dataSetName, cut,single=True):
             ))
 
     if method.find('plot')>-1:
-        title = cut.name
         plotString.append('# Set title of plot')
-        plotString.append('ax.set_title("{}")\n'.format(title))
+        plotString.append(title+'_ax.set_title("{}")\n'.format(cut.name))
+        self.appendPLTSHOW = True
 
-        plotString.append('plt.show()\n')
         
     return '\n'.join(plotString)
 
