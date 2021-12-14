@@ -18,7 +18,7 @@ def customFreeze(debug=False):
     newFolder = os.path.join('target','MJOLNIRGui','MJOLNIR')
     if not os.path.isdir(newFolder):
         os.mkdir(newFolder)
-    for f in [MJOLNIR.__flatConeNormalization__,MJOLNIR.__multiFLEXXNormalization__,MJOLNIR.__CAMEANormalization__]:
+    for f in [MJOLNIR.__flatConeNormalization__,MJOLNIR.__bambusNormalization__,MJOLNIR.__multiFLEXXNormalization__,MJOLNIR.__CAMEANormalization__]:
         print(f)
         copyfile(f, os.path.join(newFolder,os.path.split(f)[1]))
     
