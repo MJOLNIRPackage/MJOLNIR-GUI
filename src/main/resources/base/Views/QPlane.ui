@@ -175,14 +175,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="QPlane_figureList_comboBox">
-        <property name="toolTip">
-         <string>Current Figure</string>
-        </property>
-        <property name="statusTip">
-         <string>Current Figure</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+        <item>
+         <widget class="QComboBox" name="QPlane_figureList_comboBox">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="QPlane_figureToCSV_pushButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Export to csv</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -426,7 +440,6 @@
   <tabstop>QPlane_CAxisMin_lineEdit</tabstop>
   <tabstop>QPlane_setCAxis_button</tabstop>
   <tabstop>QPlane_Grid_checkBox</tabstop>
-  <tabstop>QPlane_figureList_comboBox</tabstop>
   <tabstop>QPlane_EMax_lineEdit</tabstop>
   <tabstop>QPlane_EMin_lineEdit</tabstop>
   <tabstop>QPlane_xBinTolerance_lineEdit</tabstop>

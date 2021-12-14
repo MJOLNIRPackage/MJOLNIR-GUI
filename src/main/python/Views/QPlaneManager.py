@@ -132,6 +132,25 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setChecked')(value)
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
+    if not figure is None:
+        self.ui.QPlane_figureToCSV_pushButton.setEnabled(True)
+    else:
+        
+        self.ui.QPlane_figureToCSV_pushButton.setEnabled(False)
+
+@ProgressBarDecoratorArguments(runningText='Save QPlane to csv',completedText='QPlane saved')
+def saveToCSV(self):
+    figure = self.figureListQPlane.getCurrentFigure()
+    ax = figure.gca()
+    title = ax.title.get_text()
+    location,_ = QtWidgets.QFileDialog.getSaveFileName(self,'Save QPlane',str(title)+'.csv','CSV (*.csv)')
+    if location is None or location == '':
+        return False
+    if not location.split('.')[-1] == 'csv':
+        location = location+'.csv'
+    
+    ax.to_csv(location)
+    return True
 
 def cut1DFunctionRectangle(self,ax,dr):
     # If there is no sample, i.e. 1/AA plot
@@ -199,6 +218,7 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
         self.guiWindow.QPlane_Grid_checkBox_toggled_function = lambda: QPlane_Grid_checkBox_toggled_function(self.guiWindow)
         self.guiWindow.QPlane_DataSet_selectionChanged_function = lambda: QPlane_DataSet_selectionChanged_function(self.guiWindow)
         self.guiWindow.QPlane_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+        self.guiWindow.QPlane_saveToCSV = lambda: saveToCSV(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'QPlane' in key:
@@ -227,6 +247,8 @@ class QPlaneManager(QPlaneManagerBase, QPlaneManagerForm):
 
         self.guiWindow.figureListQPlane.view.currentIndexChanged.connect(self.guiWindow.QPlane_indexChanged)
         self.guiWindow.ui.QPlane_figureList_comboBox.setItemDelegate(self.mplListDelegate)
+
+        self.guiWindow.ui.QPlane_figureToCSV_pushButton.clicked.connect(self.guiWindow.QPlane_saveToCSV)
 
     def CAxisChanged(self):
         if self.guiWindow.ui.QPlane_setCAxis_button.isEnabled():

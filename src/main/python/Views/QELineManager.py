@@ -200,6 +200,25 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setChecked')(value)
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
+    if not figure is None:
+        self.ui.QELine_figureToCSV_pushButton.setEnabled(True)
+    else:
+        
+        self.ui.QELine_figureToCSV_pushButton.setEnabled(False)
+
+@ProgressBarDecoratorArguments(runningText='Save QELine to csv',completedText='QELine saved')
+def saveToCSV(self):
+    figure = self.figureListQELine.getCurrentFigure()
+    ax = figure.gca()
+    title = ax.title.get_text()
+    location,_ = QtWidgets.QFileDialog.getSaveFileName(self,'Save QELine',str(title)+'.csv','CSV (*.csv)')
+    if location is None or location == '':
+        return False
+    if not location.split('.')[-1] == 'csv':
+        location = location+'.csv'
+    
+    ax.to_csv(location)
+    return True
 
 def cut1DrectanglePerpendicular(self,ax,dr):
     # If there is no sample, i.e. 1/AA plot
@@ -301,6 +320,7 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
         self.guiWindow.QELine_DataSet_selectionChanged_function = lambda: QELine_DataSet_selectionChanged_function(self.guiWindow)
         self.guiWindow.QELine_Grid_checkBox_toggled_function = lambda: QELine_Grid_checkBox_toggled_function(self.guiWindow)
         self.guiWindow.QELine_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+        self.guiWindow.QELine_saveToCSV = lambda: saveToCSV(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'QELine' in key:
@@ -330,6 +350,8 @@ class QELineManager(QELineManagerBase, QELineManagerForm):
 
         self.guiWindow.figureListQELine.view.currentIndexChanged.connect(self.guiWindow.QELine_indexChanged)
         self.guiWindow.ui.QELine_figureList_comboBox.setItemDelegate(self.mplListDelegate)
+
+        self.guiWindow.ui.QELine_figureToCSV_pushButton.clicked.connect(self.guiWindow.QELine_saveToCSV)
 
     def CAxisChanged(self):
         if self.guiWindow.ui.QELine_setCAxis_button.isEnabled():

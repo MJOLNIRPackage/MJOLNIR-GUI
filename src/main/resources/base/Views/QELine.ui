@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>233</height>
+    <height>238</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -189,14 +189,28 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="QELine_figureList_comboBox">
-          <property name="toolTip">
-           <string>Current Figure</string>
-          </property>
-          <property name="statusTip">
-           <string>Current Figure</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+          <item>
+           <widget class="QComboBox" name="QELine_figureList_comboBox">
+            <property name="toolTip">
+             <string>Current Figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Current Figure</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="QELine_figureToCSV_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Export to csv</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="verticalSpacer_2">
@@ -600,7 +614,6 @@
   <tabstop>QELine_CAxisMin_lineEdit</tabstop>
   <tabstop>QELine_setCAxis_button</tabstop>
   <tabstop>QELine_Grid_checkBox</tabstop>
-  <tabstop>QELine_figureList_comboBox</tabstop>
   <tabstop>QELine_HStart_lineEdit</tabstop>
   <tabstop>QELine_KStart_lineEdit</tabstop>
   <tabstop>QELine_LStart_lineEdit</tabstop>

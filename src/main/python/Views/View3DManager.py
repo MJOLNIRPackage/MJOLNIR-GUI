@@ -220,6 +220,27 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setChecked')(value)
             else:
                 getattr(getattr(self.ui,setting),'setText')(str(value))
+    if not figure is None:
+        self.ui.View3D_figureToCSV_pushButton.setEnabled(True)
+    else:
+        self.ui.View3D_figureToCSV_pushButton.setEnabled(False)
+
+@ProgressBarDecoratorArguments(runningText='Save View3D to csv',completedText='View3D saved')
+def saveToCSV(self):
+    figure = self.figureListView3D.getCurrentFigure()
+    ax = figure
+    try:
+        title = ax.ax.set_title.get_text()
+    except AttributeError:
+        title = 'View3D'
+    location,_ = QtWidgets.QFileDialog.getSaveFileName(self,'Save View3D',str(title)+'.csv','CSV (*.csv)')
+    if location is None or location == '':
+        return False
+    if not location.split('.')[-1] == 'csv':
+        location = location+'.csv'
+    
+    ax.to_csv(location)
+    return True
 
 ## Function to connect draggable rectangles from interactive 1D cuts to the gui
 def cut1DFunctionRectangle(self,viewer,dr):
@@ -297,6 +318,7 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.View3D_DataSet_selectionChanged_function = lambda: View3D_DataSet_selectionChanged_function(self.guiWindow)
         self.guiWindow.View3D_Grid_checkBox_toggled_function = lambda: View3D_Grid_checkBox_toggled_function(self.guiWindow)
         self.guiWindow.View3D_indexChanged = lambda index: indexChanged(self.guiWindow,index)
+        self.guiWindow.View3D_saveToCSV = lambda: saveToCSV(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'View3D' in key:
@@ -328,6 +350,8 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.DataSetModel.dataChanged.connect(self.guiWindow.View3D_DataSet_selectionChanged_function)
         self.guiWindow.figureListView3D.view.currentIndexChanged.connect(self.guiWindow.View3D_indexChanged)
         self.guiWindow.ui.View3D_figureList_comboBox.setItemDelegate(self.mplListDelegate)
+
+        self.guiWindow.ui.View3D_figureToCSV_pushButton.clicked.connect(self.guiWindow.View3D_saveToCSV)
 
     def titleEnterPressed(self):
         if self.guiWindow.ui.View3D_SetTitle_button.isEnabled():
