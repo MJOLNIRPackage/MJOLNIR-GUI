@@ -11,6 +11,8 @@ except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.Qt import QApplication
+from MJOLNIR.Data import DataFile
 import numpy as np
 from os import path
 
@@ -41,7 +43,6 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.DataSetSelectionModel.selectionChanged.connect(self.selectedDataSetChanged)
     self.ui.DataSet_DataSets_listView.setSelectionModel(self.DataSetSelectionModel)
     
-    self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataSet_DoubleClick_Selection_function)
     def checkUpdatedName(self,index,*args):
         ds = self.model().data(index)
         suggestedName = self.model().generateValidName(ds)
@@ -67,8 +68,34 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                 delete.setToolTip('Delete DataSet') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(lambda: deleteFunction(self,gui,idx))
-
+                delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
                 menu.addAction(delete)
+
+                ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+                if len(ds)>0:
+                    currentDS = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+                    if len(currentDS)!=0: # If it contains data files
+                        if currentDS[0].instrument=='CAMEA': ## Only CAMEA data can be recallibrated
+                            recalibrate = QtWidgets.QAction('Update Calibration')
+                            recalibrate.setToolTip("Update calibration file(s)")
+                            recalibrate.setStatusTip(recalibrate.toolTip())
+                            recalibrate.triggered.connect(lambda: gui.DataSet_recalibrateFunction(gui,idx))
+                            recalibrate.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
+                            
+                            menu.addAction(recalibrate)
+
+                        sort = QtWidgets.QAction('Auto Sort')
+                        sort.setToolTip("Sort data files according to ascending Ei, abs(2theta), scan dir, A3")
+                        sort.setStatusTip(sort.toolTip())
+                        def sorting(ds,gui):
+                            ds.autoSort()
+                            gui.DataSetModel.layoutChanged.emit()
+                            gui.DataFileModel.layoutChanged.emit()
+                        sort.triggered.connect(lambda: sorting(ds,gui))
+                        sort.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/arrow-circle-double-135.png')))
+                        
+                        menu.addAction(sort)
+
                 return menu.exec_(position)
 
     self.ui.DataSet_DataSets_listView.contextMenuEvent = lambda event: contextMenu(self.ui.DataSet_DataSets_listView,event,self)
@@ -90,7 +117,7 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
     self.ui.DataSet_DeleteFiles_button.setToolTip('Delete selected Datafile')
     self.ui.DataSet_DeleteFiles_button.setStatusTip(self.ui.DataSet_DeleteFiles_button.toolTip())
 
-    self.ui.DataSet_DataSets_listView.doubleClicked.connect(self.DataFile_DoubleClick_Selection_function)
+    
 
     self.DataFileInfoModel = DataFileInfoModel(DataSet_filenames_listView=self.ui.DataSet_filenames_listView,dataSetModel=self.DataSetModel,
     DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,dataFileModel=self.DataFileModel,guiWindow=self)
@@ -108,9 +135,31 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
                 delete.setToolTip('Delete DataFile') 
                 delete.setStatusTip(delete.toolTip())
                 delete.triggered.connect(self.DataSet_DeleteFiles_button_function)
+                delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
 
                 menu.addAction(delete)
                 return menu.exec_(position)
+
+    def dragEnterEvent(self, gui, event):
+        gui.stateMachine.requireStateByName('Partial')
+        if event.mimeData().hasUrls():
+            # returns (path and file name, '.'+extension)
+            check = [path.splitext(u.toLocalFile())[1][1:] in DataFile.supportedRawFormats for u in event.mimeData().urls()]
+            if np.all(check):
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.ignore()
+
+    def dropEvent(self, gui, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        gui._tempFiles = files
+        gui.DataSet_AddFiles_Decorated()
+        
+
+    self.ui.DataSet_filenames_listView.dragEnterEvent = lambda event: dragEnterEvent(self.ui.DataSet_filenames_listView.dragEnterEvent,self,event)
+    self.ui.DataSet_filenames_listView.dropEvent = lambda event: dropEvent(self.ui.DataSet_filenames_listView.dragEnterEvent,self,event)
 
     self.ui.DataSet_filenames_listView.contextMenuEvent = lambda event: contextMenuDataFiles(self.ui.DataSet_filenames_listView,event,self)
     
@@ -135,11 +184,14 @@ def DataSet_NewDataSet_button_function(self):
     #ds.currentNormalizationSettings.update(normalizationParams)
 
     self.DataSetModel.append(ds)
+    idx = self.DataSetModel.getCurrentDatasetIndex()
+    self.ui.DataSet_DataSets_listView.edit(idx)
     self.update()
     self.stateMachine.run()
 
 def DataSet_DeleteDataSet_button_function(self):
-    self.DataSetModel.delete(self.ui.DataSet_DataSets_listView.selectedIndexes()[0])
+    idx = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
+    self.DataSetModel.delete(idx)
     self.DataFileModel.layoutChanged.emit()
     self.stateMachine.run()
     
@@ -147,19 +199,21 @@ def DataSet_DeleteFiles_button_function(self):
     self.DataFileModel.delete()
     self.stateMachine.run()
 
-def DataSet_DoubleClick_Selection_function(self,index,*args,**kwargs):
-    self.ui.DataSet_DataSets_listView.edit(index)
-
-def DataFile_DoubleClick_Selection_function(self,index,*args,**kwargs):
-    self.ui.DataSet_filenames_listView.edit(index)
-
 @ProgressBarDecoratorArguments(runningText='Adding Data Files',completedText='Data Files Added')
 def DataSet_AddFiles_button_function(self):
     if not self.stateMachine.requireStateByName('Partial'):
         return False
+    folder = self.currentFolder
+    ## generate string for raw, converted, and all files
+    allowedRawFilesString = 'Raw ('+' '.join(['*.'+str(x) for x in DataFile.supportedRawFormats])+')'
+    allowedConvertedFilesString = 'Converted ('+' '.join(['*.'+str(x) for x in DataFile.supportedConvertedFormats])+')'
+    allowedAllFilesString = 'All Files (*)'
     
-    folder = self.getCurrentDirectory()
-    files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,"HDF (*.hdf);;NXS (*.nxs);;All Files (*)")
+    allowedString = ';;'.join([allowedRawFilesString,allowedConvertedFilesString,allowedAllFilesString])
+    files, _ = QtWidgets.QFileDialog.getOpenFileNames(self,"Open data Files", folder,allowedString)
+    return self.DataSet_AddFiles(files)
+
+def DataSet_AddFiles(self,files):
     if self.DataSetModel.getCurrentDatasetIndex() is None: # no dataset is currently selected
         self.DataSet_NewDataSet_button_function()
     self.DataFileModel.add(files,guiWindow=self)
@@ -175,9 +229,12 @@ def DataSet_AddFiles_button_function(self):
     return True
 
 @ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Conversion Done')
+def DataSet_AddFiles_Decorated(self):
+    return self.DataSet_AddFiles(self._tempFiles)
+
+@ProgressBarDecoratorArguments(runningText='Converting data files',completedText='Conversion Done')
 def DataSet_convertData_button_function(self):    
     #  Should add a check if a data set is selected
-    
     if not self.stateMachine.requireStateByName('Raw'):
         return False
     
@@ -186,6 +243,47 @@ def DataSet_convertData_button_function(self):
     self.DataFileInfoModel.layoutChanged.emit()
     return val
     
+
+def recalibrateFunction(gui,idx):
+    folder = gui.currentFolder
+    calibrationFiles, _ = QtWidgets.QFileDialog.getOpenFileNames(gui,"Open Calibration File(s)", folder,"calbiration (*.calib);;All Files (*)")
+    
+    # Find the folder of the data files, using last data file
+    if len(calibrationFiles)==0:
+        return False
+    folder = path.dirname(calibrationFiles[-1])
+    gui.setCurrentDirectory(folder)
+
+    ds = gui.DataSetModel.data(idx[0],role = QtCore.Qt.ItemDataRole)
+    
+    length = len(ds)+1 # Files + 1 for loading of calibration files
+    gui.setProgressBarMaximum(length)
+    progress = 0
+    gui.setProgressBarValue(progress)
+    gui.setProgressBarLabelText('Loading calibration file'+'s'*(len(calibrationFiles)>1))
+    ds.updateCalibration(calibrationFiles,overwrite=True)
+    progress += 1
+    gui.setProgressBarValue(progress)
+
+    files = []
+    dataSetName = ds.name
+    gui.setProgressBarLabelText('Updating calibration')
+    for d in ds:
+        files.append(d.fileLocation)
+        d.saveHDF(d.fileLocation)
+        progress += 1
+        gui.setProgressBarValue(progress)
+
+    gui.DataSetModel.delete(idx[0])
+
+    ds = GuiDataSet(name=dataSetName)
+    gui.setProgressBarLabelText('Reloading data file'+'s'*(len(files)>1))
+    gui.DataSetModel.append(ds)
+    gui.DataFileModel.add(files,guiWindow=gui)
+    gui.setProgressBarLabelText('Calibration Updated')
+    gui.update()
+    gui.resetProgressBarTimed()
+    return True
     
 def convert(self):
     ds = self.DataSetModel.getCurrentDataSet()
@@ -254,36 +352,63 @@ def DataSet_binning_comboBoxReset(self):
 
 ############### Setup of info panel
 
+def DataSet_DataFileInfo_copy(self,idx,clipboard=True):
+    """Copy text in currently selected item to either clipboard or log"""
+    
+    text = self.DataFileInfoModel.data(idx,QtCore.Qt.DisplayRole)
+    if clipboard:
+        QApplication.clipboard().setText(text)
+    else:
+        self.writeToStatus(text)
+    
+def DataSet_DataFileInfo_remove(self,idx):
+    currentInfos = self.DataFileInfoModel.infos
+    del currentInfos[idx.row()]
+    self.DataFileInfoModel.layoutChanged.emit()
+    
+
 def setupDataFileInfoModel(self):
     
     self.DataFileInfoModel.infos = [x for x in settings.keys()]#['sample/name','A3','A4','magneticField','temperature','scanCommand','scanParameters','comment','binning']
+    def contextMenuDataFilesInfo(view,event,gui):
+        # Generate a context menu that opens on right click
+        
+        position = event.globalPos()
+        idx = view.currentIndex()
+        if idx is None:
+            return
+        if idx.row()>=self.DataFileInfoModel.rowCount(None):
+            return
     
+        if event.type() == QtCore.QEvent.ContextMenu:
+            menu = QtWidgets.QMenu()
+            copyCB = QtWidgets.QAction('Copy to clipboard')
+            copyCB.setToolTip('Copy Current information to clipboard') 
+            copyCB.setStatusTip(copyCB.toolTip())
+            copyCB.triggered.connect(lambda: self.DataSet_DataFileInfo_copy(idx,clipboard=True))
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
+            copyLog = QtWidgets.QAction('Copy to log')
+            copyLog.setToolTip('Copy Current information to log') 
+            copyLog.setStatusTip(copyLog.toolTip())
+            copyLog.triggered.connect(lambda: self.DataSet_DataFileInfo_copy(idx,clipboard=False))
 
-# try:
-#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-# except:
-#     DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(folder,"loadFile.ui"))
+            currentInfo = self.DataFileInfoModel.infos[idx.row()].baseText.split(':')[0] # base text has ': ' at the end
+            removeInfo = QtWidgets.QAction("Remove '{}'".format(currentInfo))
+            removeInfo.setToolTip("Remove '{}' from overview".format(currentInfo)) 
+            removeInfo.setStatusTip(removeInfo.toolTip())
+            removeInfo.triggered.connect(lambda: self.DataSet_DataFileInfo_remove(idx))
+
+            
+
+            menu.addAction(copyCB)
+            menu.addAction(copyLog)
+            menu.addAction(removeInfo)
+            return menu.exec_(position)
+    self.ui.DataSet_fileAttributs_listView.contextMenuEvent = lambda event: contextMenuDataFilesInfo(self.ui.DataSet_fileAttributs_listView,event,self)
+
 
 DataSetManagerBase, DataSetManagerForm = loadUI('loadFile.ui')
-
-#try:
-#    # needed when freezing app
-#    DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"loadFile.ui"))
-#    
-#except:
-#    try:
-#        # needed when running app local through fbs
-#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"loadFile.ui"))
-#        
-#    except:
-#        # needed when running app after pip install
-#        DataSetManagerBase, DataSetManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"loadFile.ui"))
-        
+       
         
 class DataSetManager(DataSetManagerBase, DataSetManagerForm):
     def __init__(self, parent=None, guiWindow=None):
@@ -299,10 +424,11 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.DataSet_NewDataSet_button_function = lambda:DataSet_NewDataSet_button_function(self.guiWindow)
         self.guiWindow.DataSet_DeleteDataSet_button_function = lambda:DataSet_DeleteDataSet_button_function(self.guiWindow)
         self.guiWindow.DataSet_DeleteFiles_button_function = lambda:DataSet_DeleteFiles_button_function(self.guiWindow)
-        self.guiWindow.DataSet_DoubleClick_Selection_function = lambda index:DataSet_DoubleClick_Selection_function(self.guiWindow,index)
-        self.guiWindow.DataFile_DoubleClick_Selection_function = lambda index:DataFile_DoubleClick_Selection_function(self.guiWindow,index)
 
         self.guiWindow.DataSet_AddFiles_button_function = lambda: DataSet_AddFiles_button_function(self.guiWindow)
+        self.guiWindow.DataSet_AddFiles = lambda files: DataSet_AddFiles(self.guiWindow,files)
+        self.guiWindow.DataSet_recalibrateFunction = lambda gui,idx: recalibrateFunction(gui,idx=idx)
+        self.guiWindow.DataSet_AddFiles_Decorated = lambda : DataSet_AddFiles_Decorated(self.guiWindow)
 
         self.guiWindow.DataSet_convertData_button_function = lambda: DataSet_convertData_button_function(self.guiWindow)
         self.guiWindow.convert = lambda: convert(self.guiWindow)
@@ -312,9 +438,12 @@ class DataSetManager(DataSetManagerBase, DataSetManagerForm):
         self.guiWindow.setupDataSet = lambda:setupDataSet(self.guiWindow)
         self.guiWindow.setupDataFile =  lambda:setupDataFile(self.guiWindow)
         self.guiWindow.setupDataFileInfoModel = lambda:setupDataFileInfoModel(self.guiWindow)
+        self.guiWindow.DataSet_DataFileInfo_copy = lambda idx,clipboard:DataSet_DataFileInfo_copy(self.guiWindow,idx,clipboard)
+        self.guiWindow.DataSet_DataFileInfo_remove = lambda idx: DataSet_DataFileInfo_remove(self.guiWindow, idx)
         self.guiWindow.setupDataSet_binning_comboBox = lambda:setupDataSet_binning_comboBox(self.guiWindow)
         self.guiWindow.updateBinningComboBox = lambda: updateBinningComboBox(self.guiWindow)
         self.guiWindow.DataSet_binning_comboBox_Changed = lambda:DataSet_binning_comboBox_Changed(self.guiWindow)
+        
         
         
         for key,value in self.__dict__.items():

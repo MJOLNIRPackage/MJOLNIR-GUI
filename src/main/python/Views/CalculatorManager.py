@@ -21,36 +21,20 @@ from os import path
 from PyQt5 import QtWidgets,QtGui,QtCore
 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator.ui"))
-# except:
-#     CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(folder,"Calculator.ui"))
-
 
 CalculatorManagerBase, CalculatorManagerForm = loadUI('Calculator.ui')
 
-
-#try:
-#    CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Calculator.ui"))
-#except:
-#    try:
-#        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Calculator.ui"))
-#    except:
-#        CalculatorManagerBase, CalculatorManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Calculator.ui"))
 # All of this connects the buttons and their functions to the main window.
        
 
 
 class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
-    def __init__(self):
+    def __init__(self,parent=None,guiWindow=None):
 
-        super(CalculatorManager, self).__init__()
+        super(CalculatorManager, self).__init__(parent=parent)
         self.setupUi(self)
+        self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/calculator.png')))
 
         self.nameList = ['General','Simple','Advanced'] 
         self.viewClasses = [CalculatorGeneralManager,CalculatorSimpleManager,CalculatorAdvancedManager]
@@ -69,7 +53,7 @@ class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
 
-            widget = Type(guiWindow=self)
+            widget = Type(guiWindow=self.guiWindow)
             #if Type == NormalizationManager: # Get a reference to the sample manager directly in self
             #    self.normalizationManager = widget
             self.views.append(widget)

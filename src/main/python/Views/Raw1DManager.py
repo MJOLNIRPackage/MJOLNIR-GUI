@@ -11,6 +11,7 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
+from MJOLNIR.Data import DataFile
 
 
 def setupRaw1DCutSpinBoxes(self):
@@ -46,10 +47,12 @@ def updateRaw1DCutSpinBoxes(self,dfs=None):
     df = dfs[0]
     
 
+    maxAnalyzer = DataFile.analyzerLimits[df.instrument]
+    maxDetector = DataFile.detectorLimits[df.instrument]
     self.ui.Raw1D_Analyzer_spinBox.setEnabled(True)
     self.ui.Raw1D_Detector_spinBox.setEnabled(True)
-    self.ui.Raw1D_Analyzer_spinBox.setMaximum(df.maxAnalyzerSelection-1)
-    self.ui.Raw1D_Detector_spinBox.setMaximum(df.maxDetectorSelection-1)
+    self.ui.Raw1D_Analyzer_spinBox.setMaximum(maxAnalyzer)
+    self.ui.Raw1D_Detector_spinBox.setMaximum(maxDetector)
     self.ui.Raw1D_Analyzer_spinBox.setValue(df.analyzerSelection)
     self.ui.Raw1D_Detector_spinBox.setValue(df.detectorSelection)
     self.updateRaw1DCutLabels(dfs)
@@ -80,6 +83,9 @@ def updateRaw1DCutLabels(self,dfs=None):
     elif df.type == 'FlatCone':
         EPrDetector = 1
         detectors = 31
+    elif df.type == 'Bambus' or df.instrument == 'Bambus':
+        EPrDetector = 1
+        detectors = 100
     else:
         totalDetectors = np.array(df.instrumentCalibrations[calibrationIndex][0].shape[:-1])
         if len(totalDetectors) == 2:
@@ -95,13 +101,14 @@ def updateRaw1DCutLabels(self,dfs=None):
     instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
     
     
-    instrumentCalibrationEf.shape = (detectors,EPrDetector*binning,4)
-    instrumentCalibrationA4.shape = (detectors,EPrDetector*binning)
+    instrumentCalibrationEf.shape = (-1,4)
+    instrumentCalibrationA4.shape = (-1)
 
     analyzerValue = self.ui.Raw1D_Analyzer_spinBox.value()
     detectorValue = self.ui.Raw1D_Detector_spinBox.value() #
-    Ef = instrumentCalibrationEf[detectorValue,analyzerValue,1]
-    A4 = instrumentCalibrationA4[detectorValue,analyzerValue]
+    idxDetector,_ = df.calcualteDataIndexFromDasel(detectorSelection=detectorValue,analyzerSelection=analyzerValue)
+    Ef = instrumentCalibrationEf[idxDetector,1]
+    A4 = instrumentCalibrationA4[idxDetector]
 
     EfEntry = '{:.2f}'.format(Ef).rjust(9,' ')
     A4Entry = '{:+.2f}'.format(A4).rjust(9,' ')
@@ -155,25 +162,7 @@ def Raw1D_plot_button_function(self):
     return True
 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
-# except:
-#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(folder,"Raw1D.ui"))
-
 Raw1DManagerBase, Raw1DManagerForm = loadUI('Raw1D.ui')
-
-# try:
-#     Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Raw1D.ui"))
-# except:
-#     try:
-#         Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Raw1D.ui"))
-#     except:
-#         Raw1DManagerBase, Raw1DManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Raw1D.ui"))
 
 class Raw1DManager(Raw1DManagerBase, Raw1DManagerForm):
     def __init__(self, parent=None, guiWindow=None):

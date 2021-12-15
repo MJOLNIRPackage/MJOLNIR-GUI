@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
-    <height>178</height>
+    <width>804</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,379 +20,561 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_6">
+    <widget class="QGroupBox" name="PropertiesView3D">
+     <property name="toolTip">
+      <string>Properties for current figure</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for current figure</string>
+     </property>
+     <property name="title">
+      <string>Properties</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,0,0,0,1">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="View3D_SetTitle_lineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="View3D_SetTitle_button">
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="text">
+           <string>Set Title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1,0">
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>6</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
+             <number>6</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="text">
+               <string>C Axis min</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QLineEdit" name="View3D_CAxisMin_lineEdit">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="text">
+               <string>C Axis max</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLineEdit" name="View3D_CAxisMax_lineEdit">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="text">
+               <string>0.02</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="View3D_setCAxis_button">
+          <property name="toolTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
+          <property name="text">
+           <string>Set C Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="View3D_CurratAxe_button">
+            <property name="statusTip">
+             <string>Create list of Bragg peaks from which Currat-Axe spurions are calcualted</string>
+            </property>
+            <property name="text">
+             <string>Currat-Axe List</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="View3D_CurratAxe_checkBox">
+            <property name="toolTip">
+             <string>Show or hide Currat-Axe spurions in current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Show or hide Currat-Axe spurions in current figure</string>
+            </property>
+            <property name="text">
+             <string>Plot Currat-Axe spurions</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="text">
+           <string>Current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0">
+          <item>
+           <widget class="QComboBox" name="View3D_figureList_comboBox">
+            <property name="toolTip">
+             <string>Current Figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Current Figure</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="View3D_figureToCSV_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Export to csv</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="View3D_Grid_checkBox">
+            <property name="toolTip">
+             <string>Show/hide grid on current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Show/hide grid on current figure</string>
+            </property>
+            <property name="text">
+             <string>Grid</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="CreateNewView3D_groupBox">
+     <property name="toolTip">
+      <string>Properties for new plot</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for new plot</string>
+     </property>
+     <property name="title">
+      <string>Create View3D</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>6</number>
+        </property>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Qy [1/AA]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>E [meV]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="View3D_EBin_lineEdit">
+          <property name="text">
+           <string>0.1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="View3D_QYBin_lineEdit">
+          <property name="text">
+           <string>0.05</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Qx [1/AA]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLineEdit" name="View3D_QXBin_lineEdit">
+          <property name="text">
+           <string>0.05</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QGroupBox" name="units_groupBox">
+          <property name="title">
+           <string>Units</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QRadioButton" name="View3D_SelectUnits_RLU_radioButton">
              <property name="text">
-              <string>C Axis min</string>
+              <string>RLU</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="autoExclusive">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_2</string>
+             </attribute>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_7">
+           <item>
+            <widget class="QRadioButton" name="View3D_SelectUnits_AA_radioButton">
              <property name="text">
-              <string>C Axis max</string>
+              <string>AA-1</string>
              </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Mode</string>
+             <property name="autoExclusive">
+              <bool>true</bool>
              </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_2</string>
+             </attribute>
             </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="QLineEdit" name="View3D_CAxisMin_lineEdit">
-             <property name="text">
-              <string>0</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QLineEdit" name="View3D_CAxisMax_lineEdit">
-             <property name="text">
-              <string>1e-5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
-              <widget class="QRadioButton" name="View3D_Mode_Viewer3D_radioButton">
-               <property name="text">
-                <string>View3D</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <property name="autoRepeat">
-                <bool>false</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">buttonGroup_3</string>
-               </attribute>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="View3D_Mode_Custom_radioButton">
-               <property name="text">
-                <string>Custom</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-               <property name="autoRepeat">
-                <bool>true</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">buttonGroup_3</string>
-               </attribute>
-              </widget>
-             </item>
-            </layout>
            </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="View3D_setCAxis_button">
-         <property name="text">
-          <string>Set C Axis</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Select View</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectView_QxE_radioButton">
-       <property name="text">
-        <string>Qx E</string>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectView_QyE_radioButton">
-       <property name="text">
-        <string>Qy E</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectView_QxQy_radioButton">
-       <property name="text">
-        <string>Qx Qy</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>5</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="View3D_Grid_checkBox">
-       <property name="text">
-        <string>Grid</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="View3D_LogScale_checkBox">
-       <property name="text">
-        <string>Log Scale</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="View3D_RawCounts_checkBox">
-       <property name="text">
-        <string>Raw Counts</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="View3D_SetTitle_lineEdit"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="View3D_SetTitle_button">
-       <property name="text">
-        <string>Set Title</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>5</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Units</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectUnits_RLU_radioButton">
-       <property name="text">
-        <string>RLU</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_2</string>
-       </attribute>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="View3D_SelectUnits_AA_radioButton">
-       <property name="text">
-        <string>AA-1</string>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_2</string>
-       </attribute>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>5</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Qy [1/AA]</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>E [meV]</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QLineEdit" name="View3D_EBin_lineEdit">
-         <property name="text">
-          <string>0.1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="View3D_QYBin_lineEdit">
-         <property name="text">
-          <string>0.05</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Qx [1/AA]</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLineEdit" name="View3D_QXBin_lineEdit">
-         <property name="text">
-          <string>0.05</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>5</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="View3D_plot_button">
-       <property name="text">
-        <string>Plot View 3D</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Mode</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QRadioButton" name="View3D_Mode_Viewer3D_radioButton">
+             <property name="text">
+              <string>View3D</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="autoRepeat">
+              <bool>false</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_3</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="View3D_Mode_Custom_radioButton">
+             <property name="text">
+              <string>Custom</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="autoRepeat">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_3</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QCheckBox" name="View3D_RawCounts_checkBox">
+          <property name="toolTip">
+           <string>Use neutron counts in stead of intensity</string>
+          </property>
+          <property name="statusTip">
+           <string>Use neutron counts in stead of intensity</string>
+          </property>
+          <property name="text">
+           <string>Raw Counts</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="View3D_LogScale_checkBox">
+          <property name="toolTip">
+           <string>Use log scale of intensity when plotting</string>
+          </property>
+          <property name="statusTip">
+           <string>Use log scale of intensity when plotting</string>
+          </property>
+          <property name="text">
+           <string>Log Scale</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="View3D_plot_button">
+        <property name="toolTip">
+         <string>Generate 3D Viewer</string>
+        </property>
+        <property name="statusTip">
+         <string>Generate 3D Viewer</string>
+        </property>
+        <property name="text">
+         <string>Plot View 3D</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>View3D_CAxisMax_lineEdit</tabstop>
-  <tabstop>View3D_CAxisMin_lineEdit</tabstop>
-  <tabstop>View3D_setCAxis_button</tabstop>
-  <tabstop>View3D_SelectView_QxE_radioButton</tabstop>
-  <tabstop>View3D_SelectView_QyE_radioButton</tabstop>
-  <tabstop>View3D_SelectView_QxQy_radioButton</tabstop>
-  <tabstop>View3D_Grid_checkBox</tabstop>
-  <tabstop>View3D_LogScale_checkBox</tabstop>
   <tabstop>View3D_SetTitle_lineEdit</tabstop>
   <tabstop>View3D_SetTitle_button</tabstop>
-  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
-  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_setCAxis_button</tabstop>
+  <tabstop>View3D_CurratAxe_button</tabstop>
+  <tabstop>View3D_CurratAxe_checkBox</tabstop>
+  <tabstop>View3D_Grid_checkBox</tabstop>
   <tabstop>View3D_QXBin_lineEdit</tabstop>
   <tabstop>View3D_QYBin_lineEdit</tabstop>
   <tabstop>View3D_EBin_lineEdit</tabstop>
+  <tabstop>View3D_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>View3D_SelectUnits_AA_radioButton</tabstop>
+  <tabstop>View3D_Mode_Viewer3D_radioButton</tabstop>
+  <tabstop>View3D_Mode_Custom_radioButton</tabstop>
+  <tabstop>View3D_RawCounts_checkBox</tabstop>
+  <tabstop>View3D_LogScale_checkBox</tabstop>
   <tabstop>View3D_plot_button</tabstop>
  </tabstops>
  <resources/>
@@ -400,6 +582,5 @@
  <buttongroups>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

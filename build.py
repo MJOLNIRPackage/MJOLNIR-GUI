@@ -15,14 +15,19 @@ def customFreeze(debug=False):
     freeze(debug=debug)
     print('Generating needed folder for MJOLNIR normalizations')
 
-    newFolder = os.path.join('target','MJOLNIRGui','MJOLNIR')
+    operatingSystem = sys.platform
+
+    if operatingSystem == 'darwin':
+        newFolder = os.path.join('target','MJOLNIRGui.app','Contents','MacOS','MJOLNIR')
+    else:
+        newFolder = os.path.join('target','MJOLNIRGui','MJOLNIR')
     if not os.path.isdir(newFolder):
         os.mkdir(newFolder)
-    for f in [MJOLNIR.__flatConeNormalization__,MJOLNIR.__multiFLEXXNormalization__,MJOLNIR.__CAMEANormalization__]:
+    for f in [MJOLNIR.__flatConeNormalization__,MJOLNIR.__bambusNormalization__,MJOLNIR.__multiFLEXXNormalization__,MJOLNIR.__CAMEANormalization__]:
         print(f)
         copyfile(f, os.path.join(newFolder,os.path.split(f)[1]))
     
-    operatingSystem = sys.platform
+    
     if operatingSystem == sys.platform == 'win32':
         location = os.path.join('target','MJOLNIRGui','MJOLNIRGui.exe')
     else:

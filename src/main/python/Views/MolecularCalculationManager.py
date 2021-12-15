@@ -70,7 +70,7 @@ class ElementModel(QtCore.QAbstractTableModel):
 
 
     def flags(self,index):
-        return QtCore.Qt.ItemIsSelectable#QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsSelectable
 
 
 
@@ -93,26 +93,10 @@ def checkValidSampleFormula(self,text,sampleMassL):
 
     self.parent().elementModel.reset(elements)
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"MolecularCalculationManager.ui"))
-# except:
-#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(folder,"MolecularCalculationManager.ui"))
-
 
 MolecularCalculationManagerBase, MolecularCalculationManagerForm = loadUI('MolecularCalculationManager.ui')
 
-# try:
-#     MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"MolecularCalculationManager.ui"))
-# except:
-#     try:
-#         MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"MolecularCalculationManager.ui"))
-#     except:
-#        MolecularCalculationManagerBase, MolecularCalculationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"MolecularCalculationManager.ui"))
+
 # All of this connects the buttons and their functions to the main window.
 
 class MolecularCalculationManager(MolecularCalculationManagerBase, MolecularCalculationManagerForm):
@@ -120,6 +104,7 @@ class MolecularCalculationManager(MolecularCalculationManagerBase, MolecularCalc
         super(MolecularCalculationManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/balance.png')))
 
 
         self.elementModel = ElementModel()

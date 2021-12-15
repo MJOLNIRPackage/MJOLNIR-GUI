@@ -6,385 +6,610 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1052</width>
-    <height>178</height>
+    <width>845</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_6">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>C Axis max</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="QELine_CAxisMax_lineEdit">
-           <property name="text">
-            <string>1e-5</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="QELine_CAxisMin_lineEdit">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>C Axis min</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <spacer name="verticalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>3</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="QELine_setCAxis_button">
-       <property name="text">
-        <string>Set C Axis</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="toolTip">
+      <string>Properties for current figure</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for current figure</string>
+     </property>
+     <property name="title">
+      <string>Properties</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>6</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="QELine_SetTitle_lineEdit">
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="QELine_SetTitle_button">
+          <property name="toolTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set title of current figure</string>
+          </property>
+          <property name="text">
+           <string>Set Title</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>6</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="QELine_CAxisMax_lineEdit">
+            <property name="toolTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="text">
+             <string>0.02</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="text">
+             <string>C Axis min</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="QELine_CAxisMin_lineEdit">
+            <property name="toolTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="toolTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Set color scale axis of current figure</string>
+            </property>
+            <property name="text">
+             <string>C Axis max</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="QELine_setCAxis_button">
+          <property name="toolTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Set color scale axis of current figure</string>
+          </property>
+          <property name="text">
+           <string>Set C Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="QELine_Grid_checkBox">
+          <property name="toolTip">
+           <string>Show/hide grid on current figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Show/hide grid on current figure</string>
+          </property>
+          <property name="text">
+           <string>Grid</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="toolTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="statusTip">
+           <string>Current Figure</string>
+          </property>
+          <property name="text">
+           <string>Current figure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+          <item>
+           <widget class="QComboBox" name="QELine_figureList_comboBox">
+            <property name="toolTip">
+             <string>Current Figure</string>
+            </property>
+            <property name="statusTip">
+             <string>Current Figure</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="QELine_figureToCSV_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Export to csv</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="QELine_Grid_checkBox">
-       <property name="text">
-        <string>Grid</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="QELine_LogScale_checkBox">
-       <property name="text">
-        <string>Log Scale</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="QELine_ConstantBins_checkBox">
-       <property name="text">
-        <string>Constant Bins</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>3</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="QELine_SetTitle_lineEdit"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="QELine_SetTitle_button">
-       <property name="text">
-        <string>Set Title</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Units</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="QELine_SelectUnits_RLU_radioButton">
-       <property name="text">
-        <string>RLU</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="QELine_SelectUnits_AA_radioButton">
-       <property name="text">
-        <string>AA-1</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>3</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout_3">
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="QELine_Width_lineEdit">
-       <property name="text">
-        <string>0.1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QLineEdit" name="QELine_LStart_lineEdit">
-       <property name="text">
-        <string>-1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3">
-      <widget class="QLineEdit" name="QELine_LEnd_lineEdit">
-       <property name="text">
-        <string>1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="QELine_HEnd_lineEdit">
-       <property name="text">
-        <string>-1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLabel" name="QELine_LLabel">
-       <property name="text">
-        <string>L</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>End</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="QELine_MinPixel_lineEdit">
-       <property name="text">
-        <string>0.03</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="QELine_KLabel">
-       <property name="text">
-        <string>K</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QLineEdit" name="QELine_KStart_lineEdit">
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Width</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="QELine_HStart_lineEdit">
-       <property name="text">
-        <string>-1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Min Pixel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="QELine_HLabel">
-       <property name="text">
-        <string>H</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QLineEdit" name="QELine_KEnd_lineEdit">
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>3</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Energy Steps</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="QELine_NPoints_lineEdit">
-       <property name="text">
-        <string>40</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QPushButton" name="QELine_plot_button">
-       <property name="text">
-        <string>Plot 2D Cut</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Energy Min [meV]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>Energy Max [meV]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="QELine_EMax_lineEdit">
-       <property name="text">
-        <string>7</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="QELine_EMin_lineEdit">
-       <property name="text">
-        <string>3</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>3</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout"/>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="toolTip">
+      <string>Properties for new plot</string>
+     </property>
+     <property name="statusTip">
+      <string>Properties for new plot</string>
+     </property>
+     <property name="title">
+      <string>Create 2D plot</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_7">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="toolTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="text">
+             <string>End</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="QELine_HLabel">
+            <property name="text">
+             <string>H</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Width</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Min Pixel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLineEdit" name="QELine_LStart_lineEdit">
+            <property name="toolTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLabel" name="label">
+            <property name="toolTip">
+             <string>Minimum energy in meV</string>
+            </property>
+            <property name="statusTip">
+             <string>Minimum energy in meV</string>
+            </property>
+            <property name="text">
+             <string>Energy Min [meV]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="QELine_HStart_lineEdit">
+            <property name="toolTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="QELine_KLabel">
+            <property name="text">
+             <string>K</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLabel" name="QELine_LLabel">
+            <property name="text">
+             <string>L</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLabel" name="label_9">
+            <property name="toolTip">
+             <string>Maximum energy in meV</string>
+            </property>
+            <property name="statusTip">
+             <string>Maximum energy in meV</string>
+            </property>
+            <property name="text">
+             <string>Energy Max [meV]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="QELine_KStart_lineEdit">
+            <property name="toolTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QCheckBox" name="QELine_ConstantBins_checkBox">
+            <property name="toolTip">
+             <string>Make all bins equal size</string>
+            </property>
+            <property name="statusTip">
+             <string>Make all bins equal size</string>
+            </property>
+            <property name="text">
+             <string>Constant Bins</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="QELine_Width_lineEdit">
+            <property name="text">
+             <string>0.1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QLineEdit" name="QELine_EMax_lineEdit">
+            <property name="toolTip">
+             <string>Maximum energy in meV</string>
+            </property>
+            <property name="statusTip">
+             <string>Maximum energy in meV</string>
+            </property>
+            <property name="text">
+             <string>7</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="QELine_MinPixel_lineEdit">
+            <property name="text">
+             <string>0.03</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QCheckBox" name="QELine_LogScale_checkBox">
+            <property name="toolTip">
+             <string>Plot logarithm of intensity</string>
+            </property>
+            <property name="statusTip">
+             <string>Plot logarithm of intensity</string>
+            </property>
+            <property name="text">
+             <string>Log Scale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="QELine_HEnd_lineEdit">
+            <property name="toolTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QLabel" name="label_2">
+            <property name="toolTip">
+             <string>Number of energy steps between Emin and Emax</string>
+            </property>
+            <property name="statusTip">
+             <string>Number of energy steps between Emin and Emax</string>
+            </property>
+            <property name="text">
+             <string>Energy Steps</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="QELine_KEnd_lineEdit">
+            <property name="toolTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="toolTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>Start position for cut</string>
+            </property>
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLineEdit" name="QELine_LEnd_lineEdit">
+            <property name="toolTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="statusTip">
+             <string>End position for cut</string>
+            </property>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QLineEdit" name="QELine_EMin_lineEdit">
+            <property name="toolTip">
+             <string>Minimum energy in meV</string>
+            </property>
+            <property name="statusTip">
+             <string>Minimum energy in meV</string>
+            </property>
+            <property name="text">
+             <string>3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
+           <widget class="QLineEdit" name="QELine_NPoints_lineEdit">
+            <property name="toolTip">
+             <string>Number of energy steps between Emin and Emax</string>
+            </property>
+            <property name="statusTip">
+             <string>Number of energy steps between Emin and Emax</string>
+            </property>
+            <property name="text">
+             <string>40</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Units used when plotting</string>
+            </property>
+            <property name="statusTip">
+             <string>Units used when plotting</string>
+            </property>
+            <property name="title">
+             <string>Units</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QRadioButton" name="QELine_SelectUnits_RLU_radioButton">
+               <property name="text">
+                <string>RLU</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="QELine_SelectUnits_AA_radioButton">
+               <property name="text">
+                <string>AA-1</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="QELine_plot_button">
+        <property name="toolTip">
+         <string>Generate 2D Cut</string>
+        </property>
+        <property name="statusTip">
+         <string>Generate 2D Cut</string>
+        </property>
+        <property name="text">
+         <string>Generate 2D Plot</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>QELine_SetTitle_lineEdit</tabstop>
+  <tabstop>QELine_SetTitle_button</tabstop>
   <tabstop>QELine_CAxisMax_lineEdit</tabstop>
   <tabstop>QELine_CAxisMin_lineEdit</tabstop>
   <tabstop>QELine_setCAxis_button</tabstop>
   <tabstop>QELine_Grid_checkBox</tabstop>
-  <tabstop>QELine_LogScale_checkBox</tabstop>
-  <tabstop>QELine_ConstantBins_checkBox</tabstop>
-  <tabstop>QELine_SetTitle_lineEdit</tabstop>
-  <tabstop>QELine_SetTitle_button</tabstop>
-  <tabstop>QELine_SelectUnits_RLU_radioButton</tabstop>
-  <tabstop>QELine_SelectUnits_AA_radioButton</tabstop>
   <tabstop>QELine_HStart_lineEdit</tabstop>
   <tabstop>QELine_KStart_lineEdit</tabstop>
   <tabstop>QELine_LStart_lineEdit</tabstop>
@@ -396,6 +621,10 @@
   <tabstop>QELine_EMax_lineEdit</tabstop>
   <tabstop>QELine_EMin_lineEdit</tabstop>
   <tabstop>QELine_NPoints_lineEdit</tabstop>
+  <tabstop>QELine_ConstantBins_checkBox</tabstop>
+  <tabstop>QELine_LogScale_checkBox</tabstop>
+  <tabstop>QELine_SelectUnits_RLU_radioButton</tabstop>
+  <tabstop>QELine_SelectUnits_AA_radioButton</tabstop>
   <tabstop>QELine_plot_button</tabstop>
  </tabstops>
  <resources/>

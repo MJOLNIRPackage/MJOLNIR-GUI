@@ -65,26 +65,8 @@ def checkValidSampleNormalization(self,event,massSB):
     if not event is None:
         self.focusOutEvent_old2(event)
 
-
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"NormalizationManager.ui"))
-# except:
-#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(folder,"NormalizationManager.ui"))
-
 NormalizationManagerBase, NormalizationManagerForm = loadUI('NormalizationManager.ui')
 
-# try:
-#     NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"NormalizationManager.ui"))
-# except:
-#     try:
-#         NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"NormalizationManager.ui"))
-#     except:
-#         NormalizationManagerBase, NormalizationManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"NormalizationManager.ui"))
 # # All of this connects the buttons and their functions to the main window.
 
 class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
@@ -92,6 +74,7 @@ class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
         super(NormalizationManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/ruler.png')))
         self.initNormalizationManager()
         
     def initNormalizationManager(self):    

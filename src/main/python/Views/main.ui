@@ -68,6 +68,12 @@
       <property name="lineWidth">
        <number>0</number>
       </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -76,11 +82,23 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>798</width>
+         <width>781</width>
          <height>822</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -133,13 +151,13 @@
        <number>10</number>
       </property>
       <property name="leftMargin">
-       <number>6</number>
+       <number>10</number>
       </property>
       <property name="topMargin">
        <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>6</number>
+       <number>10</number>
       </property>
       <item>
        <widget class="QProgressBar" name="progressBar">
@@ -148,6 +166,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Current progress of action</string>
+        </property>
+        <property name="statusTip">
+         <string>Current progress of action</string>
         </property>
         <property name="value">
          <number>0</number>
@@ -160,10 +184,10 @@
          <number>10</number>
         </property>
         <property name="leftMargin">
-         <number>10</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>10</number>
+         <number>0</number>
         </property>
         <item>
          <widget class="QTextBrowser" name="textBrowser">
@@ -179,10 +203,22 @@
             <height>45</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Log of messages from the gui</string>
+          </property>
+          <property name="statusTip">
+           <string>Log of messages from the gui</string>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="log_reset_btn">
+          <property name="toolTip">
+           <string>Clear log</string>
+          </property>
+          <property name="statusTip">
+           <string>Clear log</string>
+          </property>
           <property name="text">
            <string>Clear</string>
           </property>
@@ -268,7 +304,7 @@
   </action>
   <action name="actionGenerate_QELine_script">
    <property name="text">
-    <string>Generate QELine script</string>
+    <string>Generate QE Cut script</string>
    </property>
   </action>
   <action name="actionGenerate_QPlane_script">
@@ -354,6 +390,11 @@
   <action name="actionSubtraction">
    <property name="text">
     <string>Subtraction</string>
+   </property>
+  </action>
+  <action name="actionCheck_Update">
+   <property name="text">
+    <string>Check Update</string>
    </property>
   </action>
  </widget>

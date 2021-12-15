@@ -9,8 +9,10 @@ except:
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 try:
     import _tools as _guitools
+    from Views import BraggListManager
 except ImportError:
     import MJOLNIRGui.src.main.python._tools as _guitools
+    from MJOLNIRGui.src.main.python.Views import BraggListManager
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -19,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-
+version = '0.9.8'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -39,6 +41,7 @@ try:
     from Views.CalculatorManager import CalculatorManager
     from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
+    from Views.ElectronicLogBookManager import ElectronicLogBookManager
     from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
@@ -66,6 +69,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
+    from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogBookManager
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
@@ -89,7 +93,7 @@ home = str(Path.home())
 # E.g.: View3D_plot_button and View3D_plot_button_function
 
 #Headlines so far are:
-#DataSet, View3D, QELine, QPlane, Cut1D, Raw1D
+#DataSet, View3D, QE Cut, QPlane, Cut1D, Raw1D
 
 
 class MJOLNIRMainWindow(QtWidgets.QMainWindow):
@@ -101,21 +105,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-        self.version = self.AppContext.build_settings['version']   
+        self.version = version
         ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
         guiSettings = loadSetting(self.settingsFile,'guiSettings')
-        
-        
-        #if guiSettings is None:
-        #    self.theme = 'light'
-        #else:
-        #    if not 'theme' in guiSettings:
-        #        self.theme = 'light'
-        #    else:
-        #        self.theme = guiSettings['theme']
-                
+        self.colormap = 'viridis'
+        self.currentFolder = ''
 
         
         self.ui.setupUi(self)
@@ -137,8 +133,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.update()
         self.views.append(self.ui.dataSetManager)
 
+        self.windows = [] # Holder for generated plotting windows
+        self.figureList = [] # Holder for selectable window list
+
         # Lists of views in shown order
-        self.nameList = ['View3D','QE line','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
+        self.nameList = ['View3D','QE cuts','Q plane','1D cuts','1D raw data','Masking'] # 'Normalization'
         self.viewClasses = [View3DManager,QELineManager,QPlaneManager,Cut1DManager,Raw1DManager]#[View3D,View3D,View3D,Cut1D,Raw1D] # NormalizationManager
         self.startState = [True,False,False,False,True,False] # If not collapsed #False
 
@@ -163,8 +162,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         vlay.setAlignment(QtCore.Qt.AlignTop)
         self.maskingManager = MaskManager(self)
-
-        self.windows = [] # Holder for generated plotting windows
 
         self.dataSets = []
 
@@ -207,6 +204,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.progressBar._oldText = self.ui.progressBar.text
         self.ui.progressBar.text = lambda: text(self.ui.progressBar)
 
+        self.braggPoints = None
 
         self.update()
         initGenerateScript(self)
@@ -237,6 +235,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
     }"""
 
             self.setStyleSheet(self.styleSheet()+correctedArrows)
+
+        # Set up preset for electronic logbook
+        self.logbookPreset = ['A3','twoTheta','sampleName','title','scanCommand','ei']
 
     def setupMenu(self): # Set up all QActions and menus
         self.ui.actionExit.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
@@ -279,9 +280,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_View3d_script.triggered.connect(self.generate3DScript)
 
         self.ui.actionGenerate_QELine_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QE.png')))
-        self.ui.actionGenerate_QELine_script.setToolTip('Generate QELine Script') 
+        self.ui.actionGenerate_QELine_script.setToolTip('Generate QE Cut Script') 
         self.ui.actionGenerate_QELine_script.setStatusTip(self.ui.actionGenerate_QELine_script.toolTip())
-        self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQELineScript)
+        self.ui.actionGenerate_QELine_script.triggered.connect(self.generateQEScript)
         
         self.ui.actionGenerate_QPlane_script.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/script-QP.png')))
         self.ui.actionGenerate_QPlane_script.setToolTip('Generate QPlane Script') 
@@ -345,16 +346,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionNeutron_Calculations.triggered.connect(self.neutronCalculationTool)
 
         self.ui.actionElectronic_Logbook.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
-        self.ui.actionElectronic_Logbook.setDisabled(True)
         self.ui.actionElectronic_Logbook.setToolTip('Generate Electronic Logbook from files') 
         self.ui.actionElectronic_Logbook.setStatusTip(self.ui.actionElectronic_Logbook.toolTip())
         self.ui.actionElectronic_Logbook.triggered.connect(self.electronicLogbookTool)
+        self.ui.actionElectronic_Logbook.setShortcut("Ctrl+E")
 
-        self.ui.actionSubtraction_Of_DataSets.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/book--pencil.png')))
+        self.ui.actionSubtraction_Of_DataSets.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/subtract.png')))
         self.ui.actionSubtraction_Of_DataSets.setToolTip('Perform Subtraction of two DataSets') 
         self.ui.actionSubtraction_Of_DataSets.setStatusTip(self.ui.actionSubtraction_Of_DataSets.toolTip())
         self.ui.actionSubtraction_Of_DataSets.triggered.connect(self.subtractionManager)
         self.ui.actionSubtraction_Of_DataSets.setShortcut("Ctrl+D")
+
+        self.ui.View3D_CurratAxe_button.clicked.connect(self.openBraggListWindow)
 
     def getProgressBarValue(self):
         return self.ui.progressBar.value
@@ -391,11 +394,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                     "Do you want to save Gui Settings?",
                                     QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
         
-        
         if res == QtWidgets.QMessageBox.Save:
-            self.saveCurrentGui()
-            self.closeWindows()
-            event.accept()
+            if self.saveCurrentGui(): # successful saving
+                self.closeWindows()
+                event.accept()
+            else:
+                event.ignore()
+                return False
         elif res == QtWidgets.QMessageBox.No:
             self.closeWindows()
             event.accept()
@@ -419,7 +424,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return 0
 
     def closeEvent(self, event):
-
         if self.loadedGuiSettings is None:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
@@ -445,18 +449,20 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                         window.close()
                     except:
                         pass
+            for figureList in self.figureList:
+                figureList.closeAll()
         return True
 
     def about(self):
-        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version)
+        dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version,icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/information-button.png')))
         dialog.exec_()
 
     def help(self):
-        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'))
+        dialog = HelpDialog(self.AppContext.get_resource('Help.txt'),guiWindow = self)
         dialog.exec_()
 
     def subtractionHelp(self):
-        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'))
+        dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'),guiWindow = self)
         dialog.exec_()
 
 
@@ -483,6 +489,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not saveSettings.split('.')[-1] == 'MJOLNIRGuiSettings':
             saveSettings+='.MJOLNIRGuiSettings'
 
+        if os.path.exists(saveSettings): # if file already exists user has been asked to delete it
+            os.remove(saveSettings)
         for key,value in settingsDict.items():
             updateSetting(saveSettings,key,value)
         self.loadedGuiSettings = self.generateCurrentGuiSettings()
@@ -510,7 +518,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         radioButtonString = self.generateCurrentRadioButtonSettings()
         spinBoxString = self.generateCurrentSpinBoxSettings()
         checkBoxString = self.generateCurrentcheckBoxSettings()
-        fileDir = self.getCurrentDirectory()
+        fileDir = ''
+        logbookPreset = self.logbookPreset.copy()
         if hasattr(self,'predictionSettings'):
             predictionSettings  = self.predictionSettings
         else:
@@ -518,9 +527,9 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         infos = self.DataFileInfoModel.currentInfos()
         guiSettings = self.guiSettings()
-        
         returnDict = {'dataSet':saveString, 'lineEdits':lineEditString, 'radioButtons': radioButtonString,'spinBoxes':spinBoxString,
-                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,'predictionSettings':predictionSettings}
+                      'checkBoxes':checkBoxString,'fileDir':fileDir, 'infos':infos, 'guiSettings':guiSettings,
+                      'predictionSettings':predictionSettings,'logbookPreset':logbookPreset}
         return returnDict
 
     def generateCurrentLineEditSettings(self):
@@ -581,88 +590,92 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             self.DataFileModel.updateCurrentDataSetIndex()
         self.update()
         dataSetString = loadSetting(settingsFile,'dataSet')
+        if not dataSetString is None:
+            totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
+            # Get estimate of total number of data files
+            self.setProgressBarMaximum(totalFiles)
+            
+            self.setProgressBarValue(0)
+            logbookPreset = loadSetting(settingsFile,'logbookPreset')
+            if not logbookPreset is None:
+                self.logbookPreset = logbookPreset
+            
 
-        totalFiles = np.sum([len(dsDict['files'])+np.sum(1-np.array([d is None for d in dsDict['binning']]))+1 for dsDict in dataSetString])+1
-        # Get estimate of total number of data files
-        self.setProgressBarMaximum(totalFiles)
-        
-        self.setProgressBarValue(0)
-
-
-        for dsDict in dataSetString:
-            DSName = dsDict['name']
-            self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
-            files = dsDict['files'] # data or foreground data
-            if 'background' in dsDict: # Data set is a subtracted set!
-                background = dsDict['background']
-                if len(files)!=0: # If files in dataset, continue
-                    dfs = []
-                    for dfLocation in files:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfs.append(df)
-                        self.addProgressBarValue(0.5)
-                    dfsBG = []
-                    for dfLocation in background:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfsBG.append(df)
-                        self.addProgressBarValue(0.5)
-                    
-                    
-                    foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
-                    background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
-                    binnings = dsDict['binning']
-                    if dsDict['convertBeforeSubtract']:
-                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
-                        for df,binning in zip(foreground_ds,binnings): # Give the correct binning
-                            df.binning = binning
-                        foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
-                        self.update()
-                        for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
-                            df.binning = binning
-                        background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
-                        self.update()
+            for dsDict in dataSetString:
+                DSName = dsDict['name']
+                self.setProgressBarLabelText('Loading Data Set \''+DSName+'\'')   
+                files = dsDict['files'] # data or foreground data
+                if 'background' in dsDict: # Data set is a subtracted set!
+                    background = dsDict['background']
+                    if len(files)!=0: # If files in dataset, continue
+                        dfs = []
+                        for dfLocation in files:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfs.append(df)
+                            self.addProgressBarValue(0.5)
+                        dfsBG = []
+                        for dfLocation in background:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfsBG.append(df)
+                            self.addProgressBarValue(0.5)
                         
-
-                    temp = foreground_ds-background_ds
-                    
-                    ds = GuiDataSet(name=DSName,dataSet=temp)
-                    
-                    ds.background = background
-                    ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
-                    
-                    if not ds.convertBeforeSubtract: # Convert after subtraction if needed
-                        if not np.any([b is None for b in dsDict['binning']]):
+                        
+                        foreground_ds = GuiDataSet(name='fg',dataFiles=dfs)
+                        background_ds = GuiDataSet(name='bg',dataFiles=dfsBG)
+                        binnings = dsDict['binning']
+                        if dsDict['convertBeforeSubtract']:
                             self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                            for df,binning in zip(foreground_ds,binnings): # Give the correct binning
+                                df.binning = binning
+                            foreground_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                            self.update()
+                            for df,binning in zip(background_ds,binnings): # Assume binning is the same across data sets
+                                df.binning = binning
+                            background_ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,progressUpdate=0.5,printFunction=self.writeToStatus)
+                            self.update()
+                            
+
+                        temp = foreground_ds-background_ds
+                        
+                        ds = GuiDataSet(name=DSName,dataSet=temp)
+                        
+                        ds.background = background
+                        ds.convertBeforeSubtract = dsDict['convertBeforeSubtract']
+                        
+                        if not ds.convertBeforeSubtract: # Convert after subtraction if needed
+                            if not np.any([b is None for b in dsDict['binning']]):
+                                self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
+                                ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
+                                self.update()
+
+                else: # Regular dataset
+                        
+                    dfs = None
+                    if len(files)!=0: # If files in dataset, continue
+                        dfs = []
+                        for dfLocation in files:
+                            df = GuiDataFile(dfLocation)
+                            self.update()
+                            dfs.append(df)
+                            self.addProgressBarValue(1)
+                    ds = GuiDataSet(name=DSName,dataFiles=dfs)
+                    if 'binning' in dsDict:
+                        if not np.any([b is None for b in dsDict['binning']]):
+                            binnings = dsDict['binning']
+                            for df,binning in zip(ds,binnings):
+                                df.binning = binning
+                            self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
                             ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                             self.update()
-
-            else: # Regular dataset
-                    
-                dfs = None
-                if len(files)!=0: # If files in dataset, continue
-                    dfs = []
-                    for dfLocation in files:
-                        df = GuiDataFile(dfLocation)
-                        self.update()
-                        dfs.append(df)
-                        self.addProgressBarValue(1)
-                ds = GuiDataSet(name=DSName,dataFiles=dfs)
-                if 'binning' in dsDict:
-                    if not np.any([b is None for b in dsDict['binning']]):
-                        binnings = dsDict['binning']
-                        for df,binning in zip(ds,binnings):
-                            df.binning = binning
-                        self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
-                        ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
-                        self.update()
-            
-            self.DataSetModel.append(ds)
-            self.DataSetModel.layoutChanged.emit()
-            self.update()
-            self.addProgressBarValue(1)
-            
+                
+                self.DataSetModel.append(ds)
+                self.DataSetModel.layoutChanged.emit()
+                self.update()
+                self.addProgressBarValue(1)
+        else:
+            self.setProgressBarLabelText('')
         DataFileListInfos = loadSetting(settingsFile,'infos')
         if not DataFileListInfos is None:
             self.DataFileInfoModel.infos = DataFileListInfos
@@ -670,8 +683,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.loadGuiSettings(file=settingsFile)
         self.loadLineEdits(file=settingsFile)
         self.loadRadioButtons(file=settingsFile)
-        # self.loadSpinBoxes(file=settingsFile)
-        # self.loadCheckBoxes(file=settingsFile)
+        self.loadSpinBoxes(file=settingsFile)
+        self.loadCheckBoxes(file=settingsFile)
         self.loadPredictionSettings(file=settingsFile)
         self.DataSetModel.layoutChanged.emit()
         self.DataFileInfoModel.layoutChanged.emit()
@@ -684,23 +697,40 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def guiSettings(self):
         boxStates = [b.state for b in self.boxContainers]
-        settingsDict = {'boxStates':boxStates}
+        settingsDict = {'boxStates':boxStates,'colormap':self.colormap}
+        if not hasattr(self,'BraggListWindow'):
+           settingsDict['braggPoints'] = self.braggPoints
+        else:
+            settingsDict['braggPoints'] = self.BraggListWindow.BraggListModel.data
         return settingsDict
         
     def loadGuiSettings(self,file=None):
+        
         if file is None:
             file = self.settingsFile
-        guiSettings = loadSetting(file,'guiSettings')
-        boxStates = guiSettings['boxStates']
         
-        if not boxStates is None:
-            for box,value in zip(self.boxContainers,boxStates):
-                try:
-                    if box.state != value:
-                        box.on_pressed()
-                except AttributeError:
-                    pass
+        guiSettings = loadSetting(file,'guiSettings')
+        if not guiSettings is None:
+            boxStates = guiSettings['boxStates']
+            
+            if not boxStates is None:
+                for box,value in zip(self.boxContainers,boxStates):
+                    try:
+                        if box.state != value:
+                            box.on_pressed()
+                    except AttributeError:
+                        pass
 
+            if 'braggPoints' in guiSettings:
+                self.braggPoints = guiSettings['braggPoints']
+                if hasattr(self,'BraggListWindow'):
+                    self.BraggListWindow.BraggListModel.data = self.braggPoints.copy()
+                    self.BraggListWindow.BraggListModel.layoutChanged.emit()
+            if 'colormap' in guiSettings:
+                self.colormap = guiSettings['colormap']
+            else:
+                self.colormap = 'viridis'
+        
 
     def loadLineEdits(self,file=None):
         if file is None:
@@ -768,13 +798,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                 except AttributeError:
                     pass
 
-
     def getCurrentDirectory(self):
-        return self.ui.DataSet_path_lineEdit.text()
+        return self.currentFolder
 
     def setCurrentDirectory(self,folder):
         self.currentFolder = folder
-        self.ui.DataSet_path_lineEdit.setText(folder)
         
     def writeToStatus(self,text):
         self.log.append(text)
@@ -813,9 +841,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         
         dataFileInfoModelPossibleSettings,dataFileInfoModelInitial = self.DataFileInfoModel.settingsDialog()
         # Create a widget holding check boxes for all possible settings
+        dFIMLayout = QtWidgets.QVBoxLayout() # Outer most layout
+        dFIMLayoutScrollArea = QtWidgets.QScrollArea() # scrollarea layout
+        dummyWidget = QtWidgets.QWidget() # Dummy widget to insert layout into scroll area
 
-        dFIMLayout = QtWidgets.QVBoxLayout()
-        dFIMTitleLabel = QtWidgets.QLabel(text='Select infos to be shown for selected file(s)')
+        dFIMLayout_settings = QtWidgets.QVBoxLayout()
+        dFIMTitleLabel = QtWidgets.QLabel(text='DataFile intormation \nSelect infos to be shown for selected file(s)')
         dFIMTitleLabel.setAlignment(QtCore.Qt.AlignCenter)
         # Add title to layout
         dFIMLayout.addWidget(dFIMTitleLabel)
@@ -828,32 +859,50 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             name = setting.location
             checkBox.setText(name)
             checkBox.setChecked(setting in dataFileInfoModelInitial)
-            dFIMLayout.addWidget(checkBox)
+            dFIMLayout_settings.addWidget(checkBox)
+        dummyWidget.setLayout(dFIMLayout_settings)
+        dFIMLayoutScrollArea.setWidget(dummyWidget)
+        
+        dFIMLayout.addWidget(dFIMLayoutScrollArea)
+        # Overview: dFIMLayout -> dFIMLayoutScrollArea -> dummyWidget -> dFIMLayout_settings -> checkBox
+        #     Type:   layout             widget              widget            layout            widget
+
 
         # accept function arguments: self (dialog), layout which was passed in
         def dFIMAcceptFunction(self,layout,possibleSettings=dataFileInfoModelPossibleSettings):
             self.dMFIASettings = []
             for idx,setting in enumerate(possibleSettings.values()): # Loop through all the possible settings
-                box = layout.itemAt(idx+1).widget() # Skip 0 as it is a QLabel
+                box = layout.itemAt(1).widget().widget().layout().itemAt(idx).widget() # Skip 0 as it is a QLabel
                 if box.isChecked():# If checked add the corresponding setting to list of loaded settings
                     self.dMFIASettings.append(setting.location)
 
 
         # Create layout for gui settings
         guiSettingsLayout = QtWidgets.QVBoxLayout()
- 
+        labelTitle = QtWidgets.QLabel(text = 'Color map:')
+
+        cmapBox = QtWidgets.QComboBox()
+        cmaps = plt.colormaps()
+        current = cmaps.index(self.colormap)
+        cmapBox.addItems(cmaps)
+        cmapBox.setCurrentIndex(current)
+        
+        guiSettingsLayout.addWidget(labelTitle)
+        guiSettingsLayout.addWidget(cmapBox)
+
 
         # Create radiobuttons
         
-        def guiSettingsAcceptFunction(self,layout):
-            length = layout.count()-1 # first entry is QLabel
+        def guiSettingsAcceptFunction(self,layout,guiWindow=self):
+            cmapBox = layout.itemAt(1).widget()
+            guiWindow.colormap = cmapBox.currentText()
             
  
         # settings holds a list of possible settings for all setting fields
         layouts = [guiSettingsLayout,dFIMLayout]
         acceptFunctions = [guiSettingsAcceptFunction,dFIMAcceptFunction]
         dialog = settingsBoxDialog(layouts=layouts,acceptFunctions=acceptFunctions)
-
+        dialog.setWindowIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
         dialog.resize(dialog.sizeHint())
         
         
@@ -865,18 +914,18 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return
             
     def molarMassTool(self):
-        molecularCalculationManager = MolecularCalculationManager()
+        molecularCalculationManager = MolecularCalculationManager(parent=None,guiWindow=self)
         self.windows.append(molecularCalculationManager)
         molecularCalculationManager.show()
         
 
     def neutronCalculationTool(self):
-        calculatorManager = CalculatorManager()
+        calculatorManager = CalculatorManager(parent=None,guiWindow=self)
         self.windows.append(calculatorManager)
         calculatorManager.show()
 
     def absolutNormalizationTool(self):
-        absolutNormalizationWindow = NormalizationManager(parent=None)
+        absolutNormalizationWindow = NormalizationManager(parent=None,guiWindow=self)
         self.windows.append(absolutNormalizationWindow)
         absolutNormalizationWindow.show()
 
@@ -886,12 +935,47 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         predictionToolWindow.show()
 
     def electronicLogbookTool(self):
-        print('Not Implemeted yet electronicLogbookTool')
+        electronicLogBook = ElectronicLogBookManager(parent=None,guiWindow=self)
+        self.windows.append(electronicLogBook)
+        electronicLogBook.show()
 
     def subtractionManager(self):
-        subtractionManager = SubtractionManager(guiWindow=self)
+        subtractionManager = SubtractionManager(parent=None,guiWindow=self)
         self.windows.append(subtractionManager)
         subtractionManager.show()
+
+    def getBraggPoints(self):
+        if hasattr(self,'BraggListWindow'):
+            return self.BraggListWindow.BraggListModel.data
+        else:
+            return self.braggPoints
+
+    def openBraggListWindow(self):
+        if hasattr(self,'BraggListWindow'): # If a window is open, use it
+            if self.BraggListWindow.isVisible(): # if not visible, the window was closed
+                getattr(self.BraggListWindow,'raise')()
+                self.BraggListWindow.activateWindow()
+            else:
+                if self.braggPoints is None:
+                    bL = []
+                else:
+                    bL = self.braggPoints.copy()
+                self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+                self.BraggListWindow.BraggListModel.layoutChanged.connect(self.View3D_changed_CurratAxeList_function)
+
+                #self.braggPoints = self.BraggListWindow.BraggListModel.data
+            self.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
+
+        else:
+            if self.braggPoints is None:
+                bL = []
+            else:
+                bL = self.braggPoints.copy()
+            self.BraggListWindow = BraggListManager.BraggListManager(BraggList=bL,guiWindow = self)
+            self.BraggListWindow.BraggListModel.layoutChanged.connect(self.View3D_changed_CurratAxeList_function)
+            self.windows.append(self.BraggListWindow)
+            self.BraggListWindow.show()
 
 class settingsBoxDialog(QtWidgets.QDialog):
 

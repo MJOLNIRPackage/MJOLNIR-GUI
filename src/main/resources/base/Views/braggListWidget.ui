@@ -187,6 +187,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>BraggList_listView</tabstop>
+  <tabstop>BraggList_H_spinBox</tabstop>
+  <tabstop>BraggList_K_spinBox</tabstop>
+  <tabstop>BraggList_L_spinBox</tabstop>
+  <tabstop>BraggList_add_button</tabstop>
+  <tabstop>BraggList_delete_button</tabstop>
+  <tabstop>BraggList_deleteAll_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

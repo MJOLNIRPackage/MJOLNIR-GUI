@@ -209,7 +209,7 @@
   </action>
   <action name="actionGenerate_QELine_script">
    <property name="text">
-    <string>Generate QELine script</string>
+    <string>Generate QE Cut script</string>
    </property>
   </action>
   <action name="actionGenerate_QPlane_script">

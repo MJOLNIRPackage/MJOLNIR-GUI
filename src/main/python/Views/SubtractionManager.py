@@ -91,6 +91,7 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
             QtCore.Qt.WindowMinMaxButtonsHint )
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/subtract.png')))
         self.initSubtractionManager()
         #self.guiWindow.subtractionHelp()
 
@@ -116,8 +117,8 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
             self.Subtraction_dataSet_background_comboBox.setCurrentIndex(1)
             self.Subtraction_dataSet_background_comboBox.oldIdx = 1
 
-        self.Subtraction_dataSet_foreground_comboBox.currentIndexChanged.connect(lambda: self.comboboxChanged(foreground=True))#lambda idx: comboboxChanged(idx,self.Subtraction_dataSet_foreground_comboBox,self.Subtraction_dataSet_background_comboBox))
-        self.Subtraction_dataSet_background_comboBox.currentIndexChanged.connect(lambda: self.comboboxChanged(foreground=False))#lambda idx: comboboxChanged(idx,self.Subtraction_dataSet_background_comboBox,self.Subtraction_dataSet_foreground_comboBox))
+        self.Subtraction_dataSet_foreground_comboBox.currentIndexChanged.connect(lambda: self.comboboxChanged(foreground=True))
+        self.Subtraction_dataSet_background_comboBox.currentIndexChanged.connect(lambda: self.comboboxChanged(foreground=False))
         
         
         self.DataFileModel_foreground = DataFileModel(self.Subtraction_filenames_foreground_listView,\
@@ -140,7 +141,7 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         
 
         # add selection model for smooth selection when drag/dropping
-        self.DataFile_foreground_SelectionModel = SelectionModel(self.DataFileModel_foreground)#self.ui.DataSet_DataSets_listView.selectionModel()
+        self.DataFile_foreground_SelectionModel = SelectionModel(self.DataFileModel_foreground)
         
         
         self.Subtraction_filenames_foreground_listView.setSelectionModel(self.DataFile_foreground_SelectionModel)
@@ -154,10 +155,8 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         
         self.Subtraction_fileAttributs_foreground_listView.setModel(self.DataFile_foreground_infoModel)
 
-        #self.DataFileModel_foreground.layoutChanged.connect(self.checkDataSetCombability)
         self.DataFileModel_foreground.dragDropFinished.connect(self.DataFile_foreground_SelectionModel.onModelItemsReordered)
         self.DataFile_foreground_SelectionModel.selectionChanged.connect(self.updateDataFileLabels)
-        #self.DataFileModel_foreground.layoutChanged.connect(self.updateDataFileLabels)
         
 
 
@@ -165,7 +164,6 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         self.DataFileModel_background = DataFileModel(self.Subtraction_filenames_background_listView,\
             dataSetModel=self.guiWindow.DataSetModel,DataSet_DataSets_listView=self.Subtraction_dataSet_background_comboBox,\
                 guiWindow = self.guiWindow)
-        #self.DataFileModel_background.layoutChanged.connect(self.checkDataSetCombability)
 
         # Set up model for background df view
         self.Subtraction_filenames_background_listView.setModel(self.DataFileModel_background)

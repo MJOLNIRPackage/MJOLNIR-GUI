@@ -10,18 +10,17 @@ with open(os.path.join(_here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
-settingsDir = os.path.join(os.path.dirname(__file__),'MJOLNIRGui','src','build','settings')
-settingsFiles = os.listdir(settingsDir)
-
-settings = {}
-
-for f in settingsFiles:
-    file = os.path.join(settingsDir,f)
-    with open(file) as json_file:
-        _settings = json.load(json_file)
-        for item,val in _settings.items():
-            settings[item] = val
-
+settings = {'app_name': 'MJOLNIRGui', 
+'author': 'MJOLNIRPackage', 
+'main_module': 'src/main/python/main.py', 
+'version': '0.9.8', 
+'gpg_name': 'MJOLNIRPackage', 
+'hidden_imports': ['cmath'], 
+'categories': 'Education;', 
+'description': 'Graphical user interface for the MJOLNIR software. Documentation and further information can be found at https://www.psi.ch/en/sinq/camea/data-treatment. Please do cite this package with the DOI and article found at the website.', 
+'author_email': 'MJOLNIRPackage@gmail.dk', 
+'url': 'https://github.com/MJOLNIRPackage/MJOLNIR-GUI', 
+'mac_bundle_identifier': 'ch.psi.MJOLNIRGui'}
 
 
 home = os.path.join(_here,'MJOLNIRGui')
@@ -47,7 +46,7 @@ setup(
         "console_scripts": ['MJOLNIRGui = MJOLNIRGui.src.main.python.MJOLNIR_GUI:main']
         },
     python_requires='>=3.5',
-    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5','MJOLNIR>=1.1.20','ufit>=1.4.0'], 
+    install_requires=['pip>=20','sip>=5.3','PyQt5-sip','PyQt5-Qt5','MJOLNIR>=1.1.22','ufit>=1.4.0'], 
     
     classifiers=[
         'Development Status :: 3 - Alpha',

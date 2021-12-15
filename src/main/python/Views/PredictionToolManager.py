@@ -6,45 +6,24 @@ sys.path.append('..')
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
     import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.Views import BraggListManager
 except ImportError:
     from _tools import ProgressBarDecoratorArguments,loadUI
     import _tools as _GUItools
-    from Views import BraggListManager
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
-from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy
+from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy,predictionInstrumentSupport
 from MJOLNIR.Data import Sample
 import MJOLNIR 
 import pyperclip
 
 # Handles all functionality related to the PredictionToolManager. 
 
-# if platform.system() == 'Darwin':
-#     folder = path.abspath(path.join(path.dirname(__file__),'..','..','Resources','Views'))
-# else: 
-#     folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-# try:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
-# except:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(folder,"Prediction.ui"))
-
 
 PredictionToolManagerBase, PredictionToolManagerForm = loadUI('Prediction.ui')
 
-# try:
-#     PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),"Prediction.ui"))
-# except:
-#     try:
-#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','..','resources','base','Views',"Prediction.ui"))
-#     except:
-#         PredictionToolManagerBase, PredictionToolManagerForm = uic.loadUiType(path.join(path.dirname(__file__),'..','resources','base','Views',"Prediction.ui"))
 # All of this connects the buttons and their functions to the main window.
-       
-
 
 def FocusOut(self,event,manager):
     """Custom function to overwrite default FocusOut event"""
@@ -88,10 +67,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         super(PredictionToolManager, self).__init__(parent)
         self.setupUi(self)
         self.guiWindow = guiWindow
+        self.setWindowIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/predict.png')))
 
         self.a4Validator = QtGui.QRegExpValidator()
         self.predictionAX = None
-        self.braggPoints = None
+        if not hasattr(self.guiWindow,'braggPoints'):
+            self.guiWindow.braggPoints = None
        
         regExp = QtCore.QRegExp(r'(-?[0-9]*\.[0-9]+|-?[0-9]+)(,(-?[0-9]*\.[0-9]+|-?[0-9]+))*')
         self.a4Validator.setRegExp(regExp)
@@ -108,6 +89,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
 
     def setup(self):
+
+        ## Add supported instruments to combobox
+        self.instrument_comboBox.addItems(predictionInstrumentSupport)
+
+        
         # Update all boxes with check on out focus
 
         self.cell_a_spinBox.valueChanged.connect(lambda: textChangedA4Calc([1,2],self))
@@ -237,8 +223,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def loadEnergies(self,instrument='CAMEA'):
         if instrument == 'CAMEA':
-            MJOLNIRDir = os.path.dirname(MJOLNIR.__file__)
-            calibPath = os.path.join(MJOLNIRDir,'Normalization_1.calib')
+            calibPath = MJOLNIR.__CAMEANormalization__
 
             calib = np.loadtxt(calibPath,delimiter=',',skiprows=3)
 
@@ -288,11 +273,19 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         cell = np.array(self.getCell())
 
-        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,points=points)
+        instrument = str(self.instrument_comboBox.currentText())
+
+        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,
+        points=points,outputFunction=self.guiWindow.writeToStatus, instrument=instrument)
 
         self.predictionAx = ax
         self.guiWindow.windows.append(ax[0].get_figure())
 
+        # make all figures have the same xlim and ylim by using the last axis
+
+        for a in ax[:-1]:
+            a.set_ylim(*ax[-1].get_ylim())
+            a.set_xlim(*ax[-1].get_xlim())
 
         curratAxe = self.scan_curratAxe_checkBox.isChecked()
 
@@ -300,10 +293,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             self.plotCurratAxe()
         
     def plotCurratAxe(self):
-        if hasattr(self,'BraggListWindow'):
-            BraggPoint = self.BraggListWindow.BraggListModel.data
-        elif hasattr(self,'braggPoints'):
-            BraggPoint = self.braggPoints
+        if hasattr(self.guiWindow,'BraggListWindow'):
+            BraggPoint = self.guiWindow.BraggListWindow.BraggListModel.data
+        elif hasattr(self.guiWindow,'braggPoints'):
+            BraggPoint = self.guiWindow.braggPoints
         else:
             return
 
@@ -401,10 +394,9 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         cell = self.getCell()
         scan = self.getScan()
         calc = self.getCalculation()
-        bragg = self.braggPoints
 
-        names = ['R1','R2','cell','scan','calc','braggPoints']
-        values = [R1,R2,cell,scan,calc,bragg]
+        names = ['R1','R2','cell','scan','calc']
+        values = [R1,R2,cell,scan,calc]
         for name,value in zip(names,values):
             self.guiWindow.predictionSettings[name] = value
 
@@ -423,7 +415,6 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
                 self.setCell(cell)
                 self.setScan(scan)
                 self.setCalculation(calc)
-                self.braggPoints = self.guiWindow.predictionSettings['braggPoints']
             else:# Create an empty dict
                 self.guiWindow.predictionSettings = {}
 
@@ -500,17 +491,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.HKL_L_doubleSpinBox.setValue(L)
 
     def curratAxeList(self):
-        if hasattr(self,'BraggListWindow'): # If a window is open, use it
-            self.braggPoints = self.BraggListWindow.BraggListModel.data
-        
-        self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
-        self.guiWindow.windows.append(self.BraggListWindow)
-        self.BraggListWindow.show()
+        self.guiWindow.openBraggListWindow()
 
 
     def closeEvent(self, event):
-        if hasattr(self,'BraggListWindow'):
-            self.braggPoints = self.BraggListWindow.BraggListModel.data
-        else:
-            self.braggPoints = None
         self.updateSettings()
