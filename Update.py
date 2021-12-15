@@ -11,6 +11,7 @@ import sys,os,json
 # update to new version in base.json
 settingsDir = os.path.join('src','build','settings')
 installFile = 'setup.py'
+guiFile = os.path.join('src','main','python','MJOLNIR_Gui.py')
 
 settingsFiles = os.listdir(settingsDir)
 
@@ -52,6 +53,16 @@ settingsStr = ['settings = '+str(settings).replace(', ',', \n')+'\n']
 
 finalText = text[:startLine]+settingsStr+text[endLine:]
 
-with open(installFile,'w') as f:
-    f.writelines(finalText)
+with open(guiFile) as f:
+    text = f.readlines()
+    startLine = -1
+    for i,line in enumerate(text):
+        if 'version = ' in line:
+            versionLine = i
+            break
+        
 
+text[versionLine] = "version = '{}'\n".format(version) 
+
+with open(guiFile,'w') as f:
+    f.writelines(text)

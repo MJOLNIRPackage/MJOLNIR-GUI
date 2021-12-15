@@ -21,13 +21,7 @@ from time import sleep
 
 from os import path
 import os
-try:
-    from fbs_runtime import PUBLIC_SETTINGS
-except:
-    import json
-    fileLocation = path.abspath(path.join(path.dirname(__file__),'..','..','build','settings','base.json'))
-    with open(fileLocation) as jfile:
-        PUBLIC_SETTINGS = json.load(jfile)
+version = '0.9.8'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -111,7 +105,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.AppContext = AppContext
-        self.version = PUBLIC_SETTINGS['version']   
+        self.version = version
         ### Settings saved in .MJOLNIRGuiSettings
         self.settingsFile = path.join(home,'.MJOLNIRGuiSettings')
         self.views = []
