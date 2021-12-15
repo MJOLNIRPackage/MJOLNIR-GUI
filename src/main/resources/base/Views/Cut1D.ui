@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>656</width>
-    <height>383</height>
+    <height>398</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -327,6 +327,18 @@
          </item>
          <item row="5" column="0">
           <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
            <item>
             <widget class="QLineEdit" name="Cut1D_SetTitle_lineEdit">
              <property name="toolTip">
@@ -472,8 +484,20 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
+         <property name="leftMargin">
+          <number>6</number>
+         </property>
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="rightMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
          <property name="spacing">
-          <number>1</number>
+          <number>6</number>
          </property>
          <item row="0" column="1">
           <widget class="QPushButton" name="Cut1D_plot_button">
@@ -680,8 +704,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
