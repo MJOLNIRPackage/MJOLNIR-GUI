@@ -58,6 +58,12 @@
       </property>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,0,0,0,1">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
         <property name="leftMargin">
          <number>6</number>
         </property>
@@ -72,6 +78,12 @@
         </property>
         <item>
          <widget class="QLineEdit" name="View3D_SetTitle_lineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="toolTip">
            <string>Set title of current figure</string>
           </property>
