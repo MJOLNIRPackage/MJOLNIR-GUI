@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
+    <width>804</width>
     <height>276</height>
    </rect>
   </property>
@@ -43,7 +43,7 @@
      <property name="title">
       <string>Properties</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
       <property name="spacing">
        <number>1</number>
       </property>
@@ -57,7 +57,7 @@
        <number>3</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,0,0,0,0,0">
         <property name="leftMargin">
          <number>6</number>
         </property>
@@ -96,7 +96,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <layout class="QGridLayout" name="gridLayout_2">
+           <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1,0">
             <property name="leftMargin">
              <number>6</number>
             </property>
@@ -109,20 +109,7 @@
             <property name="bottomMargin">
              <number>6</number>
             </property>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="toolTip">
-               <string>Set color scale axis of current figure</string>
-              </property>
-              <property name="statusTip">
-               <string>Set color scale axis of current figure</string>
-              </property>
-              <property name="text">
-               <string>C Axis max</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
+            <item row="0" column="0">
              <widget class="QLabel" name="label_6">
               <property name="toolTip">
                <string>Set color scale axis of current figure</string>
@@ -135,7 +122,7 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="2">
+            <item row="1" column="2">
              <widget class="QLineEdit" name="View3D_CAxisMin_lineEdit">
               <property name="toolTip">
                <string>Set color scale axis of current figure</string>
@@ -148,7 +135,20 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="toolTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="statusTip">
+               <string>Set color scale axis of current figure</string>
+              </property>
+              <property name="text">
+               <string>C Axis max</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
              <widget class="QLineEdit" name="View3D_CAxisMax_lineEdit">
               <property name="toolTip">
                <string>Set color scale axis of current figure</string>
@@ -179,7 +179,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
           <item>
            <widget class="QPushButton" name="View3D_CurratAxe_button">
             <property name="statusTip">
@@ -538,8 +538,6 @@
  <tabstops>
   <tabstop>View3D_SetTitle_lineEdit</tabstop>
   <tabstop>View3D_SetTitle_button</tabstop>
-  <tabstop>View3D_CAxisMax_lineEdit</tabstop>
-  <tabstop>View3D_CAxisMin_lineEdit</tabstop>
   <tabstop>View3D_setCAxis_button</tabstop>
   <tabstop>View3D_CurratAxe_button</tabstop>
   <tabstop>View3D_CurratAxe_checkBox</tabstop>
