@@ -1,0 +1,2 @@
+recursive-include MJOLNIRGui\src\main\resources\ *
+recursive-include MJOLNIRGui\src\build\settings\ *
