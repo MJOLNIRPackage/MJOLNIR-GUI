@@ -42,7 +42,7 @@ try:
     from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
     from Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
+    from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
     from GuiStates import empty,partial,raw,converted
@@ -70,7 +70,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
     from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
@@ -113,7 +113,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.colormap = 'viridis'
         self.currentFolder = ''
 
-        
+        self.isClosing = False 
         self.ui.setupUi(self)
         self.update()
 
@@ -161,7 +161,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             box.setContentLayout(lay)
         
         vlay.setAlignment(QtCore.Qt.AlignTop)
-        self.maskingManager = MaskManager(self)
 
         self.dataSets = []
 
@@ -211,6 +210,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         for view in self.views: # Run through all views to set them up
             view.setup()
+
+        self.maskingManager = MaskManager(self)
 
         setupGenerateScript(self)
         self.update()
@@ -295,16 +296,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
         self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
-        self.ui.actionOpen_mask_gui.setDisabled(True)
         self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
         self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
         self.ui.actionOpen_mask_gui.triggered.connect(self.maskingManager.setWindowVisible)
-        
-        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-load.png')))
-        self.ui.actionLoad_mask.setDisabled(True)
-        self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
-        self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
-        #self.ui.actionLoad_mask.triggered.connect(self.maskingManager.getMasks)
+        self.ui.actionOpen_mask_gui.setShortcut("Ctrl+M")
+
 
         self.ui.actionSettings.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
         self.ui.actionSettings.setDisabled(False)
@@ -435,7 +431,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
-
+        self.isClosing = True
+        self.maskingManager.close()
         self.closeWindows()
 
     @ProgressBarDecoratorArguments(runningText='Closing Windows',completedText='Windows Closed')

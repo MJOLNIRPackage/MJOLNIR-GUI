@@ -260,7 +260,6 @@
      <string>Mask</string>
     </property>
     <addaction name="actionOpen_mask_gui"/>
-    <addaction name="actionLoad_mask"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
