@@ -5,6 +5,8 @@ from os import path
 from PyQt5 import QtWidgets
 
 from MJOLNIR import _tools
+from MJOLNIR.Data import Mask
+import inspect
 try:
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
@@ -19,7 +21,7 @@ except ImportError:
 # be linked to the main window. If more functions are to be written they have 
 # to be connected in MJOLNIR_GUI
 
-def startString():
+def startString(ds):
     # Importing the right things
     importString = []
 
@@ -33,7 +35,10 @@ def startString():
 
 
     importString.append('from MJOLNIR import _tools')
-    importString.append('from MJOLNIR.Data import DataSet')
+    if not ds._maskingObject is None:
+        importString.append('from MJOLNIR.Data import DataSet,Mask') 
+    else:
+        importString.append('from MJOLNIR.Data import DataSet') 
     
     importString.append('\nimport numpy as np')
     importString.append('from os import path')
@@ -108,8 +113,10 @@ def generateFileLoader(dataFiles,name='dataFiles'):
     return loadString
 
 
-def loadAndBinDataSet(dataSetName='ds',DataFiles=None,convertBeforeSubtract=None,backgroundFiles=None,binning=8):
+def loadAndBinDataSet(ds=None,DataFiles=None,convertBeforeSubtract=None,backgroundFiles=None,binning=8,mask=None):
     """Generate string to be run in order to load a dataset"""
+    
+
     
     loadString = []
 
@@ -119,7 +126,7 @@ def loadAndBinDataSet(dataSetName='ds',DataFiles=None,convertBeforeSubtract=None
         binString = 'binning = {},'.format(binning)
 
     if DataFiles is None:
-        loadString.append('{} = DataSet.DataSet()'.format(dataSetName))
+        loadString.append('{} = DataSet.DataSet()'.format(ds.name))
     else:
         if not backgroundFiles is None: # Dealing with subtracted data set
             loadString.append(generateFileLoader(DataFiles,name = 'foreground'))
@@ -128,10 +135,10 @@ def loadAndBinDataSet(dataSetName='ds',DataFiles=None,convertBeforeSubtract=None
             loadString.append('{} = DataSet.DataSet(background)'.format('BG'))
 
             if not convertBeforeSubtract: # Subtract first
-                loadString.append('{} = FG - BG'.format(dataSetName))
+                loadString.append('{} = FG - BG'.format(ds.name))
                 loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
                                 +'# Binning can be changed with binning argument.')
-                loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+                loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(ds.name,binString))
 
             else:
                 loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
@@ -139,16 +146,25 @@ def loadAndBinDataSet(dataSetName='ds',DataFiles=None,convertBeforeSubtract=None
                 
                 loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format('FG',binString))
                 loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format('BG',binString))
-                loadString.append('{} = FG - BG'.format(dataSetName))
+                loadString.append('{} = FG - BG'.format(ds.name))
 
 
         else:
             loadString.append(generateFileLoader(DataFiles))
-            loadString.append('{} = DataSet.DataSet(dataFiles)'.format(dataSetName))
+            loadString.append('{} = DataSet.DataSet(dataFiles)'.format(ds.name))
 
             loadString.append('# Run the converter. This automatically generates nxs-file(s). \n'
                                 +'# Binning can be changed with binning argument.')
-            loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(dataSetName,binString))
+            loadString.append('{:}.convertDataFile({:}saveFile=False)\n\n'.format(ds.name,binString))
+
+    if not ds._maskingObject is None:
+        loadString.append('\n')
+        returnStr,totalMaskName = generateMaskStr(ds._maskingObject)
+        loadString.append(returnStr)
+        loadString.append('')
+        loadString.append('{0}.mask = {1}({0}) # Run mask on DataSet'.format(ds.name,totalMaskName))
+        loadString.append('')
+        loadString.append('')
 
 
     
@@ -178,7 +194,6 @@ def generate3DScript(self):
 
     # Start loading information from the GUI
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
@@ -211,16 +226,16 @@ def generate3DScript(self):
     RLU = self.ui.View3D_SelectUnits_RLU_radioButton.isChecked()
 
     # And generate the script
-    generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,dataSetName=dataSetName, binning=binning, qx=qx, qy=qy, E=E, 
+    generateViewer3DScript(saveFile=saveFile,dataFiles=dataFiles,ds=ds, binning=binning, qx=qx, qy=qy, E=E, 
                                 RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
                                 title=title,customViewer=customViewer,counts=counts,convertBeforeSubtract=convertBeforeSubtract,
-                                backgroundFiles=backgroundFiles,cmap=self.colormap,CurratAxeBraggList=CurratAxeBraggList)
+                                backgroundFiles=backgroundFiles,cmap=self.colormap,CurratAxeBraggList=CurratAxeBraggList,)
 
     return True
 
 
 
-def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None, 
+def generateViewer3DScript(saveFile,ds,dataFiles,binning = None, 
                            qx=0.05, qy=0.05, E = 0.08, RLU=True, 
                            CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2, customViewer=False,counts=False,
                            convertBeforeSubtract=None,backgroundFiles=None,cmap='viridis',CurratAxeBraggList=None):
@@ -228,11 +243,11 @@ def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None,
     # them with a \n
     saveString = []
     
-    saveString.append(startString())
-    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
+    saveString.append(startString(ds=ds))
+    saveString.append(loadAndBinDataSet(ds=ds,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
     
 
-    saveString.append(plotViewer3D(dataSetName=dataSetName, qx=qx, qy=qy, E=E, 
+    saveString.append(plotViewer3D(ds=ds, qx=qx, qy=qy, E=E, 
                                     RLU=RLU, CAxisMin=CAxisMin, CAxisMax=CAxisMax, log=log, grid=grid,
                                     title=title, selectView=selectView, customViewer=customViewer,counts=counts,cmap=cmap,CurratAxeBraggList=CurratAxeBraggList))
 
@@ -242,7 +257,7 @@ def generateViewer3DScript(saveFile,dataSetName,dataFiles,binning = None,
 
 
 
-def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True, 
+def plotViewer3D(ds, qx=0.05, qy=0.05, E = 0.08, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', selectView = 2, customViewer=False,counts=False,cmap='viridis',CurratAxeBraggList=None):
     # Generate the actual text for the View3D script
 
@@ -289,7 +304,7 @@ def plotViewer3D(dataSetName='ds', qx=0.05, qy=0.05, E = 0.08, RLU=True,
     args = rluArgument+logArgument+gridArgument+sliceArgument+countsArgument+cmapArgument+CABraggArgument
 
     plotString.append('# Plotting data quickly in equi-sized voxels can be done by')
-    plotString.append('Viewer = {}.View3D({}{})'.format(dataSetName,','.join([str(x) for x in [qx,qy,E]]),args))
+    plotString.append('Viewer = {}.View3D({}{})'.format(ds.name,','.join([str(x) for x in [qx,qy,E]]),args))
 
     plotString.append("# Above, all data is binned in voxels of size " +str(qx) + "/AA, " + str(qy) +"/AA, and " +str(E) +" meV.\n"\
                         +"# Automatically, data is plotted in reciprocal lattice as provided by the\n"\
@@ -331,7 +346,6 @@ def generateQEScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
@@ -368,7 +382,7 @@ def generateQEScript(self):
     RLU = self.ui.QELine_SelectUnits_RLU_radioButton.isChecked()
     
     
-    generatePlotQEScript(saveFile=saveFile,dataSetName=dataSetName,dataFiles=dataFiles,binning = binning, 
+    generatePlotQEScript(saveFile=saveFile,ds=ds,dataFiles=dataFiles,binning = binning, 
                                 HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd, 
                                 width=width, minPixel=minPixel, EMin = EMin, EMax=EMax, NPoints=NPoints, RLU=RLU, 
                                 CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins,
@@ -377,17 +391,17 @@ def generateQEScript(self):
     return True    
 
     
-def generatePlotQEScript(saveFile,dataSetName,dataFiles,binning = None, 
+def generatePlotQEScript(saveFile,ds,dataFiles,binning = None, 
                              HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                              width=0.1, minPixel=0.01, EMin = 0.0, EMax=10, NPoints=101, RLU=True, 
                              CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False,
                              convertBeforeSubtract=None,backgroundFiles=None,cmap='viridis'):
     saveString = []
     
-    saveString.append(startString())
-    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
+    saveString.append(startString(ds=ds))
+    saveString.append(loadAndBinDataSet(ds=ds,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
 
-    saveString.append(plotQEText(dataSetName=dataSetName, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
+    saveString.append(plotQEText(ds=ds, HStart=HStart, KStart=KStart, LStart = LStart, HEnd=HEnd, KEnd=KEnd, LEnd=LEnd,
                width=width, minPixel=minPixel, EMin = EMin,EMax=EMax,NPoints=NPoints, RLU=RLU, 
                 CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title, constantBins=constantBins,cmap=cmap))
 
@@ -397,7 +411,7 @@ def generatePlotQEScript(saveFile,dataSetName,dataFiles,binning = None,
         file.write(saveString)
         
 
-def plotQEText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
+def plotQEText(ds, HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KEnd=0, LEnd=1,
                width=0.1, minPixel=0.01, EMin = 0.0,EMax=10,NPoints=101, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='', constantBins=False,cmap='viridis'):
 
@@ -438,7 +452,7 @@ def plotQEText(dataSetName='ds', HStart=-1, KStart=0.0, LStart = -1, HEnd=-1, KE
         
     
     plotString.append("ax,Data,Bins = \\" )
-    plotString.append('        ' + dataSetName + '.plotCutQE(q1=Q1, q2=Q2, width=width, minPixel=minPixel, \\')
+    plotString.append('        ' + ds.name + '.plotCutQE(q1=Q1, q2=Q2, width=width, minPixel=minPixel, \\')
     plotString.append('        ' +'EnergyBins=EnergyBins' +args +')')
 
     plotString.append("# Without any intervention data is usually plotted on a useless colour scale.\n"\
@@ -476,7 +490,6 @@ def generateQPlaneScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
@@ -507,7 +520,7 @@ def generateQPlaneScript(self):
     RLU = self.ui.QPlane_SelectUnits_RLU_radioButton.isChecked()
     
     
-    generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = binning, 
+    generatePlotQPlaneScript(saveFile,ds,dataFiles,binning = binning, 
                              xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
                              EMin = EMin,EMax=EMax, RLU=RLU, 
                              CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title,
@@ -516,17 +529,17 @@ def generateQPlaneScript(self):
     return True    
 
 
-def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None, 
+def generatePlotQPlaneScript(saveFile,ds,dataFiles,binning = None, 
                              xBinTolerance=0.03, yBinTolerance=0.03,
                              EMin = 0.0,EMax=10, RLU=True, 
                              CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='',
                              convertBeforeSubtract=None,backgroundFiles=None,cmap='viridis'):
     saveString = []
     
-    saveString.append(startString())
-    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
+    saveString.append(startString(ds=ds))
+    saveString.append(loadAndBinDataSet(ds=ds,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
     
-    saveString.append(plotQPlaneText(dataSetName=dataSetName, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
+    saveString.append(plotQPlaneText(ds=ds, xBinTolerance=xBinTolerance, yBinTolerance=yBinTolerance,
                 EMin = EMin,EMax=EMax, RLU=RLU, 
                 CAxisMin = CAxisMin, CAxisMax = CAxisMax, log=log, grid=grid, title=title,cmap=cmap))
 
@@ -536,7 +549,7 @@ def generatePlotQPlaneScript(saveFile,dataSetName,dataFiles,binning = None,
         file.write(saveString)
 
 
-def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
+def plotQPlaneText(ds, xBinTolerance=0.03, yBinTolerance=0.03,
                 EMin = 0.0,EMax=10, RLU=True, 
                 CAxisMin = 0, CAxisMax = 1e-5, log=False, grid=True, title='',cmap='viridis'):
 
@@ -564,7 +577,7 @@ def plotQPlaneText(dataSetName='ds', xBinTolerance=0.03, yBinTolerance=0.03,
     plotString.append('EMax = ' + EMax)
     plotString.append('xBinTolerance = ' + xBinTolerance)
     plotString.append('yBinTolerance = ' + yBinTolerance)
-    plotString.append('Data,Bins,ax = '+ dataSetName + '.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance' + args + ')')
+    plotString.append('Data,Bins,ax = '+ ds.name + '.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance' + args + ')')
 
     plotString.append('fig = ax.get_figure() # Extract figure from returned axis')
     plotString.append('fig.colorbar(ax.pmeshs[0]) # Create colorbar from plot\n')
@@ -608,7 +621,6 @@ def generateCut1DScript(self):
         saveFile = path.splitext(saveFile)[0]+'.py'
 
     ds = self.DataSetModel.getCurrentDataSet()
-    dataSetName = ds.name.replace(' ','_')
     
     dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
@@ -621,17 +633,17 @@ def generateCut1DScript(self):
     binning = self.ui.DataSet_binning_comboBox.currentText()
     
     saveString = []
-    saveString.append(startString())
+    saveString.append(startString(ds=ds))
     saveString.append('\n\n')
-    saveString.append(loadAndBinDataSet(dataSetName=dataSetName,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
+    saveString.append(loadAndBinDataSet(ds=ds,DataFiles=dataFiles,convertBeforeSubtract=convertBeforeSubtract,backgroundFiles=backgroundFiles,binning=binning))
     self.appendPLTSHOW = False # Flag to keep track of the need for a plt.show() command
     if self.Cut1DModel.rowCount() == 1:
         cut = self.Cut1DModel.dataCuts1D[0]
-        saveString.append(plotCut1DText(dataSetName,cut,single=True,self=self))
+        saveString.append(plotCut1DText(ds,cut,single=True,self=self))
     else:
         
         for cut in self.Cut1DModel.dataCuts1D:
-            saveString.append(plotCut1DText(dataSetName,cut,single=False,self=self))
+            saveString.append(plotCut1DText(ds,cut,single=False,self=self))
             saveString.append('\n')
 
     if self.appendPLTSHOW:
@@ -642,7 +654,7 @@ def generateCut1DScript(self):
     return True    
         
         
-def plotCut1DText(dataSetName, cut,single=True,self=None):
+def plotCut1DText(ds, cut,single=True,self=None):
     title = cut.name.replace(' ','_')
     if cut.parameters['method'].find('cut1DE')>-1: # If the method contains "cut1DE" it is for constant q
         q = cut.parameters['q1']
@@ -679,9 +691,9 @@ def plotCut1DText(dataSetName, cut,single=True,self=None):
             plotString.append('E1='+str(EMin))
             plotString.append('E2='+str(EMax))
             
-            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(E1=E1,E2=E2,q=q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
+            plotString.append(returnPars+' = ' +ds.name +'.'+method+'(E1=E1,E2=E2,q=q,width=width,minPixel=minPixel,rlu=rlu,constantBins=constantBins,ufit='+str(ufit)+')')
         else:
-            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(E1={},E2={},q={},width={},minPixel={},rlu={},constantBins={},ufit={})'.format(
+            plotString.append(returnPars+' = ' +ds.name +'.'+method+'(E1={},E2={},q={},width={},minPixel={},rlu={},constantBins={},ufit={})'.format(
             EMin,EMax,'['+','.join([str(x) for x in q])+ ']',width,minPixel,rlu,constantBins,ufit))
         
     else:
@@ -723,9 +735,9 @@ def plotCut1DText(dataSetName, cut,single=True,self=None):
             plotString.append('EMin='+str(EMin))
             plotString.append('EMax='+str(EMax))
 
-            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
+            plotString.append(returnPars+' = ' +ds.name +'.'+method+'(q1=Q1,q2=Q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=True,constantBins=constantBins,ufit='+str(ufit)+')')
         else:
-            plotString.append(returnPars+' = ' +dataSetName +'.'+method+'(q1={},q2={},width={},minPixel={},Emin={},Emax={},rlu={},constantBins={},ufit={})'.format(
+            plotString.append(returnPars+' = ' +ds.name +'.'+method+'(q1={},q2={},width={},minPixel={},Emin={},Emax={},rlu={},constantBins={},ufit={})'.format(
                 '['+','.join([str(x) for x in q1])+ ']','['+','.join([str(x) for x in q2])+ ']',width,minPixel,EMin,EMax,rlu,constantBins,ufit
             ))
 
@@ -746,3 +758,45 @@ def initGenerateScript(guiWindow):
 
 def setupGenerateScript(guiWindow):
     pass
+
+def generateMaskStr(maskingObject):
+    
+    def generateMask(mask):
+        makeStr = []
+        signature = inspect.signature(type(mask).__init__)
+        
+        paramDict = {}
+        maskName = mask.name
+        for param in signature.parameters:
+            if param == 'self': continue
+            paramDict[param] = getattr(mask,param)
+            if not isinstance(paramDict[param],(np.ndarray)):
+                if isinstance(paramDict[param],(str)):
+                    makeStr.append(maskName+'_'+param+' = "'+str(paramDict[param])+'"')
+                else:
+                    makeStr.append(maskName+'_'+param+' = '+str(paramDict[param]))
+            else:
+                makeStr.append(maskName+'_'+param+' = np.array('+np.array2string(paramDict[param],separator=',')+')')
+            
+        makeStr.append('')
+        makeStr.append(paramDict['name']+' = Mask.'+type(mask).__name__+'(')
+        for idx,key in enumerate(paramDict):
+            makeStr.append('\t'+key+' = '+maskName+'_'+key+','*(idx!=len(paramDict)-1)+')'*(idx==len(paramDict)-1))
+    
+        return '\n'.join(makeStr)
+    
+    eq,masks = Mask.extract(maskingObject)
+    masks.sort(key=lambda mask:mask.name)
+    defineMaskStr = ['# Generate individual masks']+[generateMask(mask) for mask in masks]
+    totalMaskName = 'totalMask'
+    while totalMaskName in [m.name for m in masks]:
+        try:
+            idx = int(totalMaskName.split('_')[-1])
+        except ValueError:
+            totalMaskName = totalMaskName+'_1'
+        else:
+            totalMaskName = totalMaskName[:-(len(str(idx))+1)] + '_' + str(idx+1)
+    
+    maskStr = '\n\n'.join(['\n\n'.join(defineMaskStr),totalMaskName+' = '+eq])
+
+    return maskStr,totalMaskName
