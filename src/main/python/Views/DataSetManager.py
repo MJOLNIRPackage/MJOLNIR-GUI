@@ -22,6 +22,7 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.ui.DataSet_convertData_button.setStatusTip(self.ui.DataSet_convertData_button.toolTip())
 
     self.ui.DataSet_NewDataSet_button.clicked.connect(self.DataSet_NewDataSet_button_function)
+    self.ui.DataSet_NewDataSet_button.setShortcut("Ctrl+N")
     self.ui.DataSet_NewDataSet_button.setToolTip('Add new Dataset')
     self.ui.DataSet_NewDataSet_button.setStatusTip(self.ui.DataSet_NewDataSet_button.toolTip())
 
@@ -30,6 +31,7 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.ui.DataSet_DeleteDataSet_button.setStatusTip(self.ui.DataSet_DeleteDataSet_button.toolTip())
 
     self.ui.DataSet_AddFiles_button.clicked.connect(self.DataSet_AddFiles_button_function)
+    self.ui.DataSet_AddFiles_button.setShortcut("Ctrl+F")
     self.ui.DataSet_AddFiles_button.setToolTip('Add new Datafiles')
     self.ui.DataSet_AddFiles_button.setStatusTip(self.ui.DataSet_AddFiles_button.toolTip())
 
@@ -192,6 +194,7 @@ def DataSet_NewDataSet_button_function(self):
 def DataSet_DeleteDataSet_button_function(self):
     idx = self.ui.DataSet_DataSets_listView.selectedIndexes()[0]
     self.DataSetModel.delete(idx)
+    self.DataSetModel.layoutChanged.emit()
     self.DataFileModel.layoutChanged.emit()
     self.stateMachine.run()
     
