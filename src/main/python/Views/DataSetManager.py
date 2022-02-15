@@ -303,6 +303,7 @@ def convert(self):
         
         dialog.exec_()
     
+    self.DataSetModel.layoutChanged.emit()
     self.DataFileModel.layoutChanged.emit()
     self.stateMachine.run()
     return True

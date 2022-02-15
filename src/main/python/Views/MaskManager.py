@@ -147,6 +147,10 @@ translate = {
     'boxMask': '3D Box Mask'
 }
 
+translateReverse = {}
+for key,value in translate.items():
+    translateReverse[value] = key
+
 
 class maskingDialog(QtWidgets.QWidget):
     coordinates = ['h','k','l','energy','qx','qy','A3','A4']
@@ -803,7 +807,7 @@ class maskingDialog(QtWidgets.QWidget):
 
     def accept(self): # the accept button has been pressed
         # coordinates = [box.currentText() for box in self.coordinateComboBoxes]
-        MaskType = getattr(Mask,self.maskTypeComboBox.currentText())
+        MaskType = getattr(Mask,translateReverse[self.maskTypeComboBox.currentText()])
         
         maskName = self.maskNameEdit.text()
         if len(maskName) == 0:
@@ -1029,7 +1033,14 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
 
     def Mask_apply_to_dataset_button_check(self):
         if self.parent.DataSetModel.rowCount(None)!=0 and self.getMasks() is not None:
-            self.Mask_apply_to_dataset_button.setDisabled(False)
+            localIdx = self.Mask_data_set_combo_box.currentIndex()
+            idx = self.parent.DataSetModel.index(localIdx,0)
+            ds = self.parent.DataSetModel.data(idx,QtCore.Qt.ItemDataRole)
+            #print(ds)
+            if len(ds._convertedFiles)>0:
+                self.Mask_apply_to_dataset_button.setDisabled(False)
+            else:
+                self.Mask_apply_to_dataset_button.setDisabled(True)
         else:
             self.Mask_apply_to_dataset_button.setDisabled(True)
 

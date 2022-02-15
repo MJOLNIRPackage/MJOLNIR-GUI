@@ -178,7 +178,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Apply To DataSet</string>
+      <string>Apply To Converted DataSet</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
