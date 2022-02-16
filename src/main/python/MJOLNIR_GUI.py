@@ -9,10 +9,10 @@ except:
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 try:
     import _tools as _guitools
-    from Views import BraggListManager
+    from Views import BraggListManager,BraggListManager_test
 except ImportError:
     import MJOLNIRGui.src.main.python._tools as _guitools
-    from MJOLNIRGui.src.main.python.Views import BraggListManager
+    from MJOLNIRGui.src.main.python.Views import BraggListManager,BraggListManager_test
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -295,11 +295,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
-        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
-        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
-        self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
-        self.ui.actionOpen_mask_gui.triggered.connect(self.maskingManager.setWindowVisible)
-        self.ui.actionOpen_mask_gui.setShortcut("Ctrl+M")
+        self.ui.action_masking_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
+        self.ui.action_masking_gui.setToolTip('Masking Gui') 
+        self.ui.action_masking_gui.setStatusTip(self.ui.action_masking_gui.toolTip())
+        self.ui.action_masking_gui.triggered.connect(self.maskingManager.setWindowVisible)
+        self.ui.action_masking_gui.setShortcut("Ctrl+M")
 
 
         self.ui.actionSettings.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
@@ -946,6 +946,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return self.BraggListWindow.BraggListModel.data
         else:
             return self.braggPoints
+
+    def braggListTest(self):
+        self.BraggListWindow = BraggListManager_test.BraggListManager(BraggList=[],guiWindow = self)
+        
+            #self.braggPoints = self.BraggListWindow.BraggListModel.data
+        self.windows.append(self.BraggListWindow)
+        self.BraggListWindow.show()
 
     def openBraggListWindow(self):
         if hasattr(self,'BraggListWindow'): # If a window is open, use it

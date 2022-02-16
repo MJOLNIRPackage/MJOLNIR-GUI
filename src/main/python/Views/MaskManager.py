@@ -20,6 +20,19 @@ import numpy as np
 import os
 import inspect
 
+class FilterProxyModel(QtCore.QIdentityProxyModel):
+    def __init__(self,source=None, *args,**kwargs):
+        super(FilterProxyModel,self).__init__(*args,**kwargs)
+        if not source is None:
+            self.setSourceModel(source)
+
+    def flags(self,index):
+        ds = self.sourceModel().data(index,role=QtCore.Qt.ItemDataRole)
+        if len(ds._convertedFiles)>0:
+            return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
+        else:
+            return QtCore.Qt.NoItemFlags
+
 
 def Mask_DoubleClick_Selection_function(self,index,*args,**kwargs):
     self.Mask_listView.edit(index)
@@ -953,17 +966,15 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.maskingMainWindow.Mask_status_label.setPixmap(img)
         self.maskingMainWindow.Mask_status_label.setToolTip('<br>'.join([grey+' No mask applied',red+' Wrong masking',green+' Valid masking']))
         
-        self.Mask_data_set_combo_box.setModel(self.parent.DataSetModel)
-        self.Mask_apply_to_dataset_button.clicked.connect(self.ApplyMaskToDataSet)
+        self.proxyModel = FilterProxyModel(self.parent.DataSetModel)
 
+        self.Mask_data_set_combo_box.setModel(self.proxyModel)
+        self.Mask_apply_to_dataset_button.clicked.connect(self.ApplyMaskToDataSet)
+        self.Mask_data_set_combo_box.currentIndexChanged.connect(self.performButtonChecks)
         self.parent.DataSetModel.layoutChanged.connect(self.DataSetModelLayoutChanged)
 
         self.performButtonChecks()
-        # def quick(self,state):
-        #     print('quick got',state)
-        #     if not state is None:
-        #         self.parent.mask_changed.emit()
-        #self.maskingMainWindow.Mask_apply_checkbox_nonBlock.stateChanged.connect(quick)
+
 
         
     def setup(self):
@@ -996,10 +1007,22 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
 
 
     def DataSetModelLayoutChanged(self):
+        # Make clever check in order to not choose a non-valid ds
         if self.parent.DataSetModel.rowCount(None)==0:
             self.Mask_data_set_combo_box.setCurrentIndex(-1)
-        else:
-            self.Mask_data_set_combo_box.setCurrentIndex(0)
+            return 
+        
+        currentIndex = self.Mask_data_set_combo_box.currentIndex()
+        if currentIndex == -1:
+            return
+        currentFlags = self.Mask_data_set_combo_box.model().flags(self.Mask_data_set_combo_box.model().index(currentIndex,0))
+
+        print('currentIndex',currentIndex,'currentFlags',currentFlags,'expected','is enabled?',bool(currentFlags & QtCore.Qt.ItemIsEnabled))
+        if not bool(currentFlags & QtCore.Qt.ItemIsEnabled):
+            self.Mask_data_set_combo_box.setCurrentIndex(-1)
+            
+        #else:
+        #    self.Mask_data_set_combo_box.setCurrentIndex(-1)
 
         self.performButtonChecks()
         
@@ -1098,6 +1121,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
             self.maskingMainWindow.MaskModel.append(m)
 
         self.maskingMainWindow.Mask_equation_line_edit.setText(eq)
+        self.performButtonChecks()
         return True
 
         
