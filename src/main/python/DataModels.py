@@ -374,22 +374,30 @@ class BraggListModel(QtCore.QAbstractListModel):
         super(BraggListModel, self).__init__(*args, **kwargs)
         if BraggList is None:
             BraggList = []
-        self.data = BraggList 
+        self._data = BraggList 
         self.braggList_listView = braggList_listView
         
     def data(self, index, role):
-        if role == Qt.DisplayRole:# or role == QtCore.Qt.EditRole:
-            text = '\t'.join(map(str,self.data[index.row()]))
+        if index.row()>=self.rowCount(): return 
+        if index.row()<0: return 
+        if index.column()>=1: return 
+        if index.column()<-1: return 
+
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            text = '\t'.join(map(str,self._data[index.row()]))
             return text
         
     def getData(self,*args,**kwargs):
         return self.data(*args,**kwargs)
 
     def rowCount(self, index=None):
-        return len(self.data)
+        return len(self._data)
+
+    def columnCount(self, index=None):
+        return 0
 
     def append(self,BraggPoint):
-        self.data.append(BraggPoint)
+        self._data.append(BraggPoint)
         self.selectLastBragg()
         self.layoutChanged.emit()
 
@@ -398,7 +406,7 @@ class BraggListModel(QtCore.QAbstractListModel):
         indices.sort(reverse=True)
         for ind in indices:
             try:
-                del self.data[ind]
+                del self._data[ind]
                 self.layoutChanged.emit()
             except:
                 pass
@@ -414,7 +422,7 @@ class BraggListModel(QtCore.QAbstractListModel):
 
     def item(self,index):
         if not index is None:
-            return self.data[index.row()]
+            return self._data[index.row()]
 
     #def setData(self, index, value, role=QtCore.Qt.EditRole):
     #    ds = self.item(index)
