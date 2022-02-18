@@ -35,7 +35,7 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
     self.ui.DataSet_AddFiles_button.setToolTip('Add new Datafiles')
     self.ui.DataSet_AddFiles_button.setStatusTip(self.ui.DataSet_AddFiles_button.toolTip())
 
-    self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView)
+    self.DataSetModel = DataSetModel(dataSets=self.dataSets,DataSet_DataSets_listView=self.ui.DataSet_DataSets_listView,guiWindow=self)
     self.ui.DataSet_DataSets_listView.setModel(self.DataSetModel)
     self.ui.DataSet_DataSets_listView.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
     self.ui.DataSet_DataSets_listView.setDragDropOverwriteMode(False)
@@ -97,6 +97,16 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                         sort.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/arrow-circle-double-135.png')))
                         
                         menu.addAction(sort)
+                    if not ds._maskingObject is None: # A masking has been performed!
+                        removeMasking = QtWidgets.QAction('Remove Masking')
+                        removeMasking.setToolTip("Remove masking from dataset")
+                        def removeMaskingFunction(gui,ds):
+                            ds.removeMasking()
+                            gui.DataSetModel.layoutChanged.emit()
+                        removeMasking.setStatusTip(removeMasking.toolTip())
+                        removeMasking.triggered.connect(lambda: removeMaskingFunction(gui,ds))
+                        removeMasking.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
+                        menu.addAction(removeMasking)
 
                 return menu.exec_(position)
 

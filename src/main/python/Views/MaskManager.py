@@ -17,7 +17,7 @@ except ImportError:
 from MJOLNIR.Data import Mask
 from PyQt5 import QtWidgets, uic, QtCore, QtGui
 import numpy as np
-import os
+import os,warnings
 import inspect
 
 class FilterProxyModel(QtCore.QIdentityProxyModel):
@@ -885,7 +885,34 @@ class AnotherWindow(QtWidgets.QWidget):
                 self.dialog.close()
             
         
-        
+@ProgressBarDecoratorArguments(runningText='Applying Masking',completedText='Data Files Added')
+def ApplyMaskToDataSet(self):
+    self.resetProgressBar()
+    self.setProgressBarMaximum(1)
+    self.setProgressBarLabelText('Applying Masking')
+    localIdx = self.maskingManager.Mask_data_set_combo_box.currentIndex()
+    idx = self.DataSetModel.index(localIdx,0) # Create correct index type for DataSetModel
+    ds = self.DataSetModel.data(idx,QtCore.Qt.ItemDataRole) # Get the DataSet in question
+    self.setProgressBarLabelText('Applying Masking to "{}"'.format(ds.name))
+
+    
+    mask = self.maskingManager.getMasks()
+    matrix = mask(ds)
+
+    
+    self.addProgressBarValue(0.75)
+    
+    with warnings.catch_warnings(record=True) as w:
+        # Cause all warnings to always be triggered.
+        warnings.simplefilter("always")
+        ds.mask = matrix
+        if len(w)>0:
+                self.writeToStatus(str(w[0].message))
+
+    ds._maskingObject = mask
+    
+    self.maskingManager.closeEvent(event=None)    
+    return True
 
 
 MaskManagerBase, MaskManagerForm = loadUI("Mask2.ui")
@@ -897,6 +924,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.setupUi(self)
         
         self.maskingMainWindow = AnotherWindow(widget=self,AppContext=self.parent.AppContext,parent=self.parent,maskingManager=self)
+        self.guiWindow = self.parent
         self.maskingMainWindow.setVisible(False)
         self.MaskIsCorrect = False
         self.initMaskManager()
@@ -954,6 +982,9 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.maskingMainWindow.selectedMaskChanged = lambda : selectedMaskChanged(self.maskingMainWindow)
         self.maskingMainWindow.updateMaskLabels = lambda:updateMaskLabels(self.maskingMainWindow)
         self.maskingMainWindow.MaskOnChange = lambda:MaskOnChange(self.maskingMainWindow)
+
+        self.guiWindow.ApplyMaskToDataSet = lambda: ApplyMaskToDataSet(self.guiWindow)
+
         for key,value in self.__dict__.items():
                 if 'Mask' in key:
                     self.maskingMainWindow.__dict__[key] = value
@@ -969,7 +1000,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.proxyModel = FilterProxyModel(self.parent.DataSetModel)
 
         self.Mask_data_set_combo_box.setModel(self.proxyModel)
-        self.Mask_apply_to_dataset_button.clicked.connect(self.ApplyMaskToDataSet)
+        self.Mask_apply_to_dataset_button.clicked.connect(self.guiWindow.ApplyMaskToDataSet)
         self.Mask_data_set_combo_box.currentIndexChanged.connect(self.performButtonChecks)
         self.parent.DataSetModel.layoutChanged.connect(self.DataSetModelLayoutChanged)
 
@@ -1016,8 +1047,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         if currentIndex == -1:
             return
         currentFlags = self.Mask_data_set_combo_box.model().flags(self.Mask_data_set_combo_box.model().index(currentIndex,0))
-
-        print('currentIndex',currentIndex,'currentFlags',currentFlags,'expected','is enabled?',bool(currentFlags & QtCore.Qt.ItemIsEnabled))
+        
         if not bool(currentFlags & QtCore.Qt.ItemIsEnabled):
             self.Mask_data_set_combo_box.setCurrentIndex(-1)
             
@@ -1026,28 +1056,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
 
         self.performButtonChecks()
         
-    def ApplyMaskToDataSet(self):
-        self.parent.resetProgressBar()
-        self.parent.setProgressBarMaximum(1)
-        self.parent.setProgressBarLabelText('Applying Masking')
-        localIdx = self.Mask_data_set_combo_box.currentIndex()
-        idx = self.parent.DataSetModel.index(localIdx,0) # Create correct index type for DataSetModel
-        ds = self.parent.DataSetModel.data(idx,QtCore.Qt.ItemDataRole) # Get the DataSet in question
-        self.parent.setProgressBarLabelText('Applying Masking to "{}"'.format(ds.name))
-
-        
-        mask = self.getMasks()
-        matrix = mask(ds)
-        self.parent.addProgressBarValue(0.75)
-        
-        ds.mask = matrix
-        self.parent.setProgressBarValue(1)
-        self.parent.setProgressBarLabelText('Done!')
-        self.parent.resetProgressBarTimed()
-
-        ds._maskingObject = mask
-        
-        self.closeEvent(event=None)
+    
 
     def performButtonChecks(self):
         self.Mask_apply_to_dataset_button_check()
@@ -1059,8 +1068,8 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
             localIdx = self.Mask_data_set_combo_box.currentIndex()
             idx = self.parent.DataSetModel.index(localIdx,0)
             ds = self.parent.DataSetModel.data(idx,QtCore.Qt.ItemDataRole)
-            #print(ds)
-            if len(ds._convertedFiles)>0:
+
+            if len(ds._convertedFiles)>0 and localIdx>-1: # it has converted files and is selected
                 self.Mask_apply_to_dataset_button.setDisabled(False)
             else:
                 self.Mask_apply_to_dataset_button.setDisabled(True)

@@ -26,12 +26,13 @@ class DataSetModel(QtCore.QAbstractListModel):
 
     dragDropFinished = QtCore.pyqtSignal()
 
-    def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
+    def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None,guiWindow=None, **kwargs):
         super(DataSetModel, self).__init__(*args, **kwargs)
         self.dataSets = dataSets or []
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.lastDroppedItems = []
         self.pendingRemoveRowsAfterDrop = False
+        self.guiWindow = guiWindow
 
     def rowForItem(self, item):
         '''
@@ -50,8 +51,12 @@ class DataSetModel(QtCore.QAbstractListModel):
             return text
         if role == Qt.ItemDataRole:
             return self.dataSets[index.row()]
-        #if role == Qt.DecorationRole:
-        #    status = self.dataSets[index.row()].checked
+        if role == Qt.DecorationRole:
+            if not self.dataSets[index.row()]._maskingObject is None:
+                return QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/mask-open.png'))
+            else:
+                return None
+
         #    if status:
         #        return tick
 
