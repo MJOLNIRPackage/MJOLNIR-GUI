@@ -9,10 +9,10 @@ except:
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
 try:
     import _tools as _guitools
-    from Views import BraggListManager,BraggListManager_test
+    from Views import BraggListManager
 except ImportError:
     import MJOLNIRGui.src.main.python._tools as _guitools
-    from MJOLNIRGui.src.main.python.Views import BraggListManager,BraggListManager_test
+    from MJOLNIRGui.src.main.python.Views import BraggListManager
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -946,13 +946,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             return self.BraggListWindow.BraggListModel.data
         else:
             return self.braggPoints
-
-    def braggListTest(self):
-        self.BraggListWindow = BraggListManager_test.BraggListManager(BraggList=[],guiWindow = self)
-        
-            #self.braggPoints = self.BraggListWindow.BraggListModel.data
-        self.windows.append(self.BraggListWindow)
-        self.BraggListWindow.show()
+    
 
     def openBraggListWindow(self):
         if hasattr(self,'BraggListWindow'): # If a window is open, use it
