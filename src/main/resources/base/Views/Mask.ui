@@ -6,91 +6,138 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>979</width>
-    <height>322</height>
+    <width>410</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QListView" name="Mask_listView">
-       <property name="alternatingRowColors">
-        <bool>true</bool>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="Mask_delete_button_nonBlock">
+       <property name="toolTip">
+        <string>Delete selected mask</string>
        </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
+       <property name="statusTip">
+        <string>Delete selected mask</string>
+       </property>
+       <property name="text">
+        <string>Delete Mask</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="Mask_add_button_nonBlock">
+       <property name="toolTip">
+        <string>Add new mask</string>
+       </property>
+       <property name="statusTip">
+        <string>Add new mask</string>
+       </property>
+       <property name="text">
+        <string>Add Mask</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="Mask_save_file_button">
+       <property name="toolTip">
+        <string>Save mask generate from mask equation to file. Only masks utilised in the equation are saved!</string>
+       </property>
+       <property name="statusTip">
+        <string>Save mask generate from mask equation to file. Only masks utilised in the equation are saved!</string>
+       </property>
+       <property name="text">
+        <string>Save To File</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="Mask_add_button_nonBlock">
-         <property name="text">
-          <string>Add Mask</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="Mask_duplicate_button_nonBlock">
-         <property name="text">
-          <string>Duplicate</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="Mask_delete_button_nonBlock">
-         <property name="text">
-          <string>Delete Mask</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QCheckBox" name="Mask_apply_checkbox_nonBlock">
-         <property name="text">
-          <string>Apply Masks</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="Mask_type_label">
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="Mask_load_file_button">
+       <property name="toolTip">
+        <string>Load mask from file</string>
+       </property>
+       <property name="statusTip">
+        <string>Load mask from file</string>
+       </property>
+       <property name="text">
+        <string>Load From File</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QPushButton" name="Mask_duplicate_button_nonBlock">
+       <property name="toolTip">
+        <string>Duplicate selected mask</string>
+       </property>
+       <property name="statusTip">
+        <string>Duplicate selected mask</string>
+       </property>
+       <property name="text">
+        <string>Duplicate Mask</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="Mask_type_label">
+       <property name="toolTip">
+        <string>Type of selected mask</string>
+       </property>
+       <property name="statusTip">
+        <string>Type of selected mask</string>
+       </property>
+       <property name="text">
+        <string>Mask Type</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
-   <item row="0" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Masks</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QListView" name="Mask_listView">
+        <property name="toolTip">
+         <string>Type of selected mask</string>
+        </property>
+        <property name="statusTip">
+         <string>Type of selected mask</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_6">
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="Mask_TitleLabel">
          <property name="text">
-          <string>Mask Equation - Allowed operators: +. -, * (, and )</string>
+          <string>Mask Equation - Allowed operators: +, -, * (, and )</string>
          </property>
         </widget>
        </item>
@@ -117,18 +164,62 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextEdit" name="Mask_equation_text_edit"/>
+      <widget class="QLineEdit" name="Mask_equation_line_edit">
+       <property name="toolTip">
+        <string>Equation for combinated mask</string>
+       </property>
+       <property name="statusTip">
+        <string>Equation for combinated mask</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Apply To Converted DataSet</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="Mask_load_current_button_nonBlock">
+          <property name="text">
+           <string>Load Mask</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="Mask_apply_to_dataset_button">
+          <property name="toolTip">
+           <string>Apply mask equation to selected DataSet</string>
+          </property>
+          <property name="statusTip">
+           <string>Apply mask equation to selected DataSet</string>
+          </property>
+          <property name="text">
+           <string>Apply Mask</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QComboBox" name="Mask_data_set_combo_box">
+        <property name="toolTip">
+         <string>Select DataSet for masking</string>
+        </property>
+        <property name="statusTip">
+         <string>Select DataSet for masking</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>Mask_add_button_nonBlock</tabstop>
-  <tabstop>Mask_duplicate_button_nonBlock</tabstop>
-  <tabstop>Mask_delete_button_nonBlock</tabstop>
-  <tabstop>Mask_listView</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
