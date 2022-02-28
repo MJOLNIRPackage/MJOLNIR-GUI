@@ -508,6 +508,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not ds.background is None:
                 dsDict['background'] = ds.background
                 dsDict['convertBeforeSubtract'] = ds.convertBeforeSubtract
+            if not ds._maskingObject is None:
+                dsDict['maskingObject'] = ds._maskingObject
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -646,6 +648,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                 self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
                                 ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                                 self.update()
+                        if 'maskingObject' in dsDict:
+                            maskingObject = dsDict['maskingObject']                        
+                            self.setProgressBarLabelText('Applying Mask to \''+DSName+'\'') 
+                            ds.mask = maskingObject(ds)
+                            ds._maskingObject = maskingObject
 
                 else: # Regular dataset
                         
@@ -666,6 +673,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                             self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
                             ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                             self.update()
+
+                    if 'maskingObject' in dsDict:
+                        maskingObject = dsDict['maskingObject']                        
+                        ds.mask = maskingObject(ds)
+                        ds._maskingObject = maskingObject
+
                 
                 self.DataSetModel.append(ds)
                 self.DataSetModel.layoutChanged.emit()
