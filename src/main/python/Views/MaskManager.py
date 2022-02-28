@@ -885,7 +885,7 @@ class AnotherWindow(QtWidgets.QWidget):
                 self.dialog.close()
             
         
-@ProgressBarDecoratorArguments(runningText='Applying Masking',completedText='Data Files Added')
+@ProgressBarDecoratorArguments(runningText='Applying Masking',completedText='Masking Applied')
 def ApplyMaskToDataSet(self):
     self.resetProgressBar()
     self.setProgressBarMaximum(1)
@@ -915,7 +915,7 @@ def ApplyMaskToDataSet(self):
     return True
 
 
-MaskManagerBase, MaskManagerForm = loadUI("Mask2.ui")
+MaskManagerBase, MaskManagerForm = loadUI("Mask.ui")
 
 class MaskManager(MaskManagerBase, MaskManagerForm):
     def __init__(self, parent=None):
@@ -1001,6 +1001,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
 
         self.Mask_data_set_combo_box.setModel(self.proxyModel)
         self.Mask_apply_to_dataset_button.clicked.connect(self.guiWindow.ApplyMaskToDataSet)
+        self.Mask_load_current_button_nonBlock.clicked.connect(self.Mask_load_current_button_nonBlock_function)
         self.Mask_data_set_combo_box.currentIndexChanged.connect(self.performButtonChecks)
         self.parent.DataSetModel.layoutChanged.connect(self.DataSetModelLayoutChanged)
 
@@ -1047,7 +1048,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         if currentIndex == -1:
             return
         currentFlags = self.Mask_data_set_combo_box.model().flags(self.Mask_data_set_combo_box.model().index(currentIndex,0))
-        
+
         if not bool(currentFlags & QtCore.Qt.ItemIsEnabled):
             self.Mask_data_set_combo_box.setCurrentIndex(-1)
             
@@ -1060,8 +1061,20 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
 
     def performButtonChecks(self):
         self.Mask_apply_to_dataset_button_check()
+        self.Mask_load_current_button_nonBlock_check()
         self.Mask_save_file_button_check()
 
+    def Mask_load_current_button_nonBlock_check(self):
+        if self.parent.DataSetModel.rowCount(None)!=0:
+            localIdx = self.Mask_data_set_combo_box.currentIndex()
+            idx = self.parent.DataSetModel.index(localIdx,0)
+            ds = self.parent.DataSetModel.data(idx,QtCore.Qt.ItemDataRole)
+            if not ds._maskingObject is None:
+                self.Mask_load_current_button_nonBlock.setDisabled(False)
+            else:
+                self.Mask_load_current_button_nonBlock.setDisabled(True)
+        else:
+            self.Mask_load_current_button_nonBlock.setDisabled(True)
 
     def Mask_apply_to_dataset_button_check(self):
         if self.parent.DataSetModel.rowCount(None)!=0 and self.getMasks() is not None:
@@ -1081,6 +1094,39 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
             self.Mask_save_file_button.setDisabled(False)
         else:
             self.Mask_save_file_button.setDisabled(True)
+
+    def Mask_load_current_button_nonBlock_function(self):
+        localIdx = self.Mask_data_set_combo_box.currentIndex()
+
+        idx = self.parent.DataSetModel.index(localIdx,0)
+        ds = self.parent.DataSetModel.data(idx,QtCore.Qt.ItemDataRole)
+
+        eq,masks = Mask.extract(ds._maskingObject)
+
+        currentNames = self.maskingMainWindow.MaskModel.getNames()
+        newNames = [m.name for m in masks]
+
+        overlap = list(set.intersection(set(currentNames),set(newNames)))
+        if len(overlap)>0:
+            dialog = OverlapDialog(names=overlap)
+            result = dialog.exec_()
+            if result:
+                ### Delete all masks with names in 
+                names = list([m.name for m in self.maskingMainWindow.MaskModel.masks])
+
+                idx =  [names.index(name) for name in overlap] # make sure ascending
+                index = self.maskingMainWindow.MaskModel.index(-1,0)
+                self.maskingMainWindow.MaskModel.Mask_listView.setCurrentIndex(index)
+                self.maskingMainWindow.MaskModel.delete([self.maskingMainWindow.MaskModel.index(i,0) for i in idx])
+            else:
+                return False
+
+        for m in masks:
+            self.maskingMainWindow.MaskModel.append(m)
+
+        self.maskingMainWindow.Mask_equation_line_edit.setText(eq)
+        self.performButtonChecks()
+        return True
 
     def save_mask_file(self):
         mask = self.getMasks()
