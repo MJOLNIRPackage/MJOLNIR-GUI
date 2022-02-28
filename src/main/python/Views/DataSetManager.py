@@ -105,7 +105,7 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                             gui.DataSetModel.layoutChanged.emit()
                         removeMasking.setStatusTip(removeMasking.toolTip())
                         removeMasking.triggered.connect(lambda: removeMaskingFunction(gui,ds))
-                        removeMasking.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/blue-document-resize.png')))
+                        removeMasking.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-cross.png')))
                         menu.addAction(removeMasking)
 
                 return menu.exec_(position)
