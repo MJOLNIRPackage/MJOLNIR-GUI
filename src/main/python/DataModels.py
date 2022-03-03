@@ -395,6 +395,9 @@ class BraggListModel(QtCore.QAbstractListModel):
     def getData(self,*args,**kwargs):
         return self.data(*args,**kwargs)
 
+    def getAllData(self):
+        return self._data
+
     def rowCount(self, index=None):
         return len(self._data)
 
