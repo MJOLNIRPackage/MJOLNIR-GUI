@@ -66,3 +66,18 @@ text[versionLine] = "version = '{}'\n".format(version)
 
 with open(guiFile,'w') as f:
     f.writelines(text)
+
+## Change version in setup.py
+with open(installFile) as f:
+    text = f.readlines()
+    startLine = -1
+    for i,line in enumerate(text):
+        if "'version': " in line:
+            versionLine = i
+            break
+        
+
+text[versionLine] = "'version': '{}',\n".format(version) 
+
+with open(installFile,'w') as f:
+    f.writelines(text)
