@@ -38,7 +38,8 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
         self.BraggListModel.layoutChanged.connect(self.selectedChanged)
         self.BraggListSelectionModel.selectionChanged.connect(self.selectedChanged)
         
-    
+    def closeEvent(self, event): # Function called on close event for the window
+        self.guiWindow.braggPoints = self.getData()
 
     def selectedChanged(self,*args,**kwargs):
         if self.BraggListModel.rowCount() == 0:
@@ -63,6 +64,12 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
     def BraggList_deleteAll_button_function(self):
         self.BraggListModel.data = []
         self.BraggListModel.layoutChanged.emit()
+
+    def getData(self):
+        data = self.BraggListModel.getAllData()
+        if len(data) == 0:
+            return None
+        return data
 
 
     def extractBraggParamters(self):

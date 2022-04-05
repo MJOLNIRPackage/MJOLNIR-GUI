@@ -956,7 +956,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def getBraggPoints(self):
         if hasattr(self,'BraggListWindow'):
-            return self.BraggListWindow.BraggListModel.data
+            return self.BraggListWindow.getData()
         else:
             return self.braggPoints
     

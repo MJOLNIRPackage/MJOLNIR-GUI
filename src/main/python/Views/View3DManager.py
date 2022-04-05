@@ -97,15 +97,12 @@ def View3D_plot_button_function(self):
     customSlicer = not self.ui.View3D_Mode_Viewer3D_radioButton.isChecked()
     counts = self.ui.View3D_RawCounts_checkBox.isChecked()
     plotCurratAxe = self.ui.View3D_CurratAxe_checkBox.isChecked()
-    if plotCurratAxe:
-        braggList = self.getBraggPoints()
-    else:
-        braggList = None
+    braggList = self.getBraggPoints()
 
     cut1DFunctionRectangleLocal = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)    
     cut1DFunctionCircleLocal = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)    
     figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,
-    outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,cut1DFunctionRectangle=cut1DFunctionRectangleLocal,
+    outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,plotCurratAxe=plotCurratAxe,cut1DFunctionRectangle=cut1DFunctionRectangleLocal,
     cut1DFunctionCircle=cut1DFunctionCircleLocal)
     self.figureListView3D.append(figure)
     currentFigure = self.figureListView3D.getCurrentFigure()
@@ -187,7 +184,9 @@ def View3D_toggle_plotCurratAxe_function(self):
 def View3D_changed_CurratAxeList_function(self):
     currentFigure = self.figureListView3D.getCurrentFigure()
     if not currentFigure is None:
-        currentFigure.CurratAxeBraggList = self.getBraggPoints()
+        braggPoints =  self.getBraggPoints()
+        self.ui.View3D_CurratAxe_checkBox.setChecked(True)
+        currentFigure.CurratAxeBraggList = braggPoints
 
         
 
@@ -363,7 +362,7 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
 
     def curratAxeList(self):
         if hasattr(self,'BraggListWindow'): # If a window is open, use it
-            self.braggPoints = self.BraggListWindow.BraggListModel.data
+            self.braggPoints = self.BraggListWindow.getData()
         else:
             self.BraggListWindow = BraggListManager.BraggListManager(BraggList=self.braggPoints)
             self.guiWindow.windows.append(self.BraggListWindow)
