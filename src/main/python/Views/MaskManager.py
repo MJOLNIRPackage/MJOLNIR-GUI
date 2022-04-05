@@ -797,7 +797,7 @@ class maskingDialog(QtWidgets.QWidget):
     def coordinateSelectionChanged(self,id,text):
         if self._changingBoxes or text == '': # If already changing the boxes through updating of items
             return
-        print('Id {} changed to {}'.format(id,text))
+        
         self._changingBoxes = True # Start changing the boxes
         totalCoordinates = self.coordinates.copy()
         currentCoordinates = [box.currentText() for box in self.coordinateComboBoxes]
