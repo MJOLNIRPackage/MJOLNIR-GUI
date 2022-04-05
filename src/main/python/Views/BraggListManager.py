@@ -27,10 +27,16 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
         self.selectedChanged()
 
     def initBraggListManager(self):
-        self.BraggList_add_button.clicked.connect(self.BraggList_add_button_function)
+        # set multiple shortcuts for add_button
+        for sequence in ("Ctrl+Enter", "Ctrl+Return",):
+            shorcut = QtWidgets.QShortcut(sequence, self.BraggList_add_button)
+            shorcut.activated.connect(self.BraggList_add_button_function)
+
         self.BraggList_delete_button.clicked.connect(self.BraggList_delete_button_function)
+        self.BraggList_delete_button.setShortcut("Delete")
         self.BraggList_deleteAll_button.clicked.connect(self.BraggList_deleteAll_button_function)
-        
+        self.BraggList_deleteAll_button.setShortcut("Ctrl+Delete")
+
         self.BraggListModel = BraggListModel(braggList_listView=self.BraggList_listView,BraggList=self.initBraggList)
         self.BraggList_listView.setModel(self.BraggListModel)
 
@@ -44,6 +50,7 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
     def selectedChanged(self,*args,**kwargs):
         if self.BraggListModel.rowCount() == 0:
             self.BraggList_deleteAll_button.setDisabled(True)
+            self.BraggList_listView.clearSelection()
         else:
             self.BraggList_deleteAll_button.setDisabled(False)
 
@@ -62,7 +69,7 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
         self.BraggListModel.append(HKL)
 
     def BraggList_deleteAll_button_function(self):
-        self.BraggListModel.data = []
+        self.BraggListModel.deleteAll()
         self.BraggListModel.layoutChanged.emit()
 
     def getData(self):

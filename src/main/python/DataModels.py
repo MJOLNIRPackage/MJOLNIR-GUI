@@ -409,6 +409,10 @@ class BraggListModel(QtCore.QAbstractListModel):
         self.selectLastBragg()
         self.layoutChanged.emit()
 
+    def deleteAll(self):
+        indices = [self.index(i,0) for i in range(self.rowCount())]
+        self.delete(indices)
+
     def delete(self,index):
         indices = [ind.row() for ind in index] # Extract numeric index, sort decending
         indices.sort(reverse=True)
@@ -420,13 +424,13 @@ class BraggListModel(QtCore.QAbstractListModel):
                 pass
 
         QtWidgets.QApplication.processEvents()
-        index = self.getCurrentBraggIndex()
+        #index = self.getCurrentBraggIndex()
        
-        if index is None:
-            self.selectLastBragg()
-        else:
-            if index.row()==self.rowCount(None):
-                self.selectLastBragg()
+        #if index is None:
+        #    self.selectLastBragg()
+        #else:
+        #    if index.row()==self.rowCount(None):
+        #        self.selectLastBragg()
 
     def item(self,index):
         if not index is None:
