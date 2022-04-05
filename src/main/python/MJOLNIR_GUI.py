@@ -419,6 +419,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             event.ignore()
             return 0
 
+    def restart(self):
+        QtCore.QCoreApplication.quit()
+        status = QtCore.QProcess.startDetached(sys.executable, sys.argv)
+        print(status)
+
     def closeEvent(self, event):
         if self.loadedGuiSettings is None:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
