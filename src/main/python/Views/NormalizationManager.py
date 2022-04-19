@@ -247,8 +247,8 @@ class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
             if self.NormalizationManager_sampleFormula_radioButton.isChecked(): # if true chemcial formula is to be used
                 sampleFormula = inputs['sampleFormula_lineEdit']
                 sampleMolarMass = None
-                returnString.append('sampleFormula = "'+sampleFormula+'"')
-                arguments.append('sampleFormula = sampleFormula')
+                returnString.append('sampleChemicalFormula = "'+sampleFormula+'"')
+                arguments.append('sampleChemicalFormula = sampleFormula')
             else:
                 sampleFormula = None
                 sampleMolarMass = inputs['sampleMolarMass_spinBox']
@@ -311,7 +311,7 @@ class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
            args+=line+'\n'
             
         # Add only to -3 as the last two characters will be ', \n'
-        returnString.append('ds.absolutNormalize('+args[:-3]+')')
+        returnString.append('ds.absoluteNormalize('+args[:-3]+')')
         #print(arguments)
 
         pyperclip.copy('\n'.join(returnString))
