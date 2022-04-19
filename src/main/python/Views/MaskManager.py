@@ -166,7 +166,7 @@ for key,value in translate.items():
 
 
 class maskingDialog(QtWidgets.QWidget):
-    coordinates = ['h','k','l','energy','qx','qy','A3','A4']
+    coordinates = ['h','k','l','energy','qx','qy','A3','A4','Ei']
 
     def __init__(self,  maskingManager, oldMask = None, *args, **kwargs):
         super(maskingDialog, self).__init__(*args, **kwargs)
