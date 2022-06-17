@@ -430,14 +430,18 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             A3StepSize = (A3Stop-A3Start)/(A3Steps-1.0)
         A3middle = 0.5*(A3Start+A3Stop)
 
-        scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn {:}'.format(A3middle,A3StepSize,A3Steps,Monitor)
+        #scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn {:}'.format(A3middle,A3StepSize,A3Steps,Monitor)
+        scanCommand = 'scan(a3, {:.2f}, {:.2f},{:d},m={:})'.format(A3Start,A3StepSize,A3Steps,Monitor)
 
         commandString = []
-        commandString.append('dr 2t {:.2f}'.format(A4[0]))
-        commandString.append('dr ei {:.2f}'.format(Ei))
+        #commandString.append('dr 2t {:.2f}'.format(A4[0]))
+        commandString.append('maw(s2t,{:.2f})'.format(A4[0]))
+        #commandString.append('dr ei {:.2f}'.format(Ei))
+        commandString.append('maw(ei,{:.2f})'.format(Ei))
         commandString.append('')
         for a4 in A4:
-            commandString.append('dr 2t {:.2f}'.format(a4))
+            #commandString.append('dr 2t {:.2f}'.format(a4))
+            commandString.append('maw(s2t,{:.2f})'.format(a4))
             commandString.append(scanCommand)
             commandString.append('')
 
