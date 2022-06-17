@@ -54,7 +54,7 @@
           <string>Create new DataSet</string>
          </property>
          <property name="text">
-          <string>New Data Set</string>
+          <string>&amp;New Data Set</string>
          </property>
         </widget>
        </item>
@@ -127,7 +127,7 @@
           <string>Add DataFile(s)</string>
          </property>
          <property name="text">
-          <string>Add Files</string>
+          <string>Add &amp;Files</string>
          </property>
         </widget>
        </item>
