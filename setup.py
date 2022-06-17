@@ -13,7 +13,7 @@ with open(os.path.join(_here, 'README.md'), encoding='utf-8') as f:
 settings = {'app_name': 'MJOLNIRGui', 
 'author': 'MJOLNIRPackage', 
 'main_module': 'src/main/python/main.py', 
-'version': '0.9.9',
+'version': '0.9.11',
 'gpg_name': 'MJOLNIRPackage', 
 'hidden_imports': ['cmath'], 
 'categories': 'Education;', 
