@@ -32,6 +32,8 @@ class BraggListManager(BraggListManagerBase, BraggListManagerForm):
             shorcut = QtWidgets.QShortcut(sequence, self.BraggList_add_button)
             shorcut.activated.connect(self.BraggList_add_button_function)
 
+        self.BraggList_add_button.clicked.connect(self.BraggList_add_button_function)
+        self.BraggList_add_button.setShortcut("Ctrl+Return")
         self.BraggList_delete_button.clicked.connect(self.BraggList_delete_button_function)
         self.BraggList_delete_button.setShortcut("Delete")
         self.BraggList_deleteAll_button.clicked.connect(self.BraggList_deleteAll_button_function)
