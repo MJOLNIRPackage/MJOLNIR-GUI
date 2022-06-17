@@ -143,7 +143,6 @@ def forceTransitionPartialRaw(StateMachine): # add DataFile
     return transitionPartialRaw(StateMachine)
 
 def forceTansitionRawConverted(StateMachine): # add DataFile
-    print(StateMachine.currentState.name)
     StateMachine.guiWindow.convert()
     return True#transitionRawConverted(StateMachine)
 

@@ -255,13 +255,6 @@
     <addaction name="actionSettings"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuMask">
-    <property name="title">
-     <string>Mask</string>
-    </property>
-    <addaction name="actionOpen_mask_gui"/>
-    <addaction name="actionLoad_mask"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -274,6 +267,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="action_masking_gui"/>
     <addaction name="actionPrediction_Tool"/>
     <addaction name="actionCalculate_Molecular_Weight"/>
     <addaction name="actionNeutron_Calculations"/>
@@ -282,7 +276,6 @@
     <addaction name="actionSubtraction_Of_DataSets"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuMask"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -395,6 +388,11 @@
   <action name="actionCheck_Update">
    <property name="text">
     <string>Check Update</string>
+   </property>
+  </action>
+  <action name="action_masking_gui">
+   <property name="text">
+    <string>Masking Gui</string>
    </property>
   </action>
  </widget>

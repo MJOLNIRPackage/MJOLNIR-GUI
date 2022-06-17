@@ -26,12 +26,13 @@ class DataSetModel(QtCore.QAbstractListModel):
 
     dragDropFinished = QtCore.pyqtSignal()
 
-    def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None, **kwargs):
+    def __init__(self, *args, dataSets=None, DataSet_DataSets_listView=None,guiWindow=None, **kwargs):
         super(DataSetModel, self).__init__(*args, **kwargs)
         self.dataSets = dataSets or []
         self.DataSet_DataSets_listView = DataSet_DataSets_listView
         self.lastDroppedItems = []
         self.pendingRemoveRowsAfterDrop = False
+        self.guiWindow = guiWindow
 
     def rowForItem(self, item):
         '''
@@ -50,8 +51,12 @@ class DataSetModel(QtCore.QAbstractListModel):
             return text
         if role == Qt.ItemDataRole:
             return self.dataSets[index.row()]
-        #if role == Qt.DecorationRole:
-        #    status = self.dataSets[index.row()].checked
+        if role == Qt.DecorationRole:
+            if not self.dataSets[index.row()]._maskingObject is None:
+                return QtGui.QImage(self.guiWindow.AppContext.get_resource('Icons/Own/mask-open.png'))
+            else:
+                return None
+
         #    if status:
         #        return tick
 
@@ -372,47 +377,64 @@ class Cut1DModel(QtCore.QAbstractListModel):
 class BraggListModel(QtCore.QAbstractListModel):
     def __init__(self, *args, BraggList=None, braggList_listView=None, **kwargs):
         super(BraggListModel, self).__init__(*args, **kwargs)
-        self.data = BraggList or []
+        if BraggList is None:
+            BraggList = []
+        self._data = BraggList 
         self.braggList_listView = braggList_listView
         
     def data(self, index, role):
-        if role == Qt.DisplayRole:# or role == QtCore.Qt.EditRole:
-            text = '\t'.join(map(str,self.data[index.row()]))
+        if index.row()>=self.rowCount(): return 
+        if index.row()<0: return 
+        if index.column()>=1: return 
+        if index.column()<-1: return 
+
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            text = '\t'.join(map(str,self._data[index.row()]))
             return text
         
     def getData(self,*args,**kwargs):
         return self.data(*args,**kwargs)
 
+    def getAllData(self):
+        return self._data
+
     def rowCount(self, index=None):
-        return len(self.data)
+        return len(self._data)
+
+    def columnCount(self, index=None):
+        return 0
 
     def append(self,BraggPoint):
-        self.data.append(BraggPoint)
+        self._data.append(BraggPoint)
         self.selectLastBragg()
         self.layoutChanged.emit()
+
+    def deleteAll(self):
+        indices = [self.index(i,0) for i in range(self.rowCount())]
+        self.delete(indices)
 
     def delete(self,index):
         indices = [ind.row() for ind in index] # Extract numeric index, sort decending
         indices.sort(reverse=True)
         for ind in indices:
             try:
-                del self.data[ind]
+                del self._data[ind]
                 self.layoutChanged.emit()
             except:
                 pass
 
         QtWidgets.QApplication.processEvents()
-        index = self.getCurrentBraggIndex()
+        #index = self.getCurrentBraggIndex()
        
-        if index is None:
-            self.selectLastBragg()
-        else:
-            if index.row()==self.rowCount(None):
-                self.selectLastBragg()
+        #if index is None:
+        #    self.selectLastBragg()
+        #else:
+        #    if index.row()==self.rowCount(None):
+        #        self.selectLastBragg()
 
     def item(self,index):
         if not index is None:
-            return self.data[index.row()]
+            return self._data[index.row()]
 
     #def setData(self, index, value, role=QtCore.Qt.EditRole):
     #    ds = self.item(index)
@@ -478,7 +500,6 @@ class MaskModel(QtCore.QAbstractListModel):
     def combinedMask(self,value):
         if not value is self._combinedMask:
             self._combinedMask = value
-            self.guiWindow.mask_changed.emit()
         
     def data(self, index, role):
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
@@ -491,8 +512,26 @@ class MaskModel(QtCore.QAbstractListModel):
     def rowCount(self, index=None):
         return len(self.masks)
 
-    def append(self,Mask):
-        self.masks.append(Mask)
+    def generateValidName(self,ds):
+        name = ds.name
+        while name in self.getNames(): # name already exists.. This screws up drag/drop
+            try:
+                idx = int(name.split('_')[-1])
+            except ValueError:
+                name = name+'_1'
+            else:
+                name = name[:-(len(str(idx))+1)] + '_' + str(idx+1)
+        return name
+
+    def append(self,mask):
+        mask.name = self.generateValidName(mask)
+
+        if self.rowCount(None)>0:
+            numbers = [d.idx for d in self.masks]
+        else:
+            numbers = [-1]
+        mask.idx = np.max(numbers)+1
+        self.masks.append(mask)
         self.selectLastMask()
         self.layoutChanged.emit()
 
@@ -500,31 +539,39 @@ class MaskModel(QtCore.QAbstractListModel):
         indices = [ind.row() for ind in index] # Extract numeric index, sort decending
         indices.sort(reverse=True)
         for ind in indices:
-            del self.masks[ind]
-            self.layoutChanged.emit()
-
+            try:
+                del self.masks[ind]
+                self.layoutChanged.emit()
+            except:
+                pass
 
         QtWidgets.QApplication.processEvents()
-        index = self.getCurrentMaskIndex()
-       
-        if index is None:
+        selectIndex = self.getCurrentMaskIndex()
+        if selectIndex is None:
             self.selectLastMask()
         else:
-            if index.row()==self.rowCount(None):
+            if selectIndex.row()==self.rowCount(None):
                 self.selectLastMask()
+
+            else:
+                idx = self.index(selectIndex.row(),0)# Hack to force index changed emit
+                self.Mask_listView.setCurrentIndex(self.index(-1,0))
+                self.Mask_listView.setCurrentIndex(idx)
+        self.layoutChanged.emit()
 
     def item(self,index):   
         if not index is None:
-            #print('Index',index)
-            try:
-                return self.masks[index.row()]
-            except AttributeError:
-                pass
-            index = np.asarray(index)
-            if len(index) == 0:
-                return None
-            indices = np.array([x.row() for x in index],dtype=int)
-            return np.asarray(self.masks)[indices]
+            if not isinstance(index,list):
+                try:
+                    return self.masks[index.row()]
+                except (AttributeError,IndexError):
+                    return None
+            else:
+                index = np.asarray(index)
+                if len(index) == 0:
+                    return None
+                indices = np.array([x.row() for x in index],dtype=int)
+                return np.asarray(self.masks)[indices]
 
     def setData(self, index, value, role=QtCore.Qt.EditRole):
         mask = self.item(index)
@@ -534,6 +581,9 @@ class MaskModel(QtCore.QAbstractListModel):
             return True
            
         return False
+    
+    def getNames(self):
+        return [m.name for m in self.masks]
 
     def flags(self,index):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
@@ -562,10 +612,13 @@ class MaskModel(QtCore.QAbstractListModel):
         return self.item(index)
 
     def selectLastMask(self):
-        mask = self.rowCount(None)
-        if mask!=0:
-            index = self.index(self.rowCount(None)-1,0)
-            self.Mask_listView.setCurrentIndex(index)
+        
+        if len(self.masks)>0:
+            index = self.index(len(self.masks)-1,0)
+        else:
+            index = self.index(-1,0)
+        self.Mask_listView.setCurrentIndex(index)
+        
 
 
 

@@ -223,7 +223,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def loadEnergies(self,instrument='CAMEA'):
         if instrument == 'CAMEA':
-            calibPath = MJOLNIR.__CAMEANormalization__
+            calibPath = MJOLNIR.__CAMEANormalizationBinning1__
 
             calib = np.loadtxt(calibPath,delimiter=',',skiprows=3)
 
@@ -294,7 +294,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
     def plotCurratAxe(self):
         if hasattr(self.guiWindow,'BraggListWindow'):
-            BraggPoint = self.guiWindow.BraggListWindow.BraggListModel.data
+            BraggPoint = np.array(self.guiWindow.BraggListWindow.BraggListModel.getAllData())
         elif hasattr(self.guiWindow,'braggPoints'):
             BraggPoint = self.guiWindow.braggPoints
         else:
@@ -305,9 +305,9 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
         Ef = self.Efs[::-1]
         Ei = self.getScan()[3]
-        SpurionPositionsMono = self.sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Monochromator').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
-        SpurionPositionsAna  = self.sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Analyser').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
-                
+        SpurionPositionsMono = self.predictionAx[0].sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Monochromator').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
+        SpurionPositionsAna  = self.predictionAx[0].sample.CurratAxe(Ei=Ei,Ef=Ef,Bragg=BraggPoint,HKL=False,spurionType = 'Analyser').reshape(len(BraggPoint),-1,3).transpose(1,0,2)
+        
         
         self.monoPoints = []
         self.anaPoints = []

@@ -17,6 +17,8 @@ class GuiDataSet(DataSet.DataSet):
         
         for idx,df in enumerate(self):
             df.idx = idx
+
+        self._maskingObject = None # Holder for masking
         
     def setData(self,column,value):
         if column == 0: self.name = value
@@ -256,12 +258,3 @@ class Gui1DCutObject(object):
             Emin=self.parameters['EMin'],Emax=self.parameters['EMax'],QDirection=self.parameters['method']=='cut1D')
         return self._ufit
         
-
-    
-
-    
-class GuiMask(object):
-    def __init__(self,name,mask=None):
-
-        self.name = name
-        self.mask = mask

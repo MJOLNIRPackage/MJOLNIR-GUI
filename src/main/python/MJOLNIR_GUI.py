@@ -21,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-version = '0.9.8'
+version = '0.9.9'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -42,7 +42,7 @@ try:
     from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
     from Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
+    from MJOLNIR_Data import GuiDataFile,GuiDataSet
     from DataModels import DataSetModel,DataFileModel
     from StateMachine import StateMachine
     from GuiStates import empty,partial,raw,converted
@@ -70,7 +70,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
     from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet,GuiMask
+    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
     from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
     from MJOLNIRGui.src.main.python.StateMachine import StateMachine
     from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
@@ -113,7 +113,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.colormap = 'viridis'
         self.currentFolder = ''
 
-        
+        self.isClosing = False 
         self.ui.setupUi(self)
         self.update()
 
@@ -161,7 +161,6 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             box.setContentLayout(lay)
         
         vlay.setAlignment(QtCore.Qt.AlignTop)
-        self.maskingManager = MaskManager(self)
 
         self.dataSets = []
 
@@ -211,6 +210,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
         for view in self.views: # Run through all views to set them up
             view.setup()
+
+        self.maskingManager = MaskManager(self)
 
         setupGenerateScript(self)
         self.update()
@@ -294,17 +295,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionGenerate_1d_script.setStatusTip(self.ui.actionGenerate_1d_script.toolTip())
         self.ui.actionGenerate_1d_script.triggered.connect(self.generateCut1DScript)
         
-        self.ui.actionOpen_mask_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
-        self.ui.actionOpen_mask_gui.setDisabled(True)
-        self.ui.actionOpen_mask_gui.setToolTip('Open Mask Gui') 
-        self.ui.actionOpen_mask_gui.setStatusTip(self.ui.actionOpen_mask_gui.toolTip())
-        self.ui.actionOpen_mask_gui.triggered.connect(self.maskingManager.setWindowVisible)
-        
-        self.ui.actionLoad_mask.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-load.png')))
-        self.ui.actionLoad_mask.setDisabled(True)
-        self.ui.actionLoad_mask.setToolTip('Load Mask - Not Implemented') 
-        self.ui.actionLoad_mask.setStatusTip(self.ui.actionLoad_mask.toolTip())
-        #self.ui.actionLoad_mask.triggered.connect(self.maskingManager.getMasks)
+        self.ui.action_masking_gui.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-open.png')))
+        self.ui.action_masking_gui.setToolTip('Masking Gui') 
+        self.ui.action_masking_gui.setStatusTip(self.ui.action_masking_gui.toolTip())
+        self.ui.action_masking_gui.triggered.connect(self.maskingManager.setWindowVisible)
+        self.ui.action_masking_gui.setShortcut("Ctrl+M")
+
 
         self.ui.actionSettings.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/settings.png')))
         self.ui.actionSettings.setDisabled(False)
@@ -423,6 +419,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             event.ignore()
             return 0
 
+    def restart(self):
+        QtCore.QCoreApplication.quit()
+        status = QtCore.QProcess.startDetached(sys.executable, sys.argv)
+        print(status)
+
     def closeEvent(self, event):
         if self.loadedGuiSettings is None:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
@@ -435,7 +436,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         else:
             if not self.saveSettingsDialog(event): # The dialog is cancelled
                 return
-
+        self.isClosing = True
+        self.maskingManager.close()
         self.closeWindows()
 
     @ProgressBarDecoratorArguments(runningText='Closing Windows',completedText='Windows Closed')
@@ -511,6 +513,8 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
             if not ds.background is None:
                 dsDict['background'] = ds.background
                 dsDict['convertBeforeSubtract'] = ds.convertBeforeSubtract
+            if not ds._maskingObject is None:
+                dsDict['maskingObject'] = ds._maskingObject
             saveString.append(dsDict)
             if updateProgressBar: self.setProgressBarValue((i+1))
 
@@ -649,6 +653,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                                 self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')   
                                 ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                                 self.update()
+                        if 'maskingObject' in dsDict:
+                            maskingObject = dsDict['maskingObject']                        
+                            self.setProgressBarLabelText('Applying Mask to \''+DSName+'\'') 
+                            ds.mask = maskingObject(ds)
+                            ds._maskingObject = maskingObject
 
                 else: # Regular dataset
                         
@@ -669,6 +678,12 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
                             self.setProgressBarLabelText('Converting Data Set \''+DSName+'\'')     
                             ds.convertDataFile(guiWindow=self,setProgressBarMaximum=False,printFunction=self.writeToStatus)
                             self.update()
+
+                    if 'maskingObject' in dsDict:
+                        maskingObject = dsDict['maskingObject']                        
+                        ds.mask = maskingObject(ds)
+                        ds._maskingObject = maskingObject
+
                 
                 self.DataSetModel.append(ds)
                 self.DataSetModel.layoutChanged.emit()
@@ -946,9 +961,10 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def getBraggPoints(self):
         if hasattr(self,'BraggListWindow'):
-            return self.BraggListWindow.BraggListModel.data
+            return self.BraggListWindow.getData()
         else:
             return self.braggPoints
+    
 
     def openBraggListWindow(self):
         if hasattr(self,'BraggListWindow'): # If a window is open, use it

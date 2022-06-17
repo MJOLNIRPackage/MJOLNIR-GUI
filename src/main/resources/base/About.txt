@@ -6,6 +6,9 @@ MJOLNIR_Gui is a developed GUI application dedicated to the MJOLNIR package. It 
 
 Some icons by Yusuke Kamiyamane. Licensed under a Creative Commons Attribution 3.0 License. See <a href='https://p.yusukekamiyamane.com/'>yusukekamiyamane.com</a>
 
+Resolution calculations based on the original code from TAKIN 
+<a href='https://doi.org/10.5281/zenodo.4117437'>https://doi.org/10.5281/zenodo.4117437</a>
+
 The graphical user interface has been developed by:
 The CAMEA team (MJOLNIRPackage)
 
