@@ -780,7 +780,7 @@ class maskingDialog(QtWidgets.QWidget):
 
         def acceptFunction(self):
             inputFields = {}
-            inputFields['braggPeaks'] = self.BraggListManager.BraggListModel.data
+            inputFields['braggPeaks'] = self.BraggListManager.BraggListModel.getAllData()
             if self.QxQy_radioButton.isChecked():
                 inputFields['dqx'] = self.BraggList_dH_spinBox.value()
                 inputFields['dqx'] = self.BraggList_dK_spinBox.value()
@@ -1016,16 +1016,17 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.maskingMainWindow.Mask_delete_button_nonBlock.setShortcut("Del")
 
         self.maskingMainWindow.Mask_add_button_nonBlock.clicked.connect(self.maskingMainWindow.Mask_add_button_function)
-        self.maskingMainWindow.Mask_add_button_nonBlock.setShortcut("Ctrl+N")
+        self.maskingMainWindow.Mask_add_button_nonBlock.setShortcut("Ctrl+a")
 
         self.maskingMainWindow.Mask_duplicate_button_nonBlock.clicked.connect(self.maskingMainWindow.Mask_duplicate_button_nonBlock_function)
+        self.maskingMainWindow.Mask_duplicate_button_nonBlock.setShortcut("Ctrl+D")
         self.maskingMainWindow.Mask_equation_line_edit.textChanged.connect(self.maskingMainWindow.Mask_parse_equation_text_edit_function)
         self.maskingMainWindow.MaskModel.layoutChanged.connect(self.maskingMainWindow.MaskOnChange)
         self.maskingMainWindow.Mask_save_file_button.clicked.connect(self.save_mask_file)
         self.maskingMainWindow.Mask_save_file_button.setShortcut("Ctrl+S")
 
         self.maskingMainWindow.Mask_load_file_button.clicked.connect(self.load_mask_file)
-        self.maskingMainWindow.Mask_load_file_button.setShortcut("Ctrl+O")
+        self.maskingMainWindow.Mask_load_file_button.setShortcut("Ctrl+L")
 
     def getMasks(self):
         if hasattr(self.maskingMainWindow,'MaskModel'):
