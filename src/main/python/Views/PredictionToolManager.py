@@ -12,6 +12,7 @@ except ImportError:
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
+import matplotlib.pyplot as plt
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
 from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy,predictionInstrumentSupport
 from MJOLNIR.Data import Sample
@@ -275,7 +276,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         instrument = str(self.instrument_comboBox.currentText())
 
-        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,
+        *HKL1,A3R1,_A4,_SGU,_SGL,Ei,Ef = r1
+        *HKL2,A3R2 = r2[:4]
+        
+        sample = Sample.calculateSample(cell=cell,HKL1=HKL1,HKL2=HKL2,A3R1=A3R1,A3R2=A3R2,Ei=Ei,Ef=Ef)
+        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,sample=sample,
         points=points,outputFunction=self.guiWindow.writeToStatus, instrument=instrument)
 
         self.predictionAx = ax
@@ -287,6 +292,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             a.set_ylim(*ax[-1].get_ylim())
             a.set_xlim(*ax[-1].get_xlim())
 
+        def lateTightLayout():
+            fig = ax[0].get_figure()
+            plt.show()
+            fig.tight_layout(w_pad=0.5*(not np.isclose(sample.projectionAngle,np.pi/2)))
+        QtCore.QTimer.singleShot(1500, lateTightLayout)
+        
         curratAxe = self.scan_curratAxe_checkBox.isChecked()
 
         if curratAxe:
