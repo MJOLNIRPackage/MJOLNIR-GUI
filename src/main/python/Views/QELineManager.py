@@ -231,7 +231,7 @@ def cut1DrectanglePerpendicular(self,ax,dr):
     rounding = 4 # Round to 4 digits
     parameters = extractCut1DPropertiesRectanglePerpendicular(dr.rect,sample)
 
-    offset = ax.convertPlotAxisReal(parameters['center'][0]).T[0]
+    offset = ax.calculatePosition(parameters['center'][0]).T[0]#ax.convertPlotAxisReal(parameters['center'][0]).T[0]
     
     del parameters['center'] # remove the 'center' as it is not allowed in plotCut1D
 
@@ -266,10 +266,13 @@ def cut1DFunctionRectangleHorizontal(self,ax,dr):
     else:
         sample = None
     parameters = extractCut1DPropertiesRectangleHorizontal(dr.rect,sample)
-    
+    if parameters['rlu']:
+        parameters['q1'] = [np.round(x,rounding) for x in sample.calculateQxQyToHKL(*parameters['q1'])]
+        parameters['q2'] = [np.round(x,rounding) for x in sample.calculateQxQyToHKL(*parameters['q2'])]
+        #print(parameters['q1'],parameters['q2'])
     # Convert center point into actual position in Q
-    parameters['q1'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q1'][0]).T[0]]
-    parameters['q2'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q2'][0]).T[0]]
+    #parameters['q1'] = [np.round(x,rounding) for x in ax.calculatePositionInv(parameters['q1'])]#ax.convertPlotAxisReal(parameters['q1'][0]).T[0]]
+    #parameters['q2'] = [np.round(x,rounding) for x in ax.calculatePositionInv(parameters['q2'])]#ax.convertPlotAxisReal(parameters['q2'][0]).T[0]]
     
     parameters['minPixel'] = np.round(ax.minPixel,rounding)
     parameters['width'] = np.round(ax.width,rounding)
@@ -290,7 +293,7 @@ def cut1DFunctionRectangleVertical(self,ax,dr):
     parameters = extractCut1DPropertiesRectangleVertical(dr.rect,sample)
     
     # Convert center point into actual position in Q
-    parameters['q'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q']).T[0]]
+    parameters['q'] = [np.round(x,rounding) for x in ax.calculatePosition(parameters['q'][0]).T[0]]#ax.convertPlotAxisReal(parameters['q']).T[0]]
     parameters['q2'] = None
     
     parameters['minPixel'] = np.round(ax.minPixel,rounding)
