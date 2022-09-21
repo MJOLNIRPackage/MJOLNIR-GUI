@@ -20,8 +20,11 @@ from MJOLNIR.Data import Viewer3D
 from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle
 import matplotlib.pyplot as plt
 
+
+matplotlibExtensions = ['png', 'pdf', 'ps', 'eps', 'svg']
+
 # Handles all functionality related to the View3D box. Each button has its own 
-# definition, which should be pretty selfexplanatory.
+# definition, which should be pretty self explanatory.
 
 def View3D_setCAxis_button_function(self):
     currentFigure = self.figureListView3D.getCurrentFigure()
@@ -100,7 +103,7 @@ def View3D_plot_button_function(self):
     braggList = self.getBraggPoints()
 
     cut1DFunctionRectangleLocal = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)    
-    cut1DFunctionCircleLocal = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)    
+    cut1DFunctionCircleLocal = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)   
     figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,
     outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,plotCurratAxe=plotCurratAxe,cut1DFunctionRectangle=cut1DFunctionRectangleLocal,
     cut1DFunctionCircle=cut1DFunctionCircleLocal)
@@ -221,8 +224,12 @@ def indexChanged(self,index):
                 getattr(getattr(self.ui,setting),'setText')(str(value))
     if not figure is None:
         self.ui.View3D_figureToCSV_pushButton.setEnabled(True)
+        self.ui.View3D_figureToFile_pushButton.setEnabled(True)
+        self.ui.View3D_extensionList_comboBox.setEnabled(True)
     else:
         self.ui.View3D_figureToCSV_pushButton.setEnabled(False)
+        self.ui.View3D_figureToFile_pushButton.setEnabled(False)
+        self.ui.View3D_extensionList_comboBox.setEnabled(False)
 
 @ProgressBarDecoratorArguments(runningText='Save View3D to csv',completedText='View3D saved')
 def saveToCSV(self):
@@ -239,6 +246,20 @@ def saveToCSV(self):
         location = location+'.csv'
     
     ax.to_csv(location)
+    return True
+
+@ProgressBarDecoratorArguments(runningText='Save View3D to file',completedText='View3D saved')
+def saveToFile(self):
+    figure = self.figureListView3D.getCurrentFigure()
+    ax = figure
+    try:
+        title = ax.ax.set_title.get_text()
+    except AttributeError:
+        title = 'View3D'
+    folder = QtWidgets.QFileDialog.getExistingDirectory(self,'Save View3D',str(title))
+    extension = self.ui.View3D_extensionList_comboBox.currentText()
+    
+    ax.saveToFile(folder,extension,gui=self)
     return True
 
 ## Function to connect draggable rectangles from interactive 1D cuts to the gui
@@ -318,6 +339,7 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.View3D_Grid_checkBox_toggled_function = lambda: View3D_Grid_checkBox_toggled_function(self.guiWindow)
         self.guiWindow.View3D_indexChanged = lambda index: indexChanged(self.guiWindow,index)
         self.guiWindow.View3D_saveToCSV = lambda: saveToCSV(self.guiWindow)
+        self.guiWindow.View3D_saveToFile = lambda: saveToFile(self.guiWindow)
 
         for key,value in self.__dict__.items():
             if 'View3D' in key:
@@ -327,6 +349,11 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.figureListView3D = MatplotlibFigureList(combobox=self.View3D_figureList_comboBox)
         self.guiWindow.figureList.append(self.guiWindow.figureListView3D)
         self.View3D_figureList_comboBox.setModel(self.guiWindow.figureListView3D)
+
+        ## Set up extensions for matplotlib saving
+
+        for extension in matplotlibExtensions:
+            self.guiWindow.ui.View3D_extensionList_comboBox.addItem(extension)
 
         self.mplListDelegate = MatplotlibFigureListDelegate()
         
@@ -351,6 +378,7 @@ class View3DManager(View3DManagerBase, View3DManagerForm):
         self.guiWindow.ui.View3D_figureList_comboBox.setItemDelegate(self.mplListDelegate)
 
         self.guiWindow.ui.View3D_figureToCSV_pushButton.clicked.connect(self.guiWindow.View3D_saveToCSV)
+        self.guiWindow.ui.View3D_figureToFile_pushButton.clicked.connect(self.guiWindow.View3D_saveToFile)
 
     def titleEnterPressed(self):
         if self.guiWindow.ui.View3D_SetTitle_button.isEnabled():
