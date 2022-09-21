@@ -276,10 +276,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         instrument = str(self.instrument_comboBox.currentText())
 
-        *HKL1,A3R1,_A4,_SGU,_SGL,Ei,Ef = r1
+        *HKL1,A3R1,_A4,_SGU,_SGL,_Ei,_Ef = r1
         *HKL2,A3R2 = r2[:4]
         
-        sample = Sample.calculateSample(cell=cell,HKL1=HKL1,HKL2=HKL2,A3R1=A3R1,A3R2=A3R2,Ei=Ei,Ef=Ef)
+        sample = Sample.calculateSample(cell=cell,HKL1=HKL1,HKL2=HKL2,A3R1=A3R1,A3R2=A3R2,Ei=_Ei,Ef=_Ef)
         ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,sample=sample,
         points=points,outputFunction=self.guiWindow.writeToStatus, instrument=instrument)
 
