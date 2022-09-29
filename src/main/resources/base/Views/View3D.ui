@@ -130,7 +130,7 @@
                <string>Set color scale axis of current figure</string>
               </property>
               <property name="text">
-               <string>C Axis min</string>
+               <string>C Axis max</string>
               </property>
              </widget>
             </item>
@@ -156,7 +156,7 @@
                <string>Set color scale axis of current figure</string>
               </property>
               <property name="text">
-               <string>C Axis max</string>
+               <string>C Axis min</string>
               </property>
              </widget>
             </item>
