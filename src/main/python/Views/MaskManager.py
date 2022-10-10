@@ -788,7 +788,7 @@ class maskingDialog(QtWidgets.QWidget):
                 inputFields['dH'] = self.BraggList_dH_spinBox.value()
                 inputFields['dK'] = self.BraggList_dK_spinBox.value()
                 inputFields['dL'] = self.BraggList_dL_spinBox.value()
-            inputFields['maskInside'] = self.MaskInside_checkBox.isChecked()
+            inputFields['maskInside'] = True#self.MaskInside_checkBox.isChecked()
             return inputFields
 
         self.acceptFunction = lambda: acceptFunction(self)
