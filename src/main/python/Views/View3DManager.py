@@ -17,7 +17,8 @@ from os import path
 from PyQt5 import QtWidgets,uic
 import numpy as np
 from MJOLNIR.Data import Viewer3D
-from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle
+from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle,\
+    extractCut1DPropertiesRectanglePerpendicular,extractCut1DPropertiesRectangleHorizontal, extractCut1DPropertiesRectangleVertical
 import matplotlib.pyplot as plt
 
 
@@ -104,9 +105,16 @@ def View3D_plot_button_function(self):
 
     cut1DFunctionRectangleLocal = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)    
     cut1DFunctionCircleLocal = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)   
+    cut1DFunctionRectanglePerpLocal = lambda viewer,dr:cut1DFunctionRectanglePerp(self,viewer,dr)
+    cut1DFunctionRectangleHorizontalLocal = lambda viewer,dr:cut1DFunctionRectangleHorizontal(self,viewer,dr)
+    cut1DFunctionRectangleVerticalLocal = lambda viewer, dr: cut1DFunctionRectangleVertical(self,viewer,dr)
+
     figure = ds.View3D(QXBin,QYBin,EBin,grid=grid,rlu=rlu,log=log,customSlicer=customSlicer,counts=counts,
     outputFunction=self.writeToStatus,cmap=self.colormap,CurratAxeBraggList=braggList,plotCurratAxe=plotCurratAxe,cut1DFunctionRectangle=cut1DFunctionRectangleLocal,
-    cut1DFunctionCircle=cut1DFunctionCircleLocal)
+    cut1DFunctionCircle=cut1DFunctionCircleLocal, cut1DFunctionRectanglePerp=cut1DFunctionRectanglePerpLocal, cut1DFunctionRectangleHorizontal=cut1DFunctionRectangleHorizontalLocal, 
+    cut1DFunctionRectangleVertical=cut1DFunctionRectangleVerticalLocal)
+
+    figure.minPixel = np.min([QXBin,QYBin])
     self.figureListView3D.append(figure)
     currentFigure = self.figureListView3D.getCurrentFigure()
 
@@ -284,6 +292,8 @@ def cut1DFunctionRectangle(self,viewer,dr):
     parameters['Emin']=np.round(EMin,rounding)
     parameters['Emax']=np.round(EMax,rounding)
 
+    parameters['minPixel'] = viewer.minPixel
+
     # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
     self.interactiveCut = [viewer.ds,parameters['q1'],parameters['q2'],
                            parameters['width'],parameters['minPixel'],EMax,EMin,True,parameters['rlu']]
@@ -318,6 +328,133 @@ def cut1DFunctionCircle(self,viewer,dr):
     self.Cut1D_plot_button_function()
     # Reset the interactiveCut flag
     self.interactiveCut = None
+
+
+
+## Function to connect draggable rectangles from interactive 1D cuts to the gui
+def cut1DFunctionRectanglePerp(self,viewer,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(viewer.ax,'sample'):
+        sample = viewer.ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+
+    parameters = extractCut1DPropertiesRectanglePerpendicular(dr.rect,sample,rounding = rounding)
+    parameters['minPixel'] = np.round(viewer.dQE[viewer.axis],rounding)
+
+
+    
+    middlePoint = viewer.ax.calculateRLU(*parameters['center'])[0]
+    if viewer.ax.rlu:
+        dirVector = viewer.ax.calculateRLU(1,0)[0]-viewer.ax.calculateRLU(0,0)[0]
+        orthogonalVector = np.cross(viewer.ds.sample[0].planeNormal,dirVector)
+        orthogonalVector*=1/np.linalg.norm(orthogonalVector)
+    else:
+        # TODO: fix
+        orthogonalVector = np.array([viewer.ax.plotDirection[1],-viewer.ax.plotDirection[0]])
+    
+    del parameters['center'] # remove the 'center' as it is not allowed in plotCut1D
+
+    # transform the orthogonal vector if needed 
+    
+    
+    parameters['q1'] = middlePoint
+    parameters['q2'] = middlePoint+orthogonalVector
+
+    parameters['minPixel'] = viewer.ax.minPixel
+
+    # round off parameters
+    for parName in ['q1','q2','width','minPixel','Emax','Emin']:
+        parameters[parName] = np.round(parameters[parName],rounding)
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [viewer.ds,parameters['q1'],parameters['q2'],
+                           parameters['width'],parameters['minPixel'],parameters['Emax'],parameters['Emin'],True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+
+def cut1DFunctionRectangleHorizontal(self,viewer,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(viewer.ax,'sample'):
+        sample = viewer.ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+
+    parameters = extractCut1DPropertiesRectangleHorizontal(dr.rect,sample,rounding = rounding)
+    
+    parameters['q1'] = viewer.ax.calculateRLU(*parameters['q1'])[0]
+    parameters['q2'] = viewer.ax.calculateRLU(*parameters['q2'])[0]
+    if viewer.ax.rlu:
+        dirVector = viewer.ax.calculateRLU(1,0)[0]-viewer.ax.calculateRLU(0,0)[0]
+        orthogonalVector = np.cross(viewer.ds.sample[0].planeNormal,dirVector)
+        orthogonalVector*=1/np.linalg.norm(orthogonalVector)
+    else:
+        # TODO: fix
+        orthogonalVector = np.array([viewer.ax.plotDirection[1],-viewer.ax.plotDirection[0]])
+    
+    #del parameters['center'] # remove the 'center' as it is not allowed in plotCut1D
+
+    # transform the orthogonal vector if needed 
+    
+    parameters['minPixel'] = viewer.ax.minPixel
+    parameters['width'] = viewer.ax.minPixel
+    # round off parameters
+    for parName in ['q1','q2','width','minPixel','Emax','Emin']:
+        parameters[parName] = np.round(parameters[parName],rounding)
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [viewer.ds,parameters['q1'],parameters['q2'],
+                           parameters['width'],parameters['minPixel'],parameters['Emax'],parameters['Emin'],True,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+
+def cut1DFunctionRectangleVertical(self,viewer,dr):
+    # If there is no sample, i.e. 1/AA plot
+    if hasattr(viewer.ax,'sample'):
+        sample = viewer.ax.sample
+    else:
+        sample = None
+
+    # Extract the parameters
+    rounding = 4 # Round to 4 digits
+
+    parameters = extractCut1DPropertiesRectangleVertical(dr.rect,sample,rounding = rounding)
+    parameters['minPixel'] = np.round(viewer.dQE[2],rounding)
+
+
+    parameters['q'] = viewer.ax.calculateRLU(parameters['q'],0.0)[0]
+    
+    
+    # transform the orthogonal vector if needed 
+    
+    parameters['minPixel'] = viewer.ax.minPixel
+    parameters['width'] = viewer.ax.minPixel
+
+    # round off parameters
+    for parName in ['q','width','minPixel','E2','E1']:
+        parameters[parName] = np.round(parameters[parName],rounding)
+
+    # Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    self.interactiveCut = [viewer.ds,parameters['q'],None,
+                           parameters['width'],parameters['minPixel'],parameters['E2'],parameters['E1'],False,parameters['rlu']]
+    
+    # Perform the cut and plot it
+    self.Cut1D_plot_button_function()
+    # Reset the interactiveCut flag
+    self.interactiveCut = None
+
 
 View3DManagerBase, View3DManagerForm = loadUI('View3D.ui')
 
