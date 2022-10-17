@@ -179,3 +179,20 @@ class log(list):
         super(log, self).remove(value)
         self.updateTextBrowser()
         
+class FilterProxyModel(QtCore.QIdentityProxyModel):
+    def __init__(self,source=None, onlyConverted=False, *args,**kwargs):
+        super(FilterProxyModel,self).__init__(*args,**kwargs)
+        if not source is None:
+            self.setSourceModel(source)
+        self.onlyConverted = onlyConverted
+
+    def flags(self,index):
+        ds = self.sourceModel().data(index,role=QtCore.Qt.ItemDataRole)
+        if self.onlyConverted:
+            checkLength = len(ds._convertedFiles)
+        else:
+            checkLength = len(ds)
+        if checkLength>0:
+            return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
+        else:
+            return QtCore.Qt.NoItemFlags

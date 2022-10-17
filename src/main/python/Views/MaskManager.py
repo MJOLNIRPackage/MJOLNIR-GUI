@@ -2,7 +2,7 @@ import sys,copy
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI, FilterProxyModel
     import MJOLNIRGui.src.main.python._tools as _GUItools
     from MJOLNIRGui.src.main.python.DataModels import MaskModel
     from MJOLNIRGui.src.main.python.Views import BraggListManager
@@ -11,7 +11,7 @@ try:
 except ImportError:
     from DataModels import MaskModel
     #from MJOLNIR_Data import GuiMask
-    from _tools import ProgressBarDecoratorArguments, loadUI
+    from _tools import ProgressBarDecoratorArguments, loadUI, FilterProxyModel
     import _tools as _GUItools
     from Views import BraggListManager
 from MJOLNIR.Data import Mask
@@ -20,18 +20,7 @@ import numpy as np
 import os,warnings
 import inspect
 
-class FilterProxyModel(QtCore.QIdentityProxyModel):
-    def __init__(self,source=None, *args,**kwargs):
-        super(FilterProxyModel,self).__init__(*args,**kwargs)
-        if not source is None:
-            self.setSourceModel(source)
 
-    def flags(self,index):
-        ds = self.sourceModel().data(index,role=QtCore.Qt.ItemDataRole)
-        if len(ds._convertedFiles)>0:
-            return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
-        else:
-            return QtCore.Qt.NoItemFlags
 
 
 def Mask_DoubleClick_Selection_function(self,index,*args,**kwargs):
@@ -997,7 +986,7 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         self.maskingMainWindow.Mask_status_label.setPixmap(img)
         self.maskingMainWindow.Mask_status_label.setToolTip('<br>'.join([grey+' No mask applied',red+' Wrong masking',green+' Valid masking']))
         
-        self.proxyModel = FilterProxyModel(self.parent.DataSetModel)
+        self.proxyModel = FilterProxyModel(self.parent.DataSetModel, onlyConverted=True)
 
         self.Mask_data_set_combo_box.setModel(self.proxyModel)
         self.Mask_apply_to_dataset_button.clicked.connect(self.guiWindow.ApplyMaskToDataSet)
