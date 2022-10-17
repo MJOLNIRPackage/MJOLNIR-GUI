@@ -39,6 +39,19 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="load_dataset_pushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Load From DataSet</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="DataSet_combo_box"/>
+      </item>
      </layout>
     </widget>
    </item>
