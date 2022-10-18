@@ -4,14 +4,15 @@ from MJOLNIR import TasUBlibDEG
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments,loadUI
+    from _tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
 import numpy as np
+import matplotlib.pyplot as plt
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
 from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy,predictionInstrumentSupport
 from MJOLNIR.Data import Sample
@@ -86,6 +87,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.setup()
         self.generateScanCommands()
         self.updateSample()
+
+        self.DataSet_selected_changed()
 
 
     def setup(self):
@@ -167,10 +170,18 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         
         for key,value in self.__dict__.items():
+            if key == 'DataSet_combo_box': continue # Do not connect the data set loader
             if hasattr(value,'valueCanged'):
                 value.valueChanged.connect(self.updateSettings)
             elif hasattr(value,'textChanged'):
                 value.textChanged.connect(self.updateSettings)
+
+        self.proxyModel = FilterProxyModel(self.guiWindow.DataSetModel)
+        self.guiWindow.DataSetModel.layoutChanged.connect(self.DataSet_selected_changed)
+        self.DataSet_combo_box.setModel(self.proxyModel)
+        self.load_dataset_pushButton.clicked.connect(self.loadSampleFromDataSet)
+
+        self.DataSet_combo_box.currentIndexChanged.connect(self.DataSet_selected_changed)
         
     def updateSample(self):
         cell = np.array(self.getCell())
@@ -197,6 +208,10 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         return [H,K,L,A3,A4,0.0,0.0,Ei,Ef] # H,K,L,A3,A4,phi,chi,Ei,Ef
 
     def setAlignment(self,R,alignment=1):
+        #self.guiWindow.setUpdatesEnabled(False)
+        for obj in [getattr(self,'alignment{}_ei_spinBox'.format(alignment)),getattr(self,'alignment{}_ef_comboBox'.format(alignment)),getattr(self,'alignment{}_h_spinBox'.format(alignment)),getattr(self,'alignment{}_k_spinBox'.format(alignment)),getattr(self,'alignment{}_l_spinBox'.format(alignment)),getattr(self,'alignment{}_a3_spinBox'.format(alignment)),getattr(self,'alignment{}_a4_spinBox'.format(alignment))]:
+            obj.blockSignals(True)
+
         [H,K,L,A3,A4,_,_,Ei,Ef] = R
         getattr(self,'alignment{}_ei_spinBox'.format(alignment)).setValue(Ei)
         EfIndex = np.argmin(np.abs(Ef-self.Efs))
@@ -207,6 +222,9 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         getattr(self,'alignment{}_l_spinBox'.format(alignment)).setValue(L)
         getattr(self,'alignment{}_a3_spinBox'.format(alignment)).setValue(A3)
         getattr(self,'alignment{}_a4_spinBox'.format(alignment)).setValue(A4)
+        for obj in [getattr(self,'alignment{}_ei_spinBox'.format(alignment)),getattr(self,'alignment{}_ef_comboBox'.format(alignment)),getattr(self,'alignment{}_h_spinBox'.format(alignment)),getattr(self,'alignment{}_k_spinBox'.format(alignment)),getattr(self,'alignment{}_l_spinBox'.format(alignment)),getattr(self,'alignment{}_a3_spinBox'.format(alignment)),getattr(self,'alignment{}_a4_spinBox'.format(alignment))]:
+            obj.blockSignals(False)
+
 
     def calculateA4(self,alignment=1):
         cell = self.getCell()
@@ -275,7 +293,11 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         instrument = str(self.instrument_comboBox.currentText())
 
-        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,Cell=cell,r1=r1,r2=r2,
+        *HKL1,A3R1,_A4,_SGU,_SGL,_Ei,_Ef = r1
+        *HKL2,A3R2 = r2[:4]
+        
+        sample = Sample.calculateSample(cell=cell,HKL1=HKL1,HKL2=HKL2,A3R1=A3R1,A3R2=A3R2,Ei=_Ei,Ef=_Ef)
+        ax = prediction(A3Start=A3Start,A3Stop=A3Stop,A3Steps=A3Steps,A4Positions=A4,Ei=Ei,sample=sample,
         points=points,outputFunction=self.guiWindow.writeToStatus, instrument=instrument)
 
         self.predictionAx = ax
@@ -287,6 +309,12 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
             a.set_ylim(*ax[-1].get_ylim())
             a.set_xlim(*ax[-1].get_xlim())
 
+        def lateTightLayout():
+            fig = ax[0].get_figure()
+            plt.show()
+            fig.tight_layout(w_pad=0.5*(not np.isclose(sample.projectionAngle,np.pi/2)))
+        QtCore.QTimer.singleShot(1500, lateTightLayout)
+        
         curratAxe = self.scan_curratAxe_checkBox.isChecked()
 
         if curratAxe:
@@ -339,6 +367,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor
 
+    @BlockInput(['scan_a3Start_spinBox','scan_a3Stop_spinBox','scan_a3Steps_spinBox','scan_ei_spinBox','scan_monitor_spinBox','scan_a4_lineEdit','scan_plot_checkBox'])
     def setScan(self,scan):
         A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = scan
         self.scan_a3Start_spinBox.setValue(A3Start)
@@ -376,16 +405,17 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return a,b,c,alpha,beta,gamma
 
-
+    @BlockInput(['cell_a_spinBox','cell_b_spinBox','cell_c_spinBox','cell_alpha_spinBox','cell_beta_spinBox','cell_gamma_spinBox'])
     def setCell(self,cell):
+        
         a,b,c,alpha,beta,gamma = cell
-
         self.cell_a_spinBox.setValue(a)
         self.cell_b_spinBox.setValue(b)
         self.cell_c_spinBox.setValue(c)
         self.cell_alpha_spinBox.setValue(alpha)
         self.cell_beta_spinBox.setValue(beta)
         self.cell_gamma_spinBox.setValue(gamma)
+        
 
     def updateSettings(self):
         """Update self.guiWindow.predictionSettings with current settings"""
@@ -464,6 +494,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return Ei,Ef,H,K,L,A3,A4,EfIndex
 
+    @BlockInput(['HKL_ef_comboBox','HKL_ei_spinBox','HKL_H_doubleSpinBox','HKL_K_doubleSpinBox','HKL_L_doubleSpinBox','HKL_A3_doubleSpinBox','HKL_A4_doubleSpinBox'])
     def setCalculation(self,calc):
         Ei,Ef,H,K,L,A3,A4,EfIndex = calc
 
@@ -496,6 +527,48 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
     def curratAxeList(self):
         self.guiWindow.openBraggListWindow()
+
+    def loadSampleFromDataSet(self):
+        
+        ds = self.getDataSet()
+        if ds is None:
+            return
+
+        sample = ds[0].sample
+        r1 = sample.plane_vector1
+        r2 = sample.plane_vector2
+        cell = sample.unitCell
+        self.setCell(cell)
+        self.setAlignment(r1,alignment=1)
+        self.setAlignment(r2,alignment=2)
+        #try:
+        #    self.setAlignment(r1,alignment=1)
+        #except AttributeError: # Attribute error from wrong calculation that r2 provides a zero vector...
+        #    pass 
+       
+        #try:
+        #    self.setAlignment(r2,alignment=2)
+        #except AttributeError: # Attribute error from wrong calculation that r2 provides a zero vector...
+        #    pass 
+
+        self.updateSample()
+        
+
+    def getDataSet(self):
+        localIdx = self.DataSet_combo_box.currentIndex()
+        if localIdx<0 or self.guiWindow.DataSetModel.rowCount(None)==0:
+            return None
+        
+        idx = self.guiWindow.DataSetModel.index(localIdx,0) # Create correct index type for DataSetModel
+        return self.guiWindow.DataSetModel.data(idx,QtCore.Qt.ItemDataRole) # Get the DataSet in question
+
+    def DataSet_selected_changed(self):
+        ds = self.getDataSet()
+        if ds is None or self.guiWindow.DataSetModel.rowCount(None)==0:
+            self.load_dataset_pushButton.setDisabled(True)
+        else:
+            self.load_dataset_pushButton.setDisabled(False)
+
 
 
     def closeEvent(self, event):

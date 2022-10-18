@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>890</width>
-    <height>901</height>
+    <height>957</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -16,7 +16,13 @@
   <property name="windowTitle">
    <string>Prediction Tool</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_21">
+  <property name="toolTip">
+   <string/>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0,0,0,0,1">
    <item>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
@@ -24,7 +30,14 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_25">
       <item>
-       <widget class="QComboBox" name="instrument_comboBox"/>
+       <widget class="QComboBox" name="instrument_comboBox">
+        <property name="toolTip">
+         <string>Instrument for prediction</string>
+        </property>
+        <property name="statusTip">
+         <string>Instrument for prediction</string>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -38,6 +51,32 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="load_dataset_pushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Load from Dataset</string>
+        </property>
+        <property name="statusTip">
+         <string>Load from Dataset</string>
+        </property>
+        <property name="text">
+         <string>Load From DataSet</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="DataSet_combo_box">
+        <property name="toolTip">
+         <string>Select dataset</string>
+        </property>
+        <property name="statusTip">
+         <string>Select dataset</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -60,6 +99,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QLabel" name="label">
+            <property name="toolTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell a parameter</string>
+            </property>
             <property name="text">
              <string>a [AA]</string>
             </property>
@@ -70,6 +115,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="cell_a_spinBox">
+            <property name="toolTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell a parameter</string>
+            </property>
             <property name="decimals">
              <number>4</number>
             </property>
@@ -90,6 +141,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="toolTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell α angle</string>
+            </property>
             <property name="text">
              <string>α [deg]</string>
             </property>
@@ -100,6 +157,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="cell_alpha_spinBox">
+            <property name="toolTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell α angle</string>
+            </property>
             <property name="minimum">
              <double>0.010000000000000</double>
             </property>
@@ -121,6 +184,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="QLabel" name="label_3">
+            <property name="toolTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell b parameter</string>
+            </property>
             <property name="text">
              <string>b [AA]</string>
             </property>
@@ -131,6 +200,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="cell_b_spinBox">
+            <property name="toolTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell b parameter</string>
+            </property>
             <property name="decimals">
              <number>4</number>
             </property>
@@ -151,6 +226,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QLabel" name="label_4">
+            <property name="toolTip">
+             <string>Cell β angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell β angle</string>
+            </property>
             <property name="text">
              <string>β [deg]</string>
             </property>
@@ -182,6 +263,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <widget class="QLabel" name="label_7">
+            <property name="toolTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell c parameter</string>
+            </property>
             <property name="text">
              <string>c [AA]</string>
             </property>
@@ -192,6 +279,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="cell_c_spinBox">
+            <property name="toolTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell c parameter</string>
+            </property>
             <property name="decimals">
              <number>4</number>
             </property>
@@ -212,6 +305,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
            <widget class="QLabel" name="label_8">
+            <property name="toolTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell γ angle</string>
+            </property>
             <property name="text">
              <string>γ [deg]</string>
             </property>
@@ -222,6 +321,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="cell_gamma_spinBox">
+            <property name="toolTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell γ angle</string>
+            </property>
             <property name="minimum">
              <double>0.010000000000000</double>
             </property>
@@ -254,6 +359,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_19">
             <item>
              <widget class="QLabel" name="label_15">
+              <property name="toolTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
               <property name="text">
                <string>Ei [meV]</string>
               </property>
@@ -264,6 +375,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_ei_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
               <property name="value">
                <double>5.000000000000000</double>
               </property>
@@ -275,6 +392,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_20">
             <item>
              <widget class="QLabel" name="label_16">
+              <property name="toolTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 H Value</string>
+              </property>
               <property name="text">
                <string>H [RLU]</string>
               </property>
@@ -285,6 +408,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_h_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 H Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -302,6 +431,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_28">
             <item>
              <widget class="QLabel" name="label_24">
+              <property name="toolTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
               <property name="text">
                <string>A3 [deg]</string>
               </property>
@@ -312,6 +447,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_a3_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
               <property name="minimum">
                <double>-360.000000000000000</double>
               </property>
@@ -330,6 +471,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_21">
             <item>
              <widget class="QLabel" name="label_17">
+              <property name="toolTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
               <property name="text">
                <string>Ef [meV]</string>
               </property>
@@ -339,7 +486,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="alignment1_ef_comboBox"/>
+             <widget class="QComboBox" name="alignment1_ef_comboBox">
+              <property name="toolTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -347,6 +501,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_22">
             <item>
              <widget class="QLabel" name="label_18">
+              <property name="toolTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 K Value</string>
+              </property>
               <property name="text">
                <string>K [RLU]</string>
               </property>
@@ -357,6 +517,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_k_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 K Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -371,6 +537,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_26">
             <item>
              <widget class="QLabel" name="label_22">
+              <property name="toolTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
               <property name="text">
                <string>A4 [deg]</string>
               </property>
@@ -381,6 +553,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_a4_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
               <property name="decimals">
                <number>3</number>
               </property>
@@ -425,6 +603,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_24">
             <item>
              <widget class="QLabel" name="label_20">
+              <property name="toolTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 L Value</string>
+              </property>
               <property name="text">
                <string>L [RLU]</string>
               </property>
@@ -435,6 +619,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment1_l_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 L Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -492,6 +682,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_40">
             <item>
              <widget class="QLabel" name="label_30">
+              <property name="toolTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
               <property name="text">
                <string>Ei [meV]</string>
               </property>
@@ -502,6 +698,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_ei_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
               <property name="value">
                <double>5.000000000000000</double>
               </property>
@@ -513,6 +715,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_41">
             <item>
              <widget class="QLabel" name="label_31">
+              <property name="toolTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 H Value</string>
+              </property>
               <property name="text">
                <string>H [RLU]</string>
               </property>
@@ -523,6 +731,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_h_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 H Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -537,6 +751,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_42">
             <item>
              <widget class="QLabel" name="label_32">
+              <property name="toolTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
               <property name="text">
                <string>A3 [deg]</string>
               </property>
@@ -547,6 +767,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_a3_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
               <property name="minimum">
                <double>-360.000000000000000</double>
               </property>
@@ -568,6 +794,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_43">
             <item>
              <widget class="QLabel" name="label_33">
+              <property name="toolTip">
+               <string>Reflection 2 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 outgoing energy</string>
+              </property>
               <property name="text">
                <string>Ef [meV]</string>
               </property>
@@ -585,6 +817,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_44">
             <item>
              <widget class="QLabel" name="label_34">
+              <property name="toolTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 K Value</string>
+              </property>
               <property name="text">
                <string>K [RLU]</string>
               </property>
@@ -595,6 +833,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_k_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 K Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -612,6 +856,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_45">
             <item>
              <widget class="QLabel" name="label_35">
+              <property name="toolTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
               <property name="text">
                <string>A4 [deg]</string>
               </property>
@@ -622,6 +872,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_a4_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
               <property name="decimals">
                <number>3</number>
               </property>
@@ -666,6 +922,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_47">
             <item>
              <widget class="QLabel" name="label_36">
+              <property name="toolTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 L Value</string>
+              </property>
               <property name="text">
                <string>L [RLU]</string>
               </property>
@@ -676,6 +938,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="alignment2_l_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 L Value</string>
+              </property>
               <property name="minimum">
                <double>-20.000000000000000</double>
               </property>
@@ -721,6 +989,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Calculation of provided peak</string>
+     </property>
+     <property name="statusTip">
+      <string>Calculation of provided peak</string>
+     </property>
      <property name="title">
       <string>Calculate</string>
      </property>
@@ -731,6 +1005,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Incoming energy for calculation</string>
+            </property>
             <property name="text">
              <string>Ei [meV]</string>
             </property>
@@ -741,8 +1021,17 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_ei_spinBox">
+            <property name="toolTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Incoming energy for calculation</string>
+            </property>
             <property name="minimum">
              <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -752,6 +1041,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
            <widget class="QLabel" name="label_9">
+            <property name="toolTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation H Value</string>
+            </property>
             <property name="text">
              <string>H</string>
             </property>
@@ -762,6 +1057,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_H_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation H Value</string>
+            </property>
             <property name="minimum">
              <double>-99.989999999999995</double>
             </property>
@@ -776,6 +1077,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
            <widget class="QLabel" name="label_13">
+            <property name="toolTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
             <property name="text">
              <string>A3 [deg]</string>
             </property>
@@ -786,6 +1093,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_A3_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
             <property name="minimum">
              <double>-360.000000000000000</double>
             </property>
@@ -810,6 +1123,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
            <widget class="QLabel" name="label_10">
+            <property name="toolTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
             <property name="text">
              <string>Ef [meV]</string>
             </property>
@@ -819,7 +1138,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="HKL_ef_comboBox"/>
+           <widget class="QComboBox" name="HKL_ef_comboBox">
+            <property name="toolTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -827,6 +1153,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
            <widget class="QLabel" name="label_11">
+            <property name="toolTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation K Value</string>
+            </property>
             <property name="text">
              <string>K</string>
             </property>
@@ -837,6 +1169,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_K_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation K Value</string>
+            </property>
             <property name="minimum">
              <double>-99.989999999999995</double>
             </property>
@@ -848,6 +1186,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_15">
           <item>
            <widget class="QLabel" name="label_14">
+            <property name="toolTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
             <property name="text">
              <string>A4 [deg]</string>
             </property>
@@ -858,6 +1202,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_A4_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
             <property name="minimum">
              <double>-180.000000000000000</double>
             </property>
@@ -892,6 +1242,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
            <widget class="QLabel" name="label_12">
+            <property name="toolTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation L Value</string>
+            </property>
             <property name="text">
              <string>L</string>
             </property>
@@ -902,6 +1258,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="HKL_L_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation L Value</string>
+            </property>
             <property name="minimum">
              <double>-99.989999999999995</double>
             </property>
@@ -929,6 +1291,12 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_4">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
      <property name="title">
       <string>Scan</string>
      </property>
@@ -941,6 +1309,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_50">
             <item>
              <widget class="QLabel" name="label_37">
+              <property name="toolTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Start of sample rotation</string>
+              </property>
               <property name="text">
                <string>A3 Start [deg]</string>
               </property>
@@ -951,6 +1325,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="scan_a3Start_spinBox">
+              <property name="toolTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Start of sample rotation</string>
+              </property>
               <property name="minimum">
                <double>-720.000000000000000</double>
               </property>
@@ -965,6 +1345,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_51">
             <item>
              <widget class="QLabel" name="label_38">
+              <property name="toolTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Incoming energy for scan</string>
+              </property>
               <property name="text">
                <string>Ei [meV]</string>
               </property>
@@ -975,6 +1361,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="scan_ei_spinBox">
+              <property name="toolTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Incoming energy for scan</string>
+              </property>
               <property name="value">
                <double>5.000000000000000</double>
               </property>
@@ -984,6 +1376,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="scan_curratAxe_pushButton">
+            <property name="toolTip">
+             <string>Create/Edit Currat-Axe list</string>
+            </property>
+            <property name="statusTip">
+             <string>Create/Edit Currat-Axe list</string>
+            </property>
             <property name="text">
              <string>Currat-Axe List</string>
             </property>
@@ -997,6 +1395,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_52">
             <item>
              <widget class="QLabel" name="label_39">
+              <property name="toolTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>End of sample rotation</string>
+              </property>
               <property name="text">
                <string>A3 Stop [deg]</string>
               </property>
@@ -1007,6 +1411,12 @@
             </item>
             <item>
              <widget class="QDoubleSpinBox" name="scan_a3Stop_spinBox">
+              <property name="toolTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>End of sample rotation</string>
+              </property>
               <property name="minimum">
                <double>-720.000000000000000</double>
               </property>
@@ -1024,6 +1434,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_53">
             <item>
              <widget class="QLabel" name="label_40">
+              <property name="toolTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="statusTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
               <property name="text">
                <string>2θ [deg]</string>
               </property>
@@ -1040,6 +1456,12 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="statusTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
               <property name="text">
                <string>-36,-40</string>
               </property>
@@ -1049,8 +1471,14 @@
           </item>
           <item>
            <widget class="QCheckBox" name="scan_curratAxe_checkBox">
+            <property name="toolTip">
+             <string>Plot Currat-Axe spurions on top</string>
+            </property>
+            <property name="statusTip">
+             <string>Plot Currat-Axe spurions on top</string>
+            </property>
             <property name="text">
-             <string>Plot Currat-AxeSpurions</string>
+             <string>Plot Currat-Axe Spurions</string>
             </property>
            </widget>
           </item>
@@ -1062,6 +1490,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_54">
             <item>
              <widget class="QLabel" name="label_41">
+              <property name="toolTip">
+               <string>Number of sample rotation steps</string>
+              </property>
+              <property name="statusTip">
+               <string>Number of sample rotation steps</string>
+              </property>
               <property name="text">
                <string>A3 Steps</string>
               </property>
@@ -1072,6 +1506,12 @@
             </item>
             <item>
              <widget class="QSpinBox" name="scan_a3Steps_spinBox">
+              <property name="toolTip">
+               <string>Number of sample rotation steps</string>
+              </property>
+              <property name="statusTip">
+               <string>Number of sample rotation steps</string>
+              </property>
               <property name="minimum">
                <number>1</number>
               </property>
@@ -1098,6 +1538,12 @@
             </property>
             <item>
              <widget class="QLabel" name="label_19">
+              <property name="toolTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Monitor for scan</string>
+              </property>
               <property name="text">
                <string>Monitor</string>
               </property>
@@ -1108,6 +1554,12 @@
             </item>
             <item>
              <widget class="QSpinBox" name="scan_monitor_spinBox">
+              <property name="toolTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Monitor for scan</string>
+              </property>
               <property name="minimum">
                <number>1</number>
               </property>
@@ -1126,6 +1578,12 @@
           </item>
           <item>
            <widget class="QCheckBox" name="scan_plot_checkBox">
+            <property name="toolTip">
+             <string>Plot individual scan points</string>
+            </property>
+            <property name="statusTip">
+             <string>Plot individual scan points</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
             </property>
@@ -1157,6 +1615,12 @@
       </item>
       <item>
        <widget class="QTextEdit" name="scanCommand_textEdit">
+        <property name="toolTip">
+         <string>Suggested script</string>
+        </property>
+        <property name="statusTip">
+         <string>Suggested script</string>
+        </property>
         <property name="readOnly">
          <bool>false</bool>
         </property>
@@ -1180,6 +1644,12 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <widget class="QPushButton" name="tool_generate_button">
+        <property name="toolTip">
+         <string>Generate overview plots</string>
+        </property>
+        <property name="statusTip">
+         <string>Generate overview plots</string>
+        </property>
         <property name="text">
          <string>Generate</string>
         </property>

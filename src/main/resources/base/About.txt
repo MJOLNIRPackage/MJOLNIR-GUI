@@ -1,6 +1,7 @@
 MJOLNIR_Gui Version {MJOLNIRGui}
 MJOLNIR Version {MJOLNIR}
 Python Version {PythonVersion}
+Matplotlib Version {MATPLOTLIBVersion}
 
 MJOLNIR_Gui is a developed GUI application dedicated to the MJOLNIR package. It is meant to provide an interface to many of the features found in the software suite.
 
@@ -32,3 +33,5 @@ keywords = {Inelastic neutron scattering, Three-axis spectroscopy, Visualisation
 }
 
 For CAMEA specific questions, see  <a href='https://www.psi.ch/en/sinq/camea'>CAMEA|Paul Scherrer Institut (PSI)</a>
+
+The code base is open access and is hosted in two repositories at GitHub: <a href='https://github.com/MJOLNIRPackage/MJOLNIR'>MJOLNIR</a> and <a href='https://github.com/MJOLNIRPackage/MJOLNIR-GUI'>MJOLNIRGui</a>

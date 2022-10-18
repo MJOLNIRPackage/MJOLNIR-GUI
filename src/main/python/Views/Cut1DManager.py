@@ -119,6 +119,8 @@ def cut1DPlotTogether(self):
 def extractCutParameters(self):
     rlu = self.ui.Cut1D_SelectUnits_RLU_radioButton.isChecked()
     cutQ = self.ui.Cut1D_SelectCut_Q_radioButton.isChecked()
+
+    title = self.ui.Cut1D_SetTitle_lineEdit.text()
     
     HStart = self.ui.Cut1D_HStart_lineEdit.text()
     if cutQ: 
@@ -153,7 +155,7 @@ def extractCutParameters(self):
         q2 = np.array([HEnd,KEnd],dtype=float)
 
 
-    return ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
+    return ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu,title
 
 @ProgressBarDecoratorArguments(runningText='Save Cut1D to folder',completedText='Cut1D saved')
 def Cut1D_Export1D_btn_function(self):
@@ -223,9 +225,10 @@ def Cut1D_Generate1D_button_function(self):
         return False
 
     if self.interactiveCut is None:
-        ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = extractCutParameters(self)
+        ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu,title = extractCutParameters(self)
     else:
         ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu = self.interactiveCut
+        title = None
     if checker(q1,q2,width,minPixel,EMax,EMin,cutQ) is False:
         return False
     try:
@@ -268,7 +271,9 @@ def Cut1D_Generate1D_button_function(self):
         # Generate a Gui1DCutObject
         if not hasattr(self,'cutNumber'):
             self.cutNumber = 1
-        title = 'Cut {}'.format(self.cutNumber)
+        if title is None or len(title) == 0:
+            title = 'Cut {}'.format(self.cutNumber)
+        
         parameters['Cut1D_SetTitle_lineEdit'] = title
         gui1DCut = Gui1DCutObject(name=title,parameters=parameters,pdData=pdData,bins=bins)
         

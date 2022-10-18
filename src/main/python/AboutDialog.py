@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 #from qtmodern.windows import ModernDialog
 import MJOLNIR
 import sys
+import matplotlib
 
 class AboutDialog(QtWidgets.QDialog):
 
@@ -19,6 +20,7 @@ class AboutDialog(QtWidgets.QDialog):
         
         text = text.replace('{MJOLNIRGui}',version)
         text = text.replace('{MJOLNIR}',MJOLNIR.__version__)
+        text = text.replace('{MATPLOTLIBVersion}',matplotlib.__version__)
 
 
         pythonVersion = '.'.join([str(x) for x in sys.version_info[:3]])

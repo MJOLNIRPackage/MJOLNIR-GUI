@@ -21,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-version = '0.9.11'
+version = '1.0.0'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -716,7 +716,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         if not hasattr(self,'BraggListWindow'):
            settingsDict['braggPoints'] = self.braggPoints
         else:
-            settingsDict['braggPoints'] = self.BraggListWindow.BraggListModel.data
+            settingsDict['braggPoints'] = self.BraggListWindow.BraggListModel.getAllData()
         return settingsDict
         
     def loadGuiSettings(self,file=None):

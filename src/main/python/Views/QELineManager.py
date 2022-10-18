@@ -231,7 +231,7 @@ def cut1DrectanglePerpendicular(self,ax,dr):
     rounding = 4 # Round to 4 digits
     parameters = extractCut1DPropertiesRectanglePerpendicular(dr.rect,sample)
 
-    offset = ax.convertPlotAxisReal(parameters['center'][0]).T[0]
+    offset = ax.calculatePosition(parameters['center'][0]).T[0]#ax.convertPlotAxisReal(parameters['center'][0]).T[0]
     
     del parameters['center'] # remove the 'center' as it is not allowed in plotCut1D
 
@@ -266,13 +266,15 @@ def cut1DFunctionRectangleHorizontal(self,ax,dr):
     else:
         sample = None
     parameters = extractCut1DPropertiesRectangleHorizontal(dr.rect,sample)
-    
+
     # Convert center point into actual position in Q
-    parameters['q1'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q1'][0]).T[0]]
-    parameters['q2'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q2'][0]).T[0]]
+    parameters['q1'] = [np.round(x,rounding) for x in ax.calculatePosition(parameters['q1'][0])]#ax.convertPlotAxisReal(parameters['q1'][0]).T[0]]
+    parameters['q2'] = [np.round(x,rounding) for x in ax.calculatePosition(parameters['q2'][0])]#ax.convertPlotAxisReal(parameters['q2'][0]).T[0]]
     
     parameters['minPixel'] = np.round(ax.minPixel,rounding)
     parameters['width'] = np.round(ax.width,rounding)
+
+    #Order of parameters needed is: ds,q1,q2,width,minPixel,EMax,EMin,cutQ,rlu
     self.interactiveCut = [ax.ds,parameters['q1'],parameters['q2'],
                            parameters['width'],parameters['minPixel'],np.round(parameters['Emax'],rounding),np.round(parameters['Emin'],rounding),True,parameters['rlu']]
     
@@ -290,8 +292,7 @@ def cut1DFunctionRectangleVertical(self,ax,dr):
     parameters = extractCut1DPropertiesRectangleVertical(dr.rect,sample)
     
     # Convert center point into actual position in Q
-    parameters['q'] = [np.round(x,rounding) for x in ax.convertPlotAxisReal(parameters['q']).T[0]]
-    parameters['q2'] = None
+    parameters['q'] = [np.round(x,rounding) for x in ax.calculatePosition(parameters['q']).T]#ax.convertPlotAxisReal(parameters['q']).T[0]]
     
     parameters['minPixel'] = np.round(ax.minPixel,rounding)
     parameters['width'] = np.round(ax.width,rounding)

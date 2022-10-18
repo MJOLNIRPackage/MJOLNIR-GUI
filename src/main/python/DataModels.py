@@ -46,6 +46,9 @@ class DataSetModel(QtCore.QAbstractListModel):
         return row
         
     def data(self, index, role = Qt.ItemDataRole):
+        if index.row()<0 or index.row()>len(self.dataSets)-1:
+            return 
+        
         if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
             text = self.dataSets[index.row()].name
             return text

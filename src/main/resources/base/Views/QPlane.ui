@@ -113,7 +113,7 @@
            <string>Set color scale axis of current figure</string>
           </property>
           <property name="text">
-           <string>5e-6</string>
+           <string>0.02</string>
           </property>
          </widget>
         </item>

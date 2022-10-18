@@ -185,6 +185,12 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QPushButton" name="Mask_load_current_button_nonBlock">
+          <property name="toolTip">
+           <string>Load Mask from DataSet</string>
+          </property>
+          <property name="statusTip">
+           <string>Load Mask from DataSet</string>
+          </property>
           <property name="text">
            <string>Load Mask</string>
           </property>
