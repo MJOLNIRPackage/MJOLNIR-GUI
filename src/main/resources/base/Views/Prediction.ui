@@ -17,10 +17,10 @@
    <string>Prediction Tool</string>
   </property>
   <property name="toolTip">
-   <string>Reflection 2 outgoing energy</string>
+   <string/>
   </property>
   <property name="statusTip">
-   <string>Reflection 2 outgoing energy</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0,0,0,0,1">
    <item>
@@ -988,6 +988,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Calculation of provided peak</string>
+     </property>
+     <property name="statusTip">
+      <string>Calculation of provided peak</string>
      </property>
      <property name="title">
       <string>Calculate</string>
