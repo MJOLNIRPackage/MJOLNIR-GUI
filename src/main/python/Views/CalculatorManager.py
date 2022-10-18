@@ -38,7 +38,6 @@ class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
 
         self.nameList = ['General','Simple','Advanced'] 
         self.viewClasses = [CalculatorGeneralManager,CalculatorSimpleManager,CalculatorAdvancedManager]
-        self.startState = [True,True,True] # If extended 
 
         self.views = []
 
@@ -46,20 +45,19 @@ class CalculatorManager(CalculatorManagerBase, CalculatorManagerForm):
         vlay = self.collapsibleContainer#QtWidgets.QVBoxLayout(self.ui.collapsibleContainer)
         # Insert all views
         self.boxContainers = []
-        for name,Type,state in zip(self.nameList,self.viewClasses,self.startState):
+        for name,Type in zip(self.nameList,self.viewClasses):
             self.update()
-            box = CollapsibleBox(name,startState=state)
+            box = QtWidgets.QGroupBox(title=name)#box = CollapsibleBox(name,startState=state)
             self.boxContainers.append(box)
             vlay.addWidget(box)
             lay = QtWidgets.QVBoxLayout()
+            box.setLayout(lay)
 
             widget = Type(guiWindow=self.guiWindow)
-            #if Type == NormalizationManager: # Get a reference to the sample manager directly in self
-            #    self.normalizationManager = widget
+
             self.views.append(widget)
             lay.addWidget(widget)
            
-            box.setContentLayout(lay)
         vlay.addStretch()
 
     
