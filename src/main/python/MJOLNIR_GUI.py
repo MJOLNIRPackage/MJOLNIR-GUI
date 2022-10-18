@@ -21,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-version = '0.9.11'
+version = '1.0.0'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
