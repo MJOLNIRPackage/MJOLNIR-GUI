@@ -196,3 +196,16 @@ class FilterProxyModel(QtCore.QIdentityProxyModel):
             return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
         else:
             return QtCore.Qt.NoItemFlags
+
+def BlockInput(objectList):
+    def WrappedBlockInputFunction(func):
+        @functools.wraps(func)
+        def newFunc(self,*args,**kwargs):
+            for obj in objectList:
+                getattr(self,obj).blockSignals(True)
+            returnval = func(self,*args,**kwargs)
+            for obj in objectList:
+                getattr(self,obj).blockSignals(False)
+            return returnval
+        return newFunc
+    return WrappedBlockInputFunction

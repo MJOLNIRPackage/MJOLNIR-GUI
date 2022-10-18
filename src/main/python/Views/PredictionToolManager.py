@@ -4,10 +4,10 @@ from MJOLNIR import TasUBlibDEG
 sys.path.append('..')
 
 try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel
+    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
     import MJOLNIRGui.src.main.python._tools as _GUItools
 except ImportError:
-    from _tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel
+    from _tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
     import _tools as _GUItools
 from os import path
 from PyQt5 import QtWidgets,uic,QtGui,QtCore
@@ -367,8 +367,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor
 
+    @BlockInput(['scan_a3Start_spinBox','scan_a3Stop_spinBox','scan_a3Steps_spinBox','scan_ei_spinBox','scan_monitor_spinBox','scan_a4_lineEdit','scan_plot_checkBox'])
     def setScan(self,scan):
-        self.guiWindow.setUpdatesEnabled(False)
         A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = scan
         self.scan_a3Start_spinBox.setValue(A3Start)
         self.scan_a3Stop_spinBox.setValue(A3Stop)
@@ -380,7 +380,6 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.scan_a4_lineEdit.setText(strA4)
         
         points = self.scan_plot_checkBox.setChecked(points)
-        self.guiWindow.setUpdatesEnabled(True)
 
     
     def formatA4String(self,A4String):
@@ -406,18 +405,17 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return a,b,c,alpha,beta,gamma
 
-
+    @BlockInput(['cell_a_spinBox','cell_b_spinBox','cell_c_spinBox','cell_alpha_spinBox','cell_beta_spinBox','cell_gamma_spinBox'])
     def setCell(self,cell):
-        self.guiWindow.setUpdatesEnabled(False)
+        
         a,b,c,alpha,beta,gamma = cell
-
         self.cell_a_spinBox.setValue(a)
         self.cell_b_spinBox.setValue(b)
         self.cell_c_spinBox.setValue(c)
         self.cell_alpha_spinBox.setValue(alpha)
         self.cell_beta_spinBox.setValue(beta)
         self.cell_gamma_spinBox.setValue(gamma)
-        self.guiWindow.setUpdatesEnabled(True)
+        
 
     def updateSettings(self):
         """Update self.guiWindow.predictionSettings with current settings"""
@@ -496,8 +494,8 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         return Ei,Ef,H,K,L,A3,A4,EfIndex
 
+    @BlockInput(['HKL_ef_comboBox','HKL_ei_spinBox','HKL_H_doubleSpinBox','HKL_K_doubleSpinBox','HKL_L_doubleSpinBox','HKL_A3_doubleSpinBox','HKL_A4_doubleSpinBox'])
     def setCalculation(self,calc):
-        self.guiWindow.setUpdatesEnabled(False)
         Ei,Ef,H,K,L,A3,A4,EfIndex = calc
 
         self.HKL_ef_comboBox.setCurrentIndex(EfIndex)
@@ -507,7 +505,6 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         self.HKL_L_doubleSpinBox.setValue(L)
         self.HKL_A3_doubleSpinBox.setValue(A3)
         self.HKL_A4_doubleSpinBox.setValue(A4)
-        self.guiWindow.setUpdatesEnabled(True)
 
     def calcualteHKLtoA3A4(self):
         Ei,Ef,H,K,L,*_ = self.getCalculation()
