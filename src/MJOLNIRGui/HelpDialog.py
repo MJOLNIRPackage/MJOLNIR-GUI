@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from MJOLNIRGui._qt import QtWidgets, QtGui, QtCore
 #from qtmodern.windows import ModernDialog
 import os
 

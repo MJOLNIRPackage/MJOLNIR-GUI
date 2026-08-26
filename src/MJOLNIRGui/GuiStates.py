@@ -1,9 +1,4 @@
-import sys
-try:
-    from StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
-except ImportError:
-    from .StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
-
+from MJOLNIRGui.StateMachine import State,AllFalseBut,AllTrue,AllFalse,AllTrueBut
 
 
 import numpy as np

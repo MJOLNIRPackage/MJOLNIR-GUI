@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from MJOLNIRGui._qt import QtCore, QtWidgets
 
 class CollapsibleBox(QtWidgets.QWidget):
     def __init__(self, title="", parent=None, startState=False):

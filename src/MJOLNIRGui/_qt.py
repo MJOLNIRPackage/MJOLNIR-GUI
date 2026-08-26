@@ -1,8 +1,84 @@
 try:
-    from PyQt6 import QtCore, QtGui, QtWidgets, uic, Qt
+    from PyQt6 import QtCore, QtGui, QtWidgets, uic
+    Qt = QtCore.Qt
+
+    Qt.EditRole                    = Qt.ItemDataRole.EditRole
+    Qt.DisplayRole                 = Qt.ItemDataRole.DisplayRole
+    Qt.DecorationRole              = Qt.ItemDataRole.DecorationRole
+
+    Qt.ItemIsEditable              = Qt.ItemFlag.ItemIsEditable
+    Qt.ItemIsEnabled               = Qt.ItemFlag.ItemIsEnabled
+    Qt.ItemIsSelectable            = Qt.ItemFlag.ItemIsSelectable
+    Qt.ItemIsDragEnabled           = Qt.ItemFlag.ItemIsDragEnabled
+    Qt.ItemIsDropEnabled           = Qt.ItemFlag.ItemIsDropEnabled
+    Qt.NoItemFlags                 = Qt.ItemFlag.NoItemFlags
+
+    Qt.AlignCenter                 = Qt.AlignmentFlag.AlignCenter
+    Qt.AlignHCenter                = Qt.AlignmentFlag.AlignHCenter
+    Qt.AlignTop                    = Qt.AlignmentFlag.AlignTop
+
+    Qt.DownArrow                  = Qt.ArrowType.DownArrow
+    Qt.RightArrow                 = Qt.ArrowType.RightArrow
+
+    Qt.ToolButtonTextBesideIcon   = Qt.ToolButtonStyle.ToolButtonTextBesideIcon
+
+    Qt.Horizontal                 = Qt.Orientation.Horizontal
+
+    Qt.ScrollBarAlwaysOff         = Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+    Qt.ScrollBarAlwaysOn          = Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+
+    Qt.WindowCloseButtonHint      = Qt.WindowType.WindowCloseButtonHint
+    Qt.WindowMinMaxButtonsHint    = Qt.WindowType.WindowMinMaxButtonsHint
+    Qt.WindowSystemMenuHint       = Qt.WindowType.WindowSystemMenuHint
+    Qt.WindowTitleHint            = Qt.WindowType.WindowTitleHint
+
+    Qt.LinksAccessibleByKeyboard  = Qt.TextInteractionFlag.LinksAccessibleByKeyboard
+    Qt.LinksAccessibleByMouse     = Qt.TextInteractionFlag.LinksAccessibleByMouse
+    Qt.TextSelectableByKeyboard   = Qt.TextInteractionFlag.TextSelectableByKeyboard
+    Qt.TextSelectableByMouse      = Qt.TextInteractionFlag.TextSelectableByMouse
+
+    Qt.MoveAction                 = Qt.DropAction.MoveAction
+    Qt.IgnoreAction               = Qt.DropAction.IgnoreAction
+
+    Qt.NoPen                      = Qt.PenStyle.NoPen
+
+    QtWidgets.QSizePolicy.Preferred = QtWidgets.QSizePolicy.Policy.Preferred
+    QtWidgets.QSizePolicy.Expanding = QtWidgets.QSizePolicy.Policy.Expanding
+    QtWidgets.QSizePolicy.Minimum = QtWidgets.QSizePolicy.Policy.Minimum
+    QtWidgets.QSizePolicy.Maximum = QtWidgets.QSizePolicy.Policy.Maximum
+    QtWidgets.QSizePolicy.Fixed = QtWidgets.QSizePolicy.Policy.Fixed
+
+    QtWidgets.QLayout.SetNoConstraint = (
+        QtWidgets.QLayout.SizeConstraint.SetNoConstraint
+    )
+    QtWidgets.QAction = QtGui.QAction
+
+    QtWidgets.QAbstractItemView.InternalMove = (
+        QtWidgets.QAbstractItemView.DragDropMode.InternalMove
+    )
+
+    QtWidgets.QShortcut = QtGui.QShortcut
+    QtGui.QRegExpValidator = QtGui.QRegularExpressionValidator
+
+    FocusOut = QtCore.QEvent.Type.FocusOut
+
+    Qt.Unchecked = Qt.CheckState.Unchecked
+    Qt.PartiallyChecked = Qt.CheckState.PartiallyChecked
+    Qt.Checked = Qt.CheckState.Checked
+
+
     QT_VERSION = 6
 except ImportError:
-    from PyQt5 import QtCore, QtGui, QtWidgets, uic, Qt
+    from PyQt5 import QtCore, QtGui, QtWidgets, uic
+    from PyQt5.QtCore import Qt
+
+    FocusOut = QtCore.QEvent.FocusOut
+    Qt.ItemDataRole = object()
+
+    Qt.Checked = QtCore.Qt.Checked
+    Qt.Unchecked = QtCore.Qt.Unchecked
+    Qt.PartiallyChecked = QtCore.Qt.PartiallyChecked
+
     QT_VERSION = 5
 
 QApplication = QtWidgets.QApplication

@@ -1,7 +1,7 @@
 from MJOLNIRGui._tools import loadUI, dialog
 
 import numpy as np
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, Qt, QT_VERSION
 from MJOLNIR.Data import DataFile
 
 
@@ -45,11 +45,18 @@ class ElectronicLogBookManager(ElectronicLogBookManagerBase, ElectronicLogBookMa
             tickBox = customCheckBox(name=par,manager=self)
             tickBox.setObjectName(par+'_checkBox')
 
-            if not par in self.guiWindow.logbookPreset:
-                checked = False
+            if par not in self.guiWindow.logbookPreset:
+                if QT_VERSION == 5:
+                    checked = False
+                else:
+                    checked = Qt.Unchecked
             else:
-                checked = 2
+                if QT_VERSION == 5:
+                    checked = 2
+                else:
+                    checked = Qt.Checked
             tickBox.setCheckState(checked)
+            
             setattr(self,par+'_checkBox',tickBox)
             horizontal.addWidget(label)
             horizontal.addWidget(tickBox)

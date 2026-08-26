@@ -1,7 +1,7 @@
-
+import sys
 from MJOLNIRGui.MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     
-from MJOLNIRGui._qt import QtWidgets, QtGui, QtCore
+from MJOLNIRGui._qt import QtWidgets, QtGui, QtCore, QT_VERSION
 import datetime
 from functools import cached_property
 
@@ -40,7 +40,10 @@ class AppContext():
 
         if len(sys.argv)==2:
             self.main_window.loadGui(presetFileLocation=sys.argv[1])
-        return self.app.exec_()
+        if QT_VERSION==5:
+            return self.app.exec_()
+        else:
+            return self.app.exec()
 
     @cached_property
     def main_window(self):

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore
+from MJOLNIRGui._qt import QtCore
 from MJOLNIR.Data import DataSet,DataFile,Mask
 from MJOLNIR import _tools
 import copy

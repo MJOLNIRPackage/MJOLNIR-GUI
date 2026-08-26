@@ -1,10 +1,8 @@
 import pickle as pickle
 import os,traceback
 import functools
-from PyQt5 import QtCore,QtWidgets
-
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QCheckBox, QLabel,QApplication
-from PyQt5 import uic
+from MJOLNIRGui._qt import QtCore,QtWidgets,QApplication
+from MJOLNIRGui._qt import uic
 import platform
 from os import path
 

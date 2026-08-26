@@ -1,6 +1,6 @@
 from MJOLNIRGui._tools import loadUI, FilterProxyModel, BlockInput
 
-from MJOLNIRGui._qt import QtGui,QtCore
+from MJOLNIRGui._qt import QtGui,QtCore, QT_VERSION
 import numpy as np
 import matplotlib.pyplot as plt
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
@@ -69,8 +69,19 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         if not hasattr(self.guiWindow,'braggPoints'):
             self.guiWindow.braggPoints = None
        
-        regExp = QtCore.QRegExp(r'(-?[0-9]*\.[0-9]+|-?[0-9]+)(,(-?[0-9]*\.[0-9]+|-?[0-9]+))*')
-        self.a4Validator.setRegExp(regExp)
+        if QT_VERSION == 5:
+            self.a4Validator = QtGui.QRegExpValidator()
+            regExp = QtCore.QRegExp(
+                r'(-?[0-9]*\.[0-9]+|-?[0-9]+)(,(-?[0-9]*\.[0-9]+|-?[0-9]+))*'
+            )
+            self.a4Validator.setRegExp(regExp)
+
+        else:
+            self.a4Validator = QtGui.QRegularExpressionValidator()
+            regExp = QtCore.QRegularExpression(
+                r'(-?[0-9]*\.[0-9]+|-?[0-9]+)(,(-?[0-9]*\.[0-9]+|-?[0-9]+))*'
+            )
+            self.a4Validator.setRegularExpression(regExp)
 
 
         self.initPredictionToolManager()

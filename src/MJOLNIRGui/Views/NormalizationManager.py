@@ -1,7 +1,7 @@
 from MJOLNIRGui._tools import loadUI
 import MJOLNIRGui._tools as _GUItools
 
-from MJOLNIRGui._qt import QtGui,QtCore
+from MJOLNIRGui._qt import QtGui,QtCore, FocusOut
 import numpy as np
 from MJOLNIR._tools import calculateMolarMass
 import pyperclip
@@ -111,7 +111,7 @@ class NormalizationManager(NormalizationManagerBase, NormalizationManagerForm):
 
 
 
-        lostFocus = QtGui.QFocusEvent(QtGui.QEnterEvent.FocusOut) # Event used for return pressed functionality
+        lostFocus = QtGui.QFocusEvent(FocusOut) # Event used for return pressed functionality
         ## Shorten naming
         sampleFormLE = self.NormalizationManager_sampleFormula_lineEdit
         sampleMassSB = self.NormalizationManager_sampleMolarMass_spinBox
