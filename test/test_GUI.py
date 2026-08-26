@@ -1,6 +1,12 @@
 from pathlib import Path
 import pytest
-from MJOLNIRGui._qt import uic
+from MJOLNIRGui._qt import uic, QApplication
+
+
+@pytest.fixture(scope="session")
+def qapp():
+    return QApplication.instance() or QApplication([])
+
 
 @pytest.mark.gui
 def test_import():
@@ -19,3 +25,16 @@ def test_ui_files_load():
         base, form = uic.loadUiType(str(ui_file))
         assert base is not None
         assert form is not None
+
+
+@pytest.mark.gui
+@pytest.mark.qt5
+def test_main_window(qapp):
+    from MJOLNIRGui.main import AppContext
+
+    context = AppContext()
+    window = context.main_window
+
+    assert window is not None
+    context.timer.stop()
+    window.deleteLater()
