@@ -225,7 +225,7 @@ def Cut1D_Generate1D_button_function(self):
         return False
     try:
         if cutQ:
-            pdData,bins = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,Emin=EMin,Emax=EMax,rlu=rlu,constantBins=True,ufit=False)
+            pdData,bins = ds.cut1D(q1=q1,q2=q2,width=width,minPixel=minPixel,EMin=EMin,EMax=EMax,rlu=rlu,constantBins=True,ufit=False)
             parameters = {'q1':q1,'q2':q2,'EMin':EMin,'EMax':EMax,'rlu':rlu,'width':width,'constantBins':True,'minPixel':minPixel,'method':'cut1D','dataset':ds}
             
             # add parameters to correct edits, loop through q. If rlu sizes matches otherwise len(q) = 2 and padding with 0.0
