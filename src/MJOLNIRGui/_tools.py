@@ -97,33 +97,8 @@ def CenterWidgets(widget, host = None):
     
 
 def loadUI(fileName):
-    # print(platform.system().lower(),fileName)
-    if platform.system().lower() == 'darwin':
-        folder = path.abspath(path.join(path.dirname(__file__),'..','Resources','Views'))
-    else: 
-        folder = path.join(path.dirname(__file__),'..','..','resources','base','Views')
-
-
-    try:
-    # needed before freezing app
-        base,form = uic.loadUiType(path.join(path.dirname(__file__),fileName))
-    
-    except FileNotFoundError:
-        try:
-            # needed when running app local through fbs
-            base,form = uic.loadUiType(path.abspath(path.join(folder,fileName)))
-            
-        except FileNotFoundError:
-            # needed when running app after pip install
-            
-            # except FileNotFoundError:
-            #     base,form = uic.loadUiType(path.join(folder,fileName))
-            try:
-                base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'..','resources','base','Views',fileName)))
-                
-            except FileNotFoundError:
-                base,form = uic.loadUiType(path.abspath(path.join(path.dirname(__file__),'Views',fileName)))
-    return base,form
+    filename = os.path.abspath(os.path.join(os.path.dirname(__file__), "Views", fileName))
+    return uic.loadUiType(filename)
         
 
 class log(list):

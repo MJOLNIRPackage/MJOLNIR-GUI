@@ -9,15 +9,15 @@ except ImportError:
     
 from PyQt5 import QtWidgets, QtGui, QtCore
 import datetime
+from functools import cached_property
 
+from pathlib import Path
 
-from fbs_runtime.application_context.PyQt5 import ApplicationContext, \
-    cached_property
-    
+RESOURCE_DIR = Path(__file__).parent / "resources"
 
-class AppContext(ApplicationContext):
+class AppContext():
     def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+        self.app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
         self.splash = QtWidgets.QSplashScreen(QtGui.QPixmap(self.get_resource('splash.png')))                                    
         
         self.splash.show()
@@ -55,6 +55,8 @@ class AppContext(ApplicationContext):
         self.timer.stop()
         return res # Pass context to the window.
 
+    def get_resource(self, resource_name):
+        return str(RESOURCE_DIR / resource_name)
 
 def main():
     appctxt = AppContext()
