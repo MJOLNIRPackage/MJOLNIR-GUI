@@ -1,24 +1,13 @@
-import sys,copy
-sys.path.append('..')
+from MJOLNIRGui.DataModels import MaskModel
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments, loadUI, FilterProxyModel
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI, FilterProxyModel
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.DataModels import MaskModel
-    from MJOLNIRGui.src.main.python.Views import BraggListManager
-    #from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiMask
-    
-except ImportError:
-    from DataModels import MaskModel
-    #from MJOLNIR_Data import GuiMask
-    from _tools import ProgressBarDecoratorArguments, loadUI, FilterProxyModel
-    import _tools as _GUItools
-    from Views import BraggListManager
+from MJOLNIRGui.Views import BraggListManager
 from MJOLNIR.Data import Mask
-from PyQt5 import QtWidgets, uic, QtCore, QtGui
+
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
 import numpy as np
 import os,warnings
-import inspect
+
 
 
 

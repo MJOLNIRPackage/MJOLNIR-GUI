@@ -1,13 +1,7 @@
-import sys,os
-sys.path.append('..')
+from MJOLNIRGui._tools import loadUI, dialog
 
-try:
-    from MJOLNIRGui.src.main.python._tools import loadUI, dialog
-except ImportError:
-    from _tools import loadUI, dialog
-from os import path
 import numpy as np
-from PyQt5 import QtWidgets, uic, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
 from MJOLNIR.Data import DataFile
 
 

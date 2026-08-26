@@ -1,16 +1,8 @@
-import sys
-sys.path.append('..')
+from MJOLNIRGui.DataModels import ScanListModel
+from MJOLNIRGui._tools import loadUI
 
-try:
-#    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.DataModels import ScanListModel,Scan
-    from MJOLNIRGui.src.main.python._tools import loadUI
-except ImportError:
-    from DataModels import ScanListModel
-    from _tools import loadUI
-#    import _tools as _GUItools
-from os import path
-from PyQt5 import QtWidgets, uic, QtCore, QtGui
+
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
 import numpy as np
 from datetime import datetime
 

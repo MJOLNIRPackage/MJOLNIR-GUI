@@ -1,18 +1,9 @@
-import sys
 
-from matplotlib.pyplot import polar
-sys.path.append('..')
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
+import MJOLNIRGui._tools as _GUItools
+from MJOLNIRGui.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments,loadUI
-    import _tools as _GUItools
-    from DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
-from os import path
-from PyQt5 import QtWidgets, uic
+from MJOLNIRGui._qt import QtWidgets
 import numpy as np
 from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectanglePerpendicular,extractCut1DPropertiesRectangleHorizontal, extractCut1DPropertiesRectangleVertical
 

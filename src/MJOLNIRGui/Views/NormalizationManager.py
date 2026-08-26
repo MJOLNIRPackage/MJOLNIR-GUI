@@ -1,14 +1,7 @@
-import sys
-sys.path.append('..')
+from MJOLNIRGui._tools import loadUI
+import MJOLNIRGui._tools as _GUItools
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments, loadUI
-    import _tools as _GUItools
-from os import path
-from PyQt5 import QtWidgets,uic,QtGui,QtCore
+from MJOLNIRGui._qt import QtGui,QtCore
 import numpy as np
 from MJOLNIR._tools import calculateMolarMass
 import pyperclip
@@ -22,25 +15,6 @@ def sampleFormRadioButtonChange(self,state,formLE,massSB): # Function for radio 
     if state: 
         checkValidSampleNormalization(formLE,None,massSB)
 
-
-# def updateToDataSet(self,formName,event):
-#     ds = self.guiWindow.DataSetModel.getCurrentDataSet()
-#     attribute = getattr(self.guiWindow.ui,'NormalizationManager_'+formName)
-#     if not ds is None: # Only when there is a data set
-#         if formName.find('_lineEdit')>0:
-#             value=attribute.text().strip()
-#             if value == '': # Use standard text instead
-#                 value = attribute.placeholderText().strip()
-#             print(value)
-#         elif formName.find('_spinBox')>0:
-#             value=attribute.value()
-#         elif formName.find('_checkBox')>0:
-#             value=attribute.isChecked()
-#         else:
-#             value = None
-#     ds.currentNormalizationSettings[formName] = value
-    
-#     attribute.focusOutEvent_old(event)
 
 def checkValidSampleNormalization(self,event,massSB):
     string = self.text()

@@ -1,16 +1,6 @@
-import sys,os
+from MJOLNIRGui._tools import loadUI, FilterProxyModel, BlockInput
 
-from MJOLNIR import TasUBlibDEG
-sys.path.append('..')
-
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments,loadUI, FilterProxyModel, BlockInput
-    import _tools as _GUItools
-from os import path
-from PyQt5 import QtWidgets,uic,QtGui,QtCore
+from MJOLNIRGui._qt import QtGui,QtCore
 import numpy as np
 import matplotlib.pyplot as plt
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
@@ -22,7 +12,6 @@ except ImportError:
      timeEstimate = None
 from MJOLNIR.Data import Sample
 import MJOLNIR 
-import pyperclip
 
 # Handles all functionality related to the PredictionToolManager. 
 

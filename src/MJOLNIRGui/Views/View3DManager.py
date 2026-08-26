@@ -1,25 +1,18 @@
-import sys
-sys.path.append('..')
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
-    from MJOLNIRGui.src.main.python.Views import BraggListManager
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import Gui1DCutObject
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments,loadUI
-    from Views import BraggListManager
-    import _tools as _GUItools
-    from DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
-    from MJOLNIR_Data import Gui1DCutObject
-from os import path
-from PyQt5 import QtWidgets,uic
+
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
+from MJOLNIRGui.Views import BraggListManager
+import MJOLNIRGui._tools as _GUItools
+from MJOLNIRGui.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
+from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
+
+
+from MJOLNIRGui._qt import QtWidgets
 import numpy as np
+
 from MJOLNIR.Data import Viewer3D
 from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle,\
     extractCut1DPropertiesRectanglePerpendicular,extractCut1DPropertiesRectangleHorizontal, extractCut1DPropertiesRectangleVertical
-import matplotlib.pyplot as plt
 
 
 matplotlibExtensions = ['png', 'pdf', 'ps', 'eps', 'svg']

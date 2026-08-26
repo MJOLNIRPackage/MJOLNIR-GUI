@@ -1,13 +1,7 @@
-import sys
-#sys.path.append('..')
-
 from MJOLNIR._tools import EnergyK,WavelengthK,WavelengthEnergy,EnergyWavelength,KEnergy,KWavelength
-try:
-    from _tools import loadUI
-except (ModuleNotFoundError, ImportError):
-    from MJOLNIRGui.src.main.python._tools import loadUI
 
-from PyQt5 import QtGui
+from MJOLNIRGui._tools import loadUI
+from MJOLNIRGui._qt import QtGui
 
 # Handles all functionality related to the CalculatorGeneralManager. 
 

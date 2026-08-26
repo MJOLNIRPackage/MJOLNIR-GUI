@@ -1,18 +1,11 @@
-import sys
-#sys.path.append('..')
-
-from os import path
 import numpy as np
 
-from PyQt5 import uic
-import platform
+
 from MJOLNIR._tools import WavelengthK
 from MJOLNIR.TasUBlibDEG import calcCell,calculateBMatrix,calTwoTheta
 
-try:
-    from _tools import loadUI
-except (ModuleNotFoundError, ImportError):
-    from MJOLNIRGui.src.main.python._tools import loadUI
+
+from MJOLNIRGui._tools import loadUI
 
 # Handles all functionality related to the CalculatorAdvancedManager. 
 

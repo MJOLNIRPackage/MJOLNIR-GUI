@@ -1,14 +1,7 @@
-import sys
-sys.path.append('..')
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments, loadUI
-    import _tools as _GUItools
-from os import path
-from PyQt5 import QtWidgets,uic,QtGui,QtCore
+from MJOLNIRGui._tools import loadUI
+
+from MJOLNIRGui._qt import QtGui,QtCore
 import numpy as np
 from MJOLNIR._tools import calculateMolarMass,symbols,_relative_atomic_masses
 

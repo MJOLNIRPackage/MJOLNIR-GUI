@@ -1,24 +1,11 @@
-import sys
-sys.path.append('..')
-sys.path.append('.')
+from MJOLNIRGui.Views.CalculatorGeneralManager import CalculatorGeneralManager
+from MJOLNIRGui.Views.CalculatorSimpleManager import CalculatorSimpleManager
+from MJOLNIRGui.Views.CalculatorAdvancedManager import CalculatorAdvancedManager
 
-try:
-    from Views.CalculatorGeneralManager import CalculatorGeneralManager
-    from Views.CalculatorSimpleManager import CalculatorSimpleManager
-    from Views.CalculatorAdvancedManager import CalculatorAdvancedManager
-    from Views.collapsibleBox import CollapsibleBox
-    from _tools import loadUI
-except ModuleNotFoundError:
-    from MJOLNIRGui.src.main.python.Views.CalculatorGeneralManager import CalculatorGeneralManager
-    from MJOLNIRGui.src.main.python.Views.CalculatorSimpleManager import CalculatorSimpleManager
-    from MJOLNIRGui.src.main.python.Views.CalculatorAdvancedManager import CalculatorAdvancedManager   
-    from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
-    from MJOLNIRGui.src.main.python._tools import loadUI
+from MJOLNIRGui._tools import loadUI
 
 
-from os import path
-
-from PyQt5 import QtWidgets,QtGui,QtCore
+from MJOLNIRGui._qt import QtWidgets,QtGui
 
 
 

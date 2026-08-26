@@ -1,15 +1,9 @@
-import sys
-sys.path.append('..')
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments, loadUI
-    from MJOLNIRGui.src.main.python.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
-except ImportError:
-    from _tools import ProgressBarDecoratorArguments, loadUI
-    from DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
 
-from os import path
-from PyQt5 import QtWidgets, uic
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments, loadUI
+from MJOLNIRGui.DataModels import MatplotlibFigureList,MatplotlibFigureListDelegate
+
+from MJOLNIRGui._qt import QtWidgets
 import numpy as np
 
 from MJOLNIR.Data.DraggableShapes import extractCut1DPropertiesRectangle, extractCut1DPropertiesCircle

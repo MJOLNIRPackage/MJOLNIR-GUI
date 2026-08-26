@@ -1,22 +1,12 @@
-from re import sub
-import sys
-sys.path.append('..')
 
-try:
-    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
-    from MJOLNIRGui.src.main.python.HelpDialog import HelpDialog
-except ImportError:
-    from DataModels import DataSetModel,SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments,loadUI
-    from HelpDialog import HelpDialog
+from MJOLNIRGui.DataModels import SelectionModel,DataFileModel,DataFileInfoModel,subtractionSettings
+from MJOLNIRGui.MJOLNIR_Data import GuiDataSet
+from MJOLNIRGui._tools import loadUI
 
 
-from os import path
-from PyQt5 import QtWidgets,uic, QtCore, QtGui
-from PyQt5.QtCore import Qt
+
+from MJOLNIRGui._qt import QtWidgets,QtGui,QtCore, Qt
+
 import numpy as np
 def subtractable(file1,file2,A3Precision=0.1,twothetaPrecision=0.1,EiPrecision=0.1):
     checked = {}

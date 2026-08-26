@@ -2,17 +2,14 @@
 import numpy as np
 from os import path
 
-from PyQt5 import QtWidgets
+from MJOLNIRGui._qt import QtWidgets
 
-from MJOLNIR import _tools
+
 from MJOLNIR.Data import Mask
 import inspect
-try:
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments
-except ImportError:
-    import _tools as _GUItools
-    from _tools import ProgressBarDecoratorArguments
+
+import MJOLNIRGui._tools as _GUItools
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments
 
 
 # The general idea is to generate .py code that will load, convert and plot 

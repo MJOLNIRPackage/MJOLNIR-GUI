@@ -1,18 +1,10 @@
-import sys
-#sys.path.append('..')
 
-try:
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
-    import MJOLNIRGui.src.main.python._tools as _GUItools
-    from MJOLNIRGui.src.main.python.DataModels import Cut1DModel
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import Gui1DCutObject
-except ImportError:
-    from DataModels import Cut1DModel
-    from MJOLNIR_Data import Gui1DCutObject
-    from _tools import ProgressBarDecoratorArguments,loadUI
-    import _tools as _GUItools
+from MJOLNIRGui.DataModels import Cut1DModel
+from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
+import MJOLNIRGui._tools as _GUItools
 from os import path
-from PyQt5 import QtWidgets, uic, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
 import numpy as np
 import matplotlib.pyplot as plt
 

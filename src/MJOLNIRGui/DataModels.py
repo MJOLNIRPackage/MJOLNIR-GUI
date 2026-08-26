@@ -12,17 +12,11 @@ from MJOLNIR import _tools as M_tools
 from MJOLNIR.Geometry.Instrument import timeEstimate
 
 import matplotlib.pyplot as plt
-try:
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile
-except ImportError:
-    from  MJOLNIR_Data import GuiDataFile
+from MJOLNIRGui.MJOLNIR_Data import GuiDataFile
 
 from os import path
 from collections import namedtuple
-try:
-    import MJOLNIRGui.src.main.python._tools
-except ImportError:
-    import _tools
+
 
 from datetime import datetime, timedelta
 

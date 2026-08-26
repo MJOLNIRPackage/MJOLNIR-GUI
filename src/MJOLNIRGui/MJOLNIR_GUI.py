@@ -7,12 +7,10 @@ except:
 
 
 from MJOLNIR import _tools # Useful tools useful across MJOLNIR
-try:
-    import _tools as _guitools
-    from Views import BraggListManager
-except ImportError:
-    import MJOLNIRGui.src.main.python._tools as _guitools
-    from MJOLNIRGui.src.main.python.Views import BraggListManager
+
+import MJOLNIRGui._tools as _guitools
+from MJOLNIRGui.Views import BraggListManager
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -21,65 +19,35 @@ from time import sleep
 
 from os import path
 import os
-version = '1.0.7'
+
+
 plt.ion()
-from PyQt5 import QtWidgets, QtCore, QtGui, Qt
-try:
-    #from MJOLNIR_GUI_ui import Ui_MainWindow  
-    
-    from Views.main import Ui_MainWindow
-    from Views.DataSetManager import DataSetManager
-    from Views.View3DManager import View3DManager
-    from Views.QELineManager import QELineManager
-    from Views.QPlaneManager import QPlaneManager
-    from Views.Cut1DManager import Cut1DManager
-    from Views.MaskManager import MaskManager
-    from Views.Raw1DManager import Raw1DManager
-    from Views.NormalizationManager import NormalizationManager
-    from Views.MolecularCalculationManager import MolecularCalculationManager
-    from Views.PredictionToolManager import PredictionToolManager
-    from Views.TimeEstimateManager import ScanListManager
-    from Views.CalculatorManager import CalculatorManager
-    from Views.SubtractionManager import SubtractionManager
-    from Views.collapsibleBox import CollapsibleBox
-    from Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from DataModels import DataSetModel,DataFileModel
-    from StateMachine import StateMachine
-    from GuiStates import empty,partial,raw,converted
-    from AboutDialog import AboutDialog
-    from HelpDialog import HelpDialog
-    from generateScripts import initGenerateScript,setupGenerateScript
-    from _tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
-    
-except ModuleNotFoundError:
-    sys.path.append('.')
-    
-    #from .MJOLNIR_GUI_ui import Ui_MainWindow  
-    from MJOLNIRGui.src.main.python.Views.main import Ui_MainWindow
-    from MJOLNIRGui.src.main.python.Views.DataSetManager import DataSetManager
-    from MJOLNIRGui.src.main.python.Views.View3DManager import View3DManager
-    from MJOLNIRGui.src.main.python.Views.QELineManager import QELineManager
-    from MJOLNIRGui.src.main.python.Views.QPlaneManager import QPlaneManager
-    from MJOLNIRGui.src.main.python.Views.Cut1DManager import Cut1DManager
-    from MJOLNIRGui.src.main.python.Views.MaskManager import MaskManager
-    from MJOLNIRGui.src.main.python.Views.Raw1DManager import Raw1DManager
-    from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
-    from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
-    from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
-    from MJOLNIRGui.src.main.python.Views.TimeEstimateManager import ScanListManager
-    from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
-    from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
-    from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
-    from MJOLNIRGui.src.main.python.Views.ElectronicLogBookManager import ElectronicLogBookManager
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python.DataModels import DataSetModel,DataFileModel
-    from MJOLNIRGui.src.main.python.StateMachine import StateMachine
-    from MJOLNIRGui.src.main.python.GuiStates import empty,partial,raw,converted
-    from MJOLNIRGui.src.main.python.AboutDialog import AboutDialog
-    from MJOLNIRGui.src.main.python.HelpDialog import HelpDialog
-    from MJOLNIRGui.src.main.python.generateScripts import initGenerateScript,setupGenerateScript
-    from MJOLNIRGui.src.main.python._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, Qt
+
+from MJOLNIRGui.Views.main import Ui_MainWindow
+from MJOLNIRGui.Views.DataSetManager import DataSetManager
+from MJOLNIRGui.Views.View3DManager import View3DManager
+from MJOLNIRGui.Views.QELineManager import QELineManager
+from MJOLNIRGui.Views.QPlaneManager import QPlaneManager
+from MJOLNIRGui.Views.Cut1DManager import Cut1DManager
+from MJOLNIRGui.Views.MaskManager import MaskManager
+from MJOLNIRGui.Views.Raw1DManager import Raw1DManager
+from MJOLNIRGui.Views.NormalizationManager import NormalizationManager
+from MJOLNIRGui.Views.MolecularCalculationManager import MolecularCalculationManager
+from MJOLNIRGui.Views.PredictionToolManager import PredictionToolManager
+from MJOLNIRGui.Views.TimeEstimateManager import ScanListManager
+from MJOLNIRGui.Views.CalculatorManager import CalculatorManager
+from MJOLNIRGui.Views.SubtractionManager import SubtractionManager
+from MJOLNIRGui.Views.collapsibleBox import CollapsibleBox
+from MJOLNIRGui.Views.ElectronicLogBookManager import ElectronicLogBookManager
+from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
+from MJOLNIRGui.DataModels import DataSetModel,DataFileModel
+from MJOLNIRGui.StateMachine import StateMachine
+from MJOLNIRGui.GuiStates import empty,partial,raw,converted
+from MJOLNIRGui.AboutDialog import AboutDialog
+from MJOLNIRGui.HelpDialog import HelpDialog
+from MJOLNIRGui.generateScripts import initGenerateScript,setupGenerateScript
+from MJOLNIRGui._tools import loadSetting,updateSetting,ProgressBarDecoratorArguments
 
 import sys
 

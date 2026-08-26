@@ -1,15 +1,7 @@
-import sys
-sys.path.append('..')
+from MJOLNIRGui.MJOLNIR_Data import GuiDataSet
+from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
 
-try:
-    from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI
-except ImportError:
-    from MJOLNIR_Data import GuiDataFile,GuiDataSet
-    from _tools import ProgressBarDecoratorArguments,loadUI
 
-from os import path
-from PyQt5 import QtWidgets,uic
 import numpy as np
 from MJOLNIR.Data import DataFile
 
