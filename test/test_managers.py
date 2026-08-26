@@ -29,6 +29,14 @@ from MJOLNIRGui.Views.QPlaneManager import QPlaneManager
 from MJOLNIRGui.Views.Raw1DManager import Raw1DManager
 from MJOLNIRGui.Views.View3DManager import View3DManager
 from MJOLNIRGui.Views.TimeEstimateManager import ScanListManager
+from MJOLNIRGui.Views.CalculatorManager import CalculatorManager
+from MJOLNIRGui.Views.CalculatorGeneralManager import CalculatorGeneralManager
+from MJOLNIRGui.Views.ElectronicLogBookManager import ElectronicLogBookManager
+from MJOLNIRGui.Views.MolecularCalculationManager import MolecularCalculationManager
+from MJOLNIRGui.Views.NormalizationManager import NormalizationManager
+from MJOLNIRGui.Views.PredictionToolManager import PredictionToolManager
+from MJOLNIRGui.Views.SubtractionManager import SubtractionManager
+from MJOLNIRGui.Views.MaskManager import MaskManager
 
 
 
@@ -40,7 +48,7 @@ from MJOLNIRGui.Views.TimeEstimateManager import ScanListManager
     CalculatorSimpleManager,
     ScanListManager,
 ])
-def test_manager_construction(qapp, manager):
+def test_manager_construction_simple(qapp, manager):
     widget = manager()
     assert widget is not None
     widget.deleteLater()
@@ -62,4 +70,34 @@ def test_manager_construction(qapp, manager, gui_window):
 
     assert _manager is not None
     _manager.deleteLater()
-    
+
+
+@pytest.mark.gui
+@pytest.mark.qt5
+@pytest.mark.parametrize("manager", [
+    CalculatorManager,
+    CalculatorGeneralManager,
+    ElectronicLogBookManager,
+    MolecularCalculationManager,
+    NormalizationManager,
+    PredictionToolManager,
+    SubtractionManager,
+])
+def test_manager_construction_dependent(gui_window, manager):
+    context, window = gui_window
+
+    widget = manager(guiWindow=window)
+
+    assert widget is not None
+    widget.deleteLater()
+
+@pytest.mark.gui
+@pytest.mark.qt5
+def test_mask_manager(gui_window):
+    context, window = gui_window
+
+    manager = MaskManager(parent=window)
+
+    assert manager is not None
+
+    manager.deleteLater()
