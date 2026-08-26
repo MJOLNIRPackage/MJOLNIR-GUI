@@ -1,13 +1,7 @@
-#from fbs_runtime.application_context.PyQt5 import ApplicationContext
-import sys
-try:
-    from MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
-except ImportError:
-    import os
-    os.chdir(os.path.dirname(__file__))
-    from MJOLNIRGui.src.main.python.MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
+
+from MJOLNIRGui.MJOLNIR_GUI import MJOLNIRMainWindow,updateSplash
     
-from PyQt5 import QtWidgets, QtGui, QtCore
+from MJOLNIRGui._qt import QtWidgets, QtGui, QtCore
 import datetime
 from functools import cached_property
 
