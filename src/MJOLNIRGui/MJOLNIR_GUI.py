@@ -55,7 +55,7 @@ import sys
 from pathlib import Path
 home = str(Path.home())
 
-
+version = "1.1.0"
 ####
 
 # Naming convention: WhereInGui_description_type
