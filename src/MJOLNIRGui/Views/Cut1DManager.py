@@ -4,7 +4,7 @@ from MJOLNIRGui.MJOLNIR_Data import Gui1DCutObject
 from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
 import MJOLNIRGui._tools as _GUItools
 from os import path
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, QT_VERSION
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -69,7 +69,11 @@ def setupCut1D(self):
                     plotTogether.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/plotMany.png')))
                     menu.addAction(plotTogether)
                 menu.addAction(delete)
-                return menu.exec_(position)
+                if QT_VERSION == 5:
+                    result = menu.exec_(position)
+                else:
+                    result = menu.exec(position)
+                return result
 
     self.ui.Cut1D_listView.contextMenuEvent = lambda event: contextMenu(self.ui.Cut1D_listView,event,self)
 

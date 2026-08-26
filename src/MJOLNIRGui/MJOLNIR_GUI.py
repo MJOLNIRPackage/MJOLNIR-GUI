@@ -22,7 +22,7 @@ import os
 
 
 plt.ion()
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, Qt
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, Qt, QT_VERSION
 
 from MJOLNIRGui.Views.main import Ui_MainWindow
 from MJOLNIRGui.Views.DataSetManager import DataSetManager
@@ -434,15 +434,27 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
 
     def about(self):
         dialog = AboutDialog(self.AppContext.get_resource('About.txt'),version=self.version,icon=QtGui.QIcon(self.AppContext.get_resource('Icons/Own/information-button.png')))
-        dialog.exec_()
+        if QT_VERSION == 5:
+            dialog.exec_()
+        else:
+            dialog.exec()
+                
 
     def help(self):
         dialog = HelpDialog(self.AppContext.get_resource('Help.txt'),guiWindow = self)
-        dialog.exec_()
+        if QT_VERSION == 5:
+            dialog.exec_()
+        else:
+            dialog.exec()
+                
 
     def subtractionHelp(self):
         dialog = HelpDialog(self.AppContext.get_resource('SubtractionHelp.txt'),guiWindow = self)
-        dialog.exec_()
+        if QT_VERSION == 5:
+            dialog.exec_()
+        else:
+            dialog.exec()
+                
 
 
     def setupStateMachine(self):
@@ -898,8 +910,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         dialog.resize(dialog.sizeHint())
         
         
-        
-        if dialog.exec_(): # Execute the dialog
+        if QT_VERSION == 5:
+            result = dialog.exec_()
+        else:
+            result = dialog.exec()
+        if result: # Execute the dialog
             self.DataFileInfoModel.infos = dialog.dMFIASettings # update settings
             self.DataFileInfoModel.layoutChanged.emit()
         else:
@@ -1020,10 +1035,8 @@ def updateSplash(splash,originalTime,updateInterval,padding='\n'*7+20*' '):
     QtWidgets.QApplication.processEvents()
 
 def main():
-    try:
-        import AppContextEmulator
-    except ImportError:
-        from MJOLNIRGui.src.main.python import AppContextEmulator
+    
+    from MJOLNIRGui import AppContextEmulator
         
 
     app = QtWidgets.QApplication(sys.argv) # Passing command line arguments to app
@@ -1054,7 +1067,11 @@ def main():
     if len(sys.argv)==2:
         window.loadGui(presetFileLocation=sys.argv[1])
 
-    app.exec_() 
+    if QT_VERSION == 5:
+        app.exec_()
+    else:
+        app.exec()
+    
 
 if __name__ == '__main__':
     main()

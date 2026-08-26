@@ -4,7 +4,7 @@ from MJOLNIRGui._tools import ProgressBarDecoratorArguments, loadUI, FilterProxy
 from MJOLNIRGui.Views import BraggListManager
 from MJOLNIR.Data import Mask
 
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, QT_VERSION
 import numpy as np
 import os,warnings
 
@@ -940,8 +940,10 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
                     delete.setIcon(QtGui.QIcon(self.parent.AppContext.get_resource('Icons/Own/cross-button.png')))
                     menu.addAction(delete)
 
-
-                    return menu.exec_(position)
+                    if QT_VERSION == 5:
+                        return menu.exec_(position)
+                    else:
+                        return menu.exec(position)
 
         self.maskingMainWindow.MaskModel.Mask_listView.contextMenuEvent = lambda event: contextMenu(self.maskingMainWindow.MaskModel.Mask_listView,event,self)
 
@@ -1088,7 +1090,11 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         overlap = list(set.intersection(set(currentNames),set(newNames)))
         if len(overlap)>0:
             dialog = OverlapDialog(names=overlap)
-            result = dialog.exec_()
+            if QT_VERSION == 5:
+                result = dialog.exec_()
+            else:
+                result = dialog.exec()
+
             if result:
                 ### Delete all masks with names in 
                 names = list([m.name for m in self.maskingMainWindow.MaskModel.masks])
@@ -1139,7 +1145,10 @@ class MaskManager(MaskManagerBase, MaskManagerForm):
         overlap = list(set.intersection(set(currentNames),set(newNames)))
         if len(overlap)>0:
             dialog = OverlapDialog(names=overlap)
-            result = dialog.exec_()
+            if QT_VERSION == 5:
+                result = dialog.exec_()
+            else:
+                result = dialog.exec()
             if result:
                 ### Delete all masks with names in 
                 names = list([m.name for m in self.maskingMainWindow.MaskModel.masks])

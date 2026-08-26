@@ -3,7 +3,7 @@ from MJOLNIRGui.DataModels import DataSetModel,SelectionModel,DataFileModel,Data
 from MJOLNIRGui.MJOLNIR_Data import GuiDataFile,GuiDataSet
 from MJOLNIRGui._tools import ProgressBarDecoratorArguments,loadUI
 
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui,QApplication
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui,QApplication, QT_VERSION
 
 from MJOLNIR.Data import DataFile
 import numpy as np
@@ -101,7 +101,11 @@ def setupDataSet(self): # Set up main features for Gui regarding the dataset wid
                         removeMasking.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/mask-cross.png')))
                         menu.addAction(removeMasking)
 
-                return menu.exec_(position)
+                if QT_VERSION == 5:
+                    result = menu.exec_(position)
+                else:
+                    result = menu.exec(position)
+                return result
 
     self.ui.DataSet_DataSets_listView.contextMenuEvent = lambda event: contextMenu(self.ui.DataSet_DataSets_listView,event,self)
 
@@ -143,7 +147,11 @@ def setupDataFile(self): # Set up main features for Gui regarding the datafile w
                 delete.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/cross-button.png')))
 
                 menu.addAction(delete)
-                return menu.exec_(position)
+                if QT_VERSION == 5:
+                    result = menu.exec_(position)
+                else:
+                    result = menu.exec(position)
+                return result
 
     def dragEnterEvent(self, gui, event):
         gui.stateMachine.requireStateByName('Partial')
@@ -304,8 +312,11 @@ def convert(self):
         
         dialog.setInformativeText(str(e))
         dialog.addButton(QtWidgets.QMessageBox.Ok)
+        if QT_VERSION == 5:
+            _result = dialog.exec_()
+        else:
+            _result = dialog.exec()
         
-        dialog.exec_()
     
     self.DataSetModel.layoutChanged.emit()
     self.DataFileModel.layoutChanged.emit()
@@ -411,7 +422,11 @@ def setupDataFileInfoModel(self):
             menu.addAction(copyCB)
             menu.addAction(copyLog)
             menu.addAction(removeInfo)
-            return menu.exec_(position)
+            if QT_VERSION == 5:
+                result = menu.exec_(position)
+            else:
+                result = menu.exec(position)
+            return result
     self.ui.DataSet_fileAttributs_listView.contextMenuEvent = lambda event: contextMenuDataFilesInfo(self.ui.DataSet_fileAttributs_listView,event,self)
 
 

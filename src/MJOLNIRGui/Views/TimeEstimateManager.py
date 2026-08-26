@@ -2,7 +2,7 @@ from MJOLNIRGui.DataModels import ScanListModel
 from MJOLNIRGui._tools import loadUI
 
 
-from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui
+from MJOLNIRGui._qt import QtWidgets, QtCore, QtGui, QT_VERSION
 import numpy as np
 from datetime import datetime
 
@@ -81,7 +81,11 @@ class ScanListManager(ScanListManagerBase, ScanListManagerForm):
                     delete.triggered.connect(lambda: deleteFunction(self,idx))
                     delete.setIcon(QtGui.QIcon(self.guiWindow.AppContext.get_resource('Icons/Own/cross-button.png')))
                     menu.addAction(delete)
-            return menu.exec_(position)
+                    if QT_VERSION == 5:
+                        result = menu.exec_(position)
+                    else:
+                        result = menu.exec(position)
+            return result
         self.ScanList_listView.contextMenuEvent = lambda event: contextMenu(self.ScanList_listView,event,self)
         
     def closeEvent(self, event): # Function called on close event for the window

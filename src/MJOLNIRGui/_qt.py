@@ -57,6 +57,19 @@ try:
         QtWidgets.QAbstractItemView.DragDropMode.InternalMove
     )
 
+
+    QtWidgets.QDialogButtonBox.Ok = (
+        QtWidgets.QDialogButtonBox.StandardButton.Ok
+    )
+
+    QtWidgets.QDialogButtonBox.Cancel = (
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+
+    Qt.WindowContextHelpButtonHint = (
+        Qt.WindowType.WindowContextHelpButtonHint
+    )
+    
     QtWidgets.QShortcut = QtGui.QShortcut
     QtGui.QRegExpValidator = QtGui.QRegularExpressionValidator
 
@@ -66,6 +79,9 @@ try:
     Qt.PartiallyChecked = Qt.CheckState.PartiallyChecked
     Qt.Checked = Qt.CheckState.Checked
 
+    QtWidgets.QFrame.NoFrame = QtWidgets.QFrame.Shape.NoFrame
+
+    QtCore.QEvent.ContextMenu = QtCore.QEvent.Type.ContextMenu
 
     QT_VERSION = 6
 except ImportError:

@@ -44,7 +44,7 @@ class HelpDialog(QtWidgets.QDialog):
         self.layout = QtWidgets.QVBoxLayout()
         self.scroll_layout = QtWidgets.QScrollArea()
         self.scroll_layout.setLineWidth(0)
-        self.scroll_layout.setFrameShape(0)
+        self.scroll_layout.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.layout.addWidget(self.scroll_layout)
         
         self.scroll_layout.setWidget(self.help_label)
