@@ -134,3 +134,6 @@ MJOLNIRGui/*
 
 *.egg-info
 MJOLNIRGui-*
+# pixi environments
+.pixi/*
+!.pixi/config.toml
