@@ -1,10 +1,10 @@
 import sys
-sys.path.append('..')
+#sys.path.append('..')
 
 from MJOLNIR._tools import EnergyK,WavelengthK,WavelengthEnergy,EnergyWavelength,KEnergy,KWavelength
 try:
     from _tools import loadUI
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     from MJOLNIRGui.src.main.python._tools import loadUI
 
 from PyQt5 import QtGui

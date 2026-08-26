@@ -1,5 +1,5 @@
 import sys
-sys.path.append('..')
+#sys.path.append('..')
 
 from os import path
 
@@ -7,7 +7,7 @@ from os import path
 from MJOLNIR._tools import DSpacing,ScatteringAngle
 try:
     from _tools import loadUI
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     from MJOLNIRGui.src.main.python._tools import loadUI
 # Handles all functionality related to the CalculatorSimpleManager. 
 

@@ -9,6 +9,8 @@ import sys
 import warnings
 
 from MJOLNIR import _tools as M_tools
+from MJOLNIR.Geometry.Instrument import timeEstimate
+
 import matplotlib.pyplot as plt
 try:
     from MJOLNIRGui.src.main.python.MJOLNIR_Data import GuiDataFile
@@ -21,6 +23,8 @@ try:
     import MJOLNIRGui.src.main.python._tools
 except ImportError:
     import _tools
+
+from datetime import datetime, timedelta
 
 class DataSetModel(QtCore.QAbstractListModel):
 
@@ -483,6 +487,130 @@ class BraggListModel(QtCore.QAbstractListModel):
 
 
 
+class ScanListModel(QtCore.QAbstractListModel):
+    def __init__(self, *args, scanList=None, scanList_listView=None,startTime=None,current=None, **kwargs):
+        super(ScanListModel, self).__init__(*args, **kwargs)
+        if scanList is None:
+            scanList = []
+        self._data = scanList 
+        self.scanList_listView = scanList_listView
+        if startTime is None:
+            startTime = datetime.now()
+
+        self.startTime = startTime
+        if current is None:
+            current = 1.35
+        self.current = current
+        
+    def data(self, index, role):
+        if index.row()>=self.rowCount(): return 
+        if index.row()<0: return 
+        if index.column()>=1: return 
+        if index.column()<-1: return 
+
+        if role == Qt.DisplayRole or role == QtCore.Qt.EditRole:
+            offset = self.startTime + timedelta(seconds=np.sum([d.timeEstimate(current=self.current) for d in self._data[:index.row()]]))
+            text = self._data[index.row()].toText(current=self.current,offset=offset)
+            return text
+        
+    def timeChanged(self,date,time):
+        year,month,day = date.year(),date.month(),date.day()
+        hour,minute = time.hour(),time.minute()
+
+        self.startTime = datetime(year,month,day,hour,minute)
+        self.layoutChanged.emit()
+
+    def currentChanged(self,value):
+        self.current = value
+        self.layoutChanged.emit()
+
+    def getData(self,*args,**kwargs):
+        return self.data(*args,**kwargs)
+
+    def getAllData(self):
+        return self._data
+
+    def rowCount(self, index=None):
+        return len(self._data)
+
+    def columnCount(self, index=None):
+        return 0
+
+    def append(self,scan):
+        self._data.append(scan)
+        self.selectLastScan()
+        self.layoutChanged.emit()
+
+    def deleteAll(self):
+        indices = [self.index(i,0) for i in range(self.rowCount())]
+        self.delete(indices)
+
+    def delete(self,index):
+        indices = [ind.row() for ind in index] # Extract numeric index, sort decending
+        indices.sort(reverse=True)
+        for ind in indices:
+            try:
+                del self._data[ind]
+                self.layoutChanged.emit()
+            except:
+                pass
+
+        QtWidgets.QApplication.processEvents()
+        #index = self.getCurrentBraggIndex()
+       
+        #if index is None:
+        #    self.selectLastBragg()
+        #else:
+        #    if index.row()==self.rowCount(None):
+        #        self.selectLastBragg()
+
+    def item(self,index):
+        if not index is None:
+            return self._data[index.row()]
+
+    #def setData(self, index, value, role=QtCore.Qt.EditRole):
+    #    ds = self.item(index)
+    #    if role == QtCore.Qt.EditRole:
+    #        ds.name = value
+    #        self.dataChanged.emit(index, index)
+    #        return True
+    #       
+    #    return False
+
+    def flags(self,index):
+        return  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable
+
+    def getCurrentScanIndex(self):
+        indices = self.scanList_listView.selectedIndexes()
+        
+        if len(indices)==0:
+            return None
+        else:
+            index = indices[0]
+            if index.row()<self.rowCount(None):
+                return index
+            else:
+                return None
+
+    def getCurrentScanIndexRow(self):
+        currentIndex = self.getCurrentScanIndex()
+        if currentIndex is None:
+            return None
+        else:
+            return currentIndex.row()
+
+    def getCurrentScan(self):
+        index = self.getCurrentScanIndex()
+        return self.item(index)
+
+    def selectLastScan(self):
+        scan = self.rowCount(None)
+        if scan!=0:
+            index = self.index(self.rowCount(None)-1,0)
+            self.scanList_listView.setCurrentIndex(index)
+
+
+
 class MaskModel(QtCore.QAbstractListModel):
     def __init__(self, *args, masks=None, Mask_listView=None, guiWindow=None, **kwargs):
         super(MaskModel, self).__init__(*args, **kwargs)
@@ -818,10 +946,7 @@ class DataFileModel(QtCore.QAbstractListModel):
             return None
         else:
             ds = self.dataSetModel.item(self.getCurrentDatasetIndex())
-            if raw:
-                dfs = [ds[idx] if not ds[idx].type == 'nxs' else ds[idx].original_file for idx in indexRows]
-            else:
-                dfs = [ds[idx] for idx in indexRows]
+            dfs = [ds[idx] for idx in indexRows]
             return dfs
 
     def getData(self,raw = False):
@@ -832,7 +957,7 @@ class DataFileModel(QtCore.QAbstractListModel):
         if len(ds) == 0:
             return []
         if raw:
-            dfs = [df if not df.type == 'nxs' else df.original_file for df in ds]
+            dfs = [df if not df.type == 'nxs' else GuiDataFile(df.original_fileLocation) for df in ds]
         else:
             dfs = [df for df in ds]
         
@@ -1328,3 +1453,87 @@ class MatplotlibFigureList(QtCore.QAbstractListModel):
                 figure.closed = True
         self.layoutChanged.emit()
         #del figure
+
+def formatLongInt(value):
+    returnFormat = '{:d}'
+    string = returnFormat.format(value)
+    stringRemaining = string[::-1]
+    newString = []
+    
+    while len(stringRemaining)>2:
+        newString.append(stringRemaining[:3][::-1])
+        stringRemaining = stringRemaining[3:]
+    
+    if len(stringRemaining)>0:
+        padded = stringRemaining+' '*(3-len(stringRemaining))
+        newString.append(padded[::-1])
+    return ' '.join(newString[::-1])
+
+
+class Scan(object):
+    def __init__(self,Ei1,Ei2=None,s2t=None,A3Start=None,A3StepSize=None,A3Steps=None,monitor=None):
+
+        self.Ei1 = Ei1
+        self.Ei2 = Ei2
+        self.s2t1 = s2t
+        self.s2t2 = s2t+4
+        self.A3Start = A3Start
+        self.A3StepSize = A3StepSize
+        self.A3Steps = A3Steps
+        self.A3Stop = A3Start+A3StepSize*(A3Steps-1)
+        self.monitorValue = monitor
+
+
+    def timeEstimate(self,current=1.3):
+        time = 0
+        for e,stt in zip([self.Ei1,self.Ei1,self.Ei2,self.Ei2],[self.s2t1,self.s2t2,self.s2t2,self.s2t1]):
+            if e is None:
+                continue
+            time += timeEstimate([e],self.monitorValue,self.A3Steps,A4s=1,current=current)
+        return time
+
+    @property
+    def Ei(self):
+        returnFormat = '{:.2f}'
+        returnString = []
+        for e in [self.Ei1,self.Ei2]:
+            if e is None: continue
+            returnString.append(returnFormat.format(e))
+            
+        return ', '.join(returnString)
+
+    @property
+    def s2t(self):
+        returnFormat = '{:.2f}'
+        returnString = []
+        for s2t in [self.s2t1,self.s2t2]:
+            if s2t is None: continue
+            returnString.append(returnFormat.format(s2t))
+            
+        return ', '.join(returnString)
+
+    @property
+    def A3(self):
+        returnFormat = '{:.1f}'
+        returnString = []
+        for s2t in [self.A3Start,self.A3StepSize,self.A3Stop]:
+            returnString.append(returnFormat.format(s2t))
+        returnString = '['+':'.join(returnString)+']'+'({:})'.format(self.A3Steps)
+        return returnString
+
+    @property
+    def Monitor(self):
+        return formatLongInt(self.monitorValue)
+    
+    
+    def Time(self,current=None):
+        return '{:.2f}'.format(self.timeEstimate(current=current)/(60*60))
+
+    def timeDelta(self,current=None):
+        return timedelta(seconds=self.timeEstimate(current=current))
+   
+    def finishTime(self,current=None,offset=datetime.now()):
+        return '{:%A %H:%M}'.format(self.timeDelta(current=current)+offset)
+    
+    def toText(self,current=None,offset=datetime.now()):
+        return ' | '.join([f'{st : ^20}' for st in [self.Ei,self.s2t,self.A3,self.Monitor,self.Time(current=current),self.finishTime(current=current,offset=offset)]])

@@ -1,5 +1,5 @@
 import sys
-sys.path.append('..')
+#sys.path.append('..')
 
 try:
     from MJOLNIRGui.src.main.python._tools import ProgressBarDecoratorArguments,loadUI

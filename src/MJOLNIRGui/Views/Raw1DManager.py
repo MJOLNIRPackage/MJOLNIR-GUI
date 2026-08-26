@@ -101,14 +101,14 @@ def updateRaw1DCutLabels(self,dfs=None):
     instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
     
     
-    instrumentCalibrationEf.shape = (-1,4)
-    instrumentCalibrationA4.shape = (-1)
+    instrumentCalibrationEf.shape = (detectors,EPrDetector,4)
+    instrumentCalibrationA4.shape = (detectors,EPrDetector)
 
     analyzerValue = self.ui.Raw1D_Analyzer_spinBox.value()
     detectorValue = self.ui.Raw1D_Detector_spinBox.value() #
-    idxDetector,_ = df.calcualteDataIndexFromDasel(detectorSelection=detectorValue,analyzerSelection=analyzerValue)
-    Ef = instrumentCalibrationEf[idxDetector,1]
-    A4 = instrumentCalibrationA4[idxDetector]
+    #idxDetector,_ = df.calcualteDataIndexFromDasel(detectorSelection=detectorValue,analyzerSelection=analyzerValue)
+    Ef = instrumentCalibrationEf[detectorValue,analyzerValue,1]
+    A4 = instrumentCalibrationA4[detectorValue,analyzerValue]+df.twotheta[0]
 
     EfEntry = '{:.2f}'.format(Ef).rjust(9,' ')
     A4Entry = '{:+.2f}'.format(A4).rjust(9,' ')

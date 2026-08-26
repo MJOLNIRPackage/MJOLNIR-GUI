@@ -21,7 +21,7 @@ from time import sleep
 
 from os import path
 import os
-version = '1.0.0'
+version = '1.0.7'
 plt.ion()
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 try:
@@ -38,6 +38,7 @@ try:
     from Views.NormalizationManager import NormalizationManager
     from Views.MolecularCalculationManager import MolecularCalculationManager
     from Views.PredictionToolManager import PredictionToolManager
+    from Views.TimeEstimateManager import ScanListManager
     from Views.CalculatorManager import CalculatorManager
     from Views.SubtractionManager import SubtractionManager
     from Views.collapsibleBox import CollapsibleBox
@@ -66,6 +67,7 @@ except ModuleNotFoundError:
     from MJOLNIRGui.src.main.python.Views.NormalizationManager import NormalizationManager
     from MJOLNIRGui.src.main.python.Views.MolecularCalculationManager import MolecularCalculationManager
     from MJOLNIRGui.src.main.python.Views.PredictionToolManager import PredictionToolManager
+    from MJOLNIRGui.src.main.python.Views.TimeEstimateManager import ScanListManager
     from MJOLNIRGui.src.main.python.Views.CalculatorManager import CalculatorManager
     from MJOLNIRGui.src.main.python.Views.SubtractionManager import SubtractionManager
     from MJOLNIRGui.src.main.python.Views.collapsibleBox import CollapsibleBox
@@ -329,6 +331,13 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         self.ui.actionPrediction_Tool.triggered.connect(self.predictionTool)
         self.ui.actionPrediction_Tool.setShortcut("Ctrl+P")
 
+        self.ui.actionTime_Estimate_Tool.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/clock.png')))
+        self.ui.actionTime_Estimate_Tool.setDisabled(False)
+        self.ui.actionTime_Estimate_Tool.setToolTip('Predict Script time') 
+        self.ui.actionTime_Estimate_Tool.setStatusTip(self.ui.actionTime_Estimate_Tool.toolTip())
+        self.ui.actionTime_Estimate_Tool.triggered.connect(self.timeEstimate)
+        self.ui.actionTime_Estimate_Tool.setShortcut("Ctrl+T")
+
         self.ui.actionCalculate_Molecular_Weight.setIcon(QtGui.QIcon(self.AppContext.get_resource('Icons/Own/balance.png')))
         self.ui.actionCalculate_Molecular_Weight.setDisabled(False)
         self.ui.actionCalculate_Molecular_Weight.setToolTip('Calculate Molecular Mass from Chemical Formula') 
@@ -507,7 +516,7 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         for i,ds in enumerate(self.DataSetModel.dataSets):
             dsDict = {'name':ds.name}
             
-            localstring = [df.fileLocation if df.type != 'nxs' else df.original_file.fileLocation for df in ds]
+            localstring = [df.fileLocation if df.type != 'nxs' else df.original_fileLocation for df in ds]
             dsDict['files']=localstring
             dsDict['binning'] = [None if df.type != 'nxs' else df.binning for df in ds]
             if not ds.background is None:
@@ -948,6 +957,11 @@ class MJOLNIRMainWindow(QtWidgets.QMainWindow):
         predictionToolWindow = PredictionToolManager(parent=None,guiWindow=self)
         self.windows.append(predictionToolWindow)
         predictionToolWindow.show()
+
+    def timeEstimate(self):
+        TimeEstimateManagerWindow = ScanListManager(parent=None,guiWindow=self)
+        self.windows.append(TimeEstimateManagerWindow)
+        TimeEstimateManagerWindow.show()
 
     def electronicLogbookTool(self):
         electronicLogBook = ElectronicLogBookManager(parent=None,guiWindow=self)

@@ -15,6 +15,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from MJOLNIR.TasUBlibDEG import calTwoTheta,calculateBMatrix,calcCell
 from MJOLNIR.Geometry.Instrument import prediction,converterToA3A4,converterToQxQy,predictionInstrumentSupport
+try:
+    from MJOLNIR.Geometry.Instrument import timeEstimate
+
+except ImportError:
+     timeEstimate = None
 from MJOLNIR.Data import Sample
 import MJOLNIR 
 import pyperclip
@@ -125,7 +130,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         self.scan_a3Start_spinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_a3Stop_spinBox.valueChanged.connect(self.generateScanCommands)
-        self.scan_a3Steps_spinBox.valueChanged.connect(self.generateScanCommands)
+        self.scan_da3_doubleSpinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_ei_spinBox.valueChanged.connect(self.generateScanCommands)
         self.scan_a4_lineEdit.textChanged.connect(self.generateScanCommands)
         self.scan_monitor_spinBox.valueChanged.connect(self.generateScanCommands)
@@ -285,7 +290,9 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         
     def generatePrediction(self):
         """Generate prediction window from MJOLNIR"""
-        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = self.getScan()
+        A3Start,A3Stop,dA3,Ei,A4,points,Monitor = self.getScan()
+
+        A3Steps = int(np.abs(A3Stop-A3Start)/(dA3))+1
         r1 = np.array(self.getAlignment(alignment=1))
         r2 = np.array(self.getAlignment(alignment=2))
 
@@ -356,7 +363,7 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
     def getScan(self):
         A3Start = self.scan_a3Start_spinBox.value()
         A3Stop = self.scan_a3Stop_spinBox.value()
-        A3Steps = self.scan_a3Steps_spinBox.value()
+        DA3 = self.scan_da3_doubleSpinBox.value()
         Ei = self.scan_ei_spinBox.value()
 
         A4 = self.formatA4String(self.scan_a4_lineEdit.text())
@@ -365,14 +372,14 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
 
         Monitor = self.scan_monitor_spinBox.value()
 
-        return A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor
+        return A3Start,A3Stop,DA3,Ei,A4,points,Monitor
 
-    @BlockInput(['scan_a3Start_spinBox','scan_a3Stop_spinBox','scan_a3Steps_spinBox','scan_ei_spinBox','scan_monitor_spinBox','scan_a4_lineEdit','scan_plot_checkBox'])
+    @BlockInput(['scan_a3Start_spinBox','scan_a3Stop_spinBox','scan_da3_doubleSpinBox','scan_ei_spinBox','scan_monitor_spinBox','scan_a4_lineEdit','scan_plot_checkBox'])
     def setScan(self,scan):
-        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = scan
+        A3Start,A3Stop,DA3,Ei,A4,points,Monitor = scan
         self.scan_a3Start_spinBox.setValue(A3Start)
         self.scan_a3Stop_spinBox.setValue(A3Stop)
-        self.scan_a3Steps_spinBox.setValue(A3Steps)
+        self.scan_da3_doubleSpinBox.setValue(DA3)
         self.scan_ei_spinBox.setValue(Ei)
         self.scan_monitor_spinBox.setValue(Monitor)
 
@@ -451,33 +458,47 @@ class PredictionToolManager(PredictionToolManagerBase, PredictionToolManagerForm
         else:# Create an empty dict
             self.guiWindow.predictionSettings = {}
 
-    def generateScanCommands(self):
+    def generateScanCommands(self, NICOS=True):
         
-        A3Start,A3Stop,A3Steps,Ei,A4,points,Monitor = self.getScan()
-        if A3Steps == 1:
-            A3StepSize = 0
-        else:
-            A3StepSize = (A3Stop-A3Start)/(A3Steps-1.0)
-        A3middle = 0.5*(A3Start+A3Stop)
-
+        A3Start,A3Stop,DA3,Ei,A4,points,Monitor = self.getScan()
+        
+        A3Steps = int(np.ceil(abs(A3Start-A3Stop)/DA3)+1)
         #scanCommand = 'sc a3 {:.2f} da3 {:.2f} np {:d} mn {:}'.format(A3middle,A3StepSize,A3Steps,Monitor)
-        scanCommand = 'scan(a3, {:.2f}, {:.2f},{:d},m={:})'.format(A3Start,A3StepSize,A3Steps,Monitor)
+        scanCommand = []
 
-        commandString = []
-        #commandString.append('dr 2t {:.2f}'.format(A4[0]))
-        commandString.append('maw(s2t,{:.2f})'.format(A4[0]))
-        #commandString.append('dr ei {:.2f}'.format(Ei))
-        commandString.append('maw(ei,{:.2f})'.format(Ei))
-        commandString.append('')
-        for a4 in A4:
-            #commandString.append('dr 2t {:.2f}'.format(a4))
-            commandString.append('maw(s2t,{:.2f})'.format(a4))
-            commandString.append(scanCommand)
-            commandString.append('')
+        A4Copy = np.asarray(A4)
+        regularSteps = np.isclose(np.abs(np.diff(A4)),4)
 
-        commandString.append('')
-        cmdStr = '\n'.join(commandString)
-        self.scanCommand_textEdit.setText(cmdStr)
+        indices = np.arange(1,len(A4))[regularSteps]
+
+        combined = []
+
+        for idx in indices:
+            A4Copy[idx-1] = np.nan
+            A4Copy[idx] = np.nan
+            
+            goodA4 = A4[np.argmin([A4[idx-1],A4[idx]])+idx-1]
+            combined.append(goodA4)
+        
+        singles = list(A4Copy[np.isfinite(A4Copy)])
+        
+        
+        totalScanTime = 0
+        for _a4 in combined:
+            
+            scanCommand.append('CAMEAScan(_en1 = {:.2f}, _en2 = {:.2f}, s2t1_ = {:.2f}, _a31 = {:.2f}, _a3stepsize = {:.1f}, _a3steps = {:d},m={:})'.format(Ei,Ei+0.13,_a4,A3Start,DA3,A3Steps,Monitor))
+            if not timeEstimate is None:
+                localScanTime = timeEstimate([Ei,Ei+0.13],Monitor=Monitor,A3s=A3Steps,A4s=2)/(60*60.0) # Seconds to hours
+                scanCommand.append('# Estimated scan time: {:.2f} Hr'.format(localScanTime))
+                totalScanTime+=localScanTime
+
+
+        for _a4 in singles:
+            scanCommand.append('## CAMEAScan not possible without a s2t displaced by +- 4 degrees, got s2t = {:.2f} deg, so add either s2t = {:.2f} deg or {:.2f} deg'.format(_a4,_a4+4,_a4-4))
+        if not timeEstimate is None:
+            scanCommand.append('\n## Total estimated scan time, assuming a target current of 1300 mu A and no UCN and instrument movement time:\n# {:.2f} Hr'.format(totalScanTime))
+        scanCommand = '\n'.join(scanCommand)
+        self.scanCommand_textEdit.setText(scanCommand)
 
     def getCalculation(self):
         Ei = self.HKL_ei_spinBox.value()

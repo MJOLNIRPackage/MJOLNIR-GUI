@@ -1497,7 +1497,7 @@
                <string>Number of sample rotation steps</string>
               </property>
               <property name="text">
-               <string>A3 Steps</string>
+               <string>Δ A3</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1505,24 +1505,27 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="scan_a3Steps_spinBox">
+             <widget class="QDoubleSpinBox" name="scan_da3_doubleSpinBox">
               <property name="toolTip">
-               <string>Number of sample rotation steps</string>
+               <string>Step in A3</string>
               </property>
               <property name="statusTip">
-               <string>Number of sample rotation steps</string>
+               <string>Step in A3</string>
               </property>
-              <property name="minimum">
+              <property name="decimals">
                <number>1</number>
               </property>
+              <property name="minimum">
+               <double>0.100000000000000</double>
+              </property>
               <property name="maximum">
-               <number>361</number>
+               <double>10.000000000000000</double>
               </property>
               <property name="singleStep">
-               <number>10</number>
+               <double>0.500000000000000</double>
               </property>
               <property name="value">
-               <number>181</number>
+               <double>1.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -1681,7 +1684,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>alignment2_a4_spinBox</tabstop>
   <tabstop>scan_a3Start_spinBox</tabstop>
   <tabstop>scan_a3Stop_spinBox</tabstop>
-  <tabstop>scan_a3Steps_spinBox</tabstop>
+  <tabstop>scan_da3_doubleSpinBox</tabstop>
   <tabstop>scan_ei_spinBox</tabstop>
   <tabstop>scan_a4_lineEdit</tabstop>
  </tabstops>

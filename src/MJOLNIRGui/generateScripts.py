@@ -195,7 +195,7 @@ def generate3DScript(self):
     # Start loading information from the GUI
     ds = self.DataSetModel.getCurrentDataSet()
     
-    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    dataFiles = [df.original_fileLocation if hasattr(df,'original_fileLocation') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
         convertBeforeSubtract = ds.convertBeforeSubtract
         backgroundFiles = ds.background
@@ -347,7 +347,7 @@ def generateQEScript(self):
 
     ds = self.DataSetModel.getCurrentDataSet()
     
-    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    dataFiles = [df.original_fileLocation if hasattr(df,'original_fileLocation') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
         convertBeforeSubtract = ds.convertBeforeSubtract
         backgroundFiles = ds.background
@@ -491,7 +491,7 @@ def generateQPlaneScript(self):
 
     ds = self.DataSetModel.getCurrentDataSet()
     
-    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    dataFiles = [df.original_fileLocation if hasattr(df,'original_fileLocation') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
         convertBeforeSubtract = ds.convertBeforeSubtract
         backgroundFiles = ds.background
@@ -622,7 +622,7 @@ def generateCut1DScript(self):
 
     ds = self.DataSetModel.getCurrentDataSet()
     
-    dataFiles = [df.original_file.fileLocation if hasattr(df,'original_file') else df.fileLocation for df in ds]
+    dataFiles = [df.original_fileLocation if hasattr(df,'original_fileLocation') else df.fileLocation for df in ds]
     if not ds.background is None: # Dealing with a subracted dataset
         convertBeforeSubtract = ds.convertBeforeSubtract
         backgroundFiles = ds.background

@@ -300,9 +300,10 @@ def recalibrateFunction(gui,idx):
     
 def convert(self):
     ds = self.DataSetModel.getCurrentDataSet()
-    
+    idx = self.ui.DataSet_binning_comboBox.currentIndex()
+    binning = int(self.ui.DataSet_binning_comboBox.itemText(idx))
     try:
-        ds.convertDataFile(guiWindow=self,printFunction=self.writeToStatus)
+        ds.convertDataFile(guiWindow=self,printFunction=self.writeToStatus,deleteOnConvert=True,binning=binning)
     except AttributeError as e:
         dialog = QtWidgets.QMessageBox()
         dialog.setIcon(QtWidgets.QMessageBox.Critical)

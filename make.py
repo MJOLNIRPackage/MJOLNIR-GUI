@@ -91,6 +91,7 @@ elif args.task.lower() == 'version':
     
     addFiles = ['setup.py',
                 os.path.join('src','build','settings','base.json'),
+                os.path.join('src','main','python','MJOLNIR_GUI.py')
                 ]
     os.system("git add {}".format(' '.join(addFiles)))
     os.system('git commit -m "Update version"')

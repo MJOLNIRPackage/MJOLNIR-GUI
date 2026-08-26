@@ -42,7 +42,7 @@ def QPlane_plot_button_function(self):
     cut1DFunctionLocalRectangle = lambda viewer,dr:cut1DFunctionRectangle(self,viewer,dr)
     cut1DFunctionLocalCircle = lambda viewer,dr:cut1DFunctionCircle(self,viewer,dr)
 
-    Data,Bins,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap,
+    _,ax = ds.plotQPlane(EMin=EMin, EMax=EMax,xBinTolerance=xBinTolerance,yBinTolerance=yBinTolerance,log=log,rlu=rlu,cmap=self.colormap,
     cut1DFunctionRectangle = cut1DFunctionLocalRectangle, cut1DFunctionCircle=cut1DFunctionLocalCircle,outputFunction=self.writeToStatus)
     currentFigure = ax.get_figure()
     self.QPlane=ax   

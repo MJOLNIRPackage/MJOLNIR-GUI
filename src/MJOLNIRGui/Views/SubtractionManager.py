@@ -215,7 +215,7 @@ class SubtractionManager(SubtractionManagerBase, SubtractionManagerForm):
         subtracted_ds = GuiDataSet(dataSet=temp,name=self.Subtraction_dataSet_name_lineEdit.text())
 
         if background_ds[0].type == 'nxs': # If first file is converted
-            subtracted_ds.background = [df.original_file.fileLocation for df in background_ds]
+            subtracted_ds.background = [df.fileLocation for df in background_ds]
             subtracted_ds.convertBeforeSubtract = True
         else:    
             subtracted_ds.background = [df.fileLocation for df in background_ds]

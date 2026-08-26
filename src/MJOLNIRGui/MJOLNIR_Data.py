@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 from MJOLNIR.Data import DataSet,DataFile,Mask
+from MJOLNIR import _tools
 import copy
 import numpy as np
 #from collections import defaultdict
@@ -23,7 +24,7 @@ class GuiDataSet(DataSet.DataSet):
     def setData(self,column,value):
         if column == 0: self.name = value
         
-    def convertDataFile(self,dataFiles=None,binning=None,guiWindow=None,setProgressBarMaximum=True,progressUpdate=1,printFunction=None):
+    def convertDataFile(self,dataFiles=None,binning=None,guiWindow=None,setProgressBarMaximum=True,progressUpdate=1,printFunction=None,deleteOnConvert=True):
         """
         
         Args:
@@ -36,17 +37,24 @@ class GuiDataSet(DataSet.DataSet):
 
             - progressUpdate (float): Amount to update progress bar (default 1)
 
-            - printFunction (function): Function called with text if any is generated during conversin (Default None, -> warning)
+            - printFunction (function): Function called with text if any is generated during conversion (Default None, -> warning)
+
+            - deleteOnConvert (bool): If true, save ram by deleting unused raw files
         """
         
         dataFiles = list(self)
         if not guiWindow is None and setProgressBarMaximum:
             guiWindow.setProgressBarMaximum(len(dataFiles)+1)
-
+        
         convertedFiles = []
-        for _,rawfile in enumerate(dataFiles):
+        #for _,rawfile in enumerate(dataFiles):
+            #convFile = rawfile.convert(printFunction=printFunction,binning=binning,**kwargs)
+        for rawfile in _tools.getNext(dataFiles,delete=deleteOnConvert):
+            if hasattr(rawfile,'original_fileLocation'):
+                #binning = rawfile.binning
+                rawfile = GuiDataFile(rawfile.original_fileLocation)
+                #rawfile.binning = binning   
             convFile = rawfile.convert(printFunction=printFunction,binning=binning)
-                
             convertedFiles.append(convFile)
             if not guiWindow is None:
                 guiWindow.addProgressBarValue(progressUpdate)
@@ -187,7 +195,7 @@ class GuiDataFile(DataFile.DataFile):
     @idx.setter
     def idx(self,value):
         if self.type == 'nxs':
-            self.original_file.idx = value
+            self._idx = value
         else:
             self._idx = value
     
@@ -206,13 +214,14 @@ class GuiDataFile(DataFile.DataFile):
 
     def convert(self, printFunction,binning=None):
         if self.type == 'nxs':
-            df = self.original_file
+            df = DataFile(self.original_fileLocation)
         else:
             df = self
         if binning is None:
             binning = df.binning
         convertedFile = GuiDataFile(super(GuiDataFile, df).convert(binning = binning,printFunction=printFunction))
-        
+        convertedFile.analyzerSelectionOriginal = df.analyzerSelectionOriginal
+        convertedFile.detectorSelectionOriginal = df.detectorSelectionOriginal
         return convertedFile
 
 class Gui1DCutObject(object):
