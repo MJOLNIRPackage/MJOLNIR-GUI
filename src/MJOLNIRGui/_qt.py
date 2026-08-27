@@ -66,6 +66,32 @@ try:
             QtWidgets.QDialogButtonBox.StandardButton.Cancel
         )
 
+
+    QtWidgets.QMessageBox.Save = (
+                QtWidgets.QMessageBox.StandardButton.Save
+            )
+
+    QtWidgets.QMessageBox.No = (
+                QtWidgets.QMessageBox.StandardButton.No
+            )
+
+    QtWidgets.QMessageBox.Yes = (
+                QtWidgets.QMessageBox.StandardButton.Yes
+            )
+
+    QtWidgets.QMessageBox.Ok = (
+                QtWidgets.QMessageBox.StandardButton.Ok
+            )
+
+    QtWidgets.QMessageBox.Cancel = (
+                QtWidgets.QMessageBox.StandardButton.Cancel
+            )
+
+    QtWidgets.QMessageBox.Critical = (
+                QtWidgets.QMessageBox.Icon.Critical
+            )
+    
+    
     Qt.WindowContextHelpButtonHint = (
         Qt.WindowType.WindowContextHelpButtonHint
     )
@@ -82,6 +108,13 @@ try:
     QtWidgets.QFrame.NoFrame = QtWidgets.QFrame.Shape.NoFrame
 
     QtCore.QEvent.ContextMenu = QtCore.QEvent.Type.ContextMenu
+
+    QtCore.QAbstractAnimation.Forward = (
+        QtCore.QAbstractAnimation.Direction.Forward
+    )
+    QtCore.QAbstractAnimation.Backward = (
+        QtCore.QAbstractAnimation.Direction.Backward
+    )
 
     QT_VERSION = 6
 except ImportError:
