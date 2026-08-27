@@ -18,16 +18,15 @@ license = {text = "MPL-2.0"}
 dependencies = [
     
     "pyperclip",
+    "MJOLNIR>=1.4.0",
 ]
 
 [project.optional-dependencies]
 qt5 = [
     "PyQt5>=5.15,<6",
-    "MJOLNIR[qt5]>=1.4.0",
 ]
 qt6 = [
     "PyQt6>=6.7.1,<6.8",
-    "MJOLNIR[qt6]>=1.4.0",
 ]
 
 [project.scripts]
