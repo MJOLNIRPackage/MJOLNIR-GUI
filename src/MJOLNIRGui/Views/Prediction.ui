@@ -1,0 +1,1693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>890</width>
+    <height>957</height>
+   </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Prediction Tool</string>
+  </property>
+  <property name="toolTip">
+   <string/>
+  </property>
+  <property name="statusTip">
+   <string/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0,0,0,0,1">
+   <item>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Instrument</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_25">
+      <item>
+       <widget class="QComboBox" name="instrument_comboBox">
+        <property name="toolTip">
+         <string>Instrument for prediction</string>
+        </property>
+        <property name="statusTip">
+         <string>Instrument for prediction</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="load_dataset_pushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Load from Dataset</string>
+        </property>
+        <property name="statusTip">
+         <string>Load from Dataset</string>
+        </property>
+        <property name="text">
+         <string>Load From DataSet</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="DataSet_combo_box">
+        <property name="toolTip">
+         <string>Select dataset</string>
+        </property>
+        <property name="statusTip">
+         <string>Select dataset</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Cell parameters</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="toolTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="text">
+             <string>a [AA]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_a_spinBox">
+            <property name="toolTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell a parameter</string>
+            </property>
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>0.000100000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999.990000000000009</double>
+            </property>
+            <property name="value">
+             <double>6.283200000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="toolTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="text">
+             <string>α [deg]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_alpha_spinBox">
+            <property name="toolTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell α angle</string>
+            </property>
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>90.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="toolTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="text">
+             <string>b [AA]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_b_spinBox">
+            <property name="toolTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell b parameter</string>
+            </property>
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>0.000100000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999.990000000000009</double>
+            </property>
+            <property name="value">
+             <double>6.283200000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="toolTip">
+             <string>Cell β angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell β angle</string>
+            </property>
+            <property name="text">
+             <string>β [deg]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_beta_spinBox">
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>90.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="toolTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="text">
+             <string>c [AA]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_c_spinBox">
+            <property name="toolTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell c parameter</string>
+            </property>
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>0.000100000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999.990000000000009</double>
+            </property>
+            <property name="value">
+             <double>6.283200000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="toolTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="text">
+             <string>γ [deg]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="cell_gamma_spinBox">
+            <property name="toolTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Cell γ angle</string>
+            </property>
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>90.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Alignment 1</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_18">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="toolTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="text">
+               <string>Ei [meV]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_ei_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 incoming energy</string>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="toolTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="text">
+               <string>H [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_h_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 H Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_28">
+            <item>
+             <widget class="QLabel" name="label_24">
+              <property name="toolTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="text">
+               <string>A3 [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_a3_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 sample rotation</string>
+              </property>
+              <property name="minimum">
+               <double>-360.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>360.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="toolTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+              <property name="text">
+               <string>Ef [meV]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="alignment1_ef_comboBox">
+              <property name="toolTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 outgoing energy</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_22">
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="toolTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="text">
+               <string>K [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_k_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 K Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_26">
+            <item>
+             <widget class="QLabel" name="label_22">
+              <property name="toolTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="text">
+               <string>A4 [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_a4_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 scattering angle</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>-180.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>180.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>-37.552999999999997</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_23">
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_24">
+            <item>
+             <widget class="QLabel" name="label_20">
+              <property name="toolTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="text">
+               <string>L [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment1_l_spinBox">
+              <property name="toolTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 1 L Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_27">
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Alignment 2</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_56">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_39">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_40">
+            <item>
+             <widget class="QLabel" name="label_30">
+              <property name="toolTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="text">
+               <string>Ei [meV]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_ei_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 incoming energy</string>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_41">
+            <item>
+             <widget class="QLabel" name="label_31">
+              <property name="toolTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="text">
+               <string>H [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_h_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 H Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_42">
+            <item>
+             <widget class="QLabel" name="label_32">
+              <property name="toolTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="text">
+               <string>A3 [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_a3_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 sample rotation</string>
+              </property>
+              <property name="minimum">
+               <double>-360.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>360.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>90.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_16">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_43">
+            <item>
+             <widget class="QLabel" name="label_33">
+              <property name="toolTip">
+               <string>Reflection 2 outgoing energy</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 outgoing energy</string>
+              </property>
+              <property name="text">
+               <string>Ef [meV]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="alignment2_ef_comboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_44">
+            <item>
+             <widget class="QLabel" name="label_34">
+              <property name="toolTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="text">
+               <string>K [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_k_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 K Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_45">
+            <item>
+             <widget class="QLabel" name="label_35">
+              <property name="toolTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="text">
+               <string>A4 [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_a4_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 scattering angle</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>-180.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>180.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>-37.552999999999997</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_17">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_46">
+            <item>
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_47">
+            <item>
+             <widget class="QLabel" name="label_36">
+              <property name="toolTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="text">
+               <string>L [RLU]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="alignment2_l_spinBox">
+              <property name="toolTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="statusTip">
+               <string>Reflection 2 L Value</string>
+              </property>
+              <property name="minimum">
+               <double>-20.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_48">
+            <item>
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="HKLCalculator_groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Calculation of provided peak</string>
+     </property>
+     <property name="statusTip">
+      <string>Calculation of provided peak</string>
+     </property>
+     <property name="title">
+      <string>Calculate</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_16">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="text">
+             <string>Ei [meV]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_ei_spinBox">
+            <property name="toolTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Incoming energy for calculation</string>
+            </property>
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="toolTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="text">
+             <string>H</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_H_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation H Value</string>
+            </property>
+            <property name="minimum">
+             <double>-99.989999999999995</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="toolTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="text">
+             <string>A3 [deg]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_A3_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 sample rotation</string>
+            </property>
+            <property name="minimum">
+             <double>-360.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>360.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>-18.850000000000001</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QLabel" name="label_10">
+            <property name="toolTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+            <property name="text">
+             <string>Ef [meV]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="HKL_ef_comboBox">
+            <property name="toolTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+            <property name="statusTip">
+             <string>Outgoing energy for calculation</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="toolTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="text">
+             <string>K</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_K_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation K Value</string>
+            </property>
+            <property name="minimum">
+             <double>-99.989999999999995</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="toolTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="text">
+             <string>A4 [deg]</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_A4_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation 2 scattering angle</string>
+            </property>
+            <property name="minimum">
+             <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>-37.549999999999997</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0">
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="toolTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="text">
+             <string>L</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="HKL_L_doubleSpinBox">
+            <property name="toolTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="statusTip">
+             <string>Calculation L Value</string>
+            </property>
+            <property name="minimum">
+             <double>-99.989999999999995</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="title">
+      <string>Scan</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_49">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_18">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_50">
+            <item>
+             <widget class="QLabel" name="label_37">
+              <property name="toolTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="text">
+               <string>A3 Start [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="scan_a3Start_spinBox">
+              <property name="toolTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>Start of sample rotation</string>
+              </property>
+              <property name="minimum">
+               <double>-720.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>720.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_51">
+            <item>
+             <widget class="QLabel" name="label_38">
+              <property name="toolTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="text">
+               <string>Ei [meV]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="scan_ei_spinBox">
+              <property name="toolTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Incoming energy for scan</string>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="scan_curratAxe_pushButton">
+            <property name="toolTip">
+             <string>Create/Edit Currat-Axe list</string>
+            </property>
+            <property name="statusTip">
+             <string>Create/Edit Currat-Axe list</string>
+            </property>
+            <property name="text">
+             <string>Currat-Axe List</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_19">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_52">
+            <item>
+             <widget class="QLabel" name="label_39">
+              <property name="toolTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="text">
+               <string>A3 Stop [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="scan_a3Stop_spinBox">
+              <property name="toolTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="statusTip">
+               <string>End of sample rotation</string>
+              </property>
+              <property name="minimum">
+               <double>-720.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>720.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>180.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_53">
+            <item>
+             <widget class="QLabel" name="label_40">
+              <property name="toolTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="statusTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="text">
+               <string>2θ [deg]</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="scan_a4_lineEdit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="statusTip">
+               <string>Scattering angle list (Seperate by ',')</string>
+              </property>
+              <property name="text">
+               <string>-36,-40</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="scan_curratAxe_checkBox">
+            <property name="toolTip">
+             <string>Plot Currat-Axe spurions on top</string>
+            </property>
+            <property name="statusTip">
+             <string>Plot Currat-Axe spurions on top</string>
+            </property>
+            <property name="text">
+             <string>Plot Currat-Axe Spurions</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_54">
+            <item>
+             <widget class="QLabel" name="label_41">
+              <property name="toolTip">
+               <string>Number of sample rotation steps</string>
+              </property>
+              <property name="statusTip">
+               <string>Number of sample rotation steps</string>
+              </property>
+              <property name="text">
+               <string>Δ A3</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="scan_da3_doubleSpinBox">
+              <property name="toolTip">
+               <string>Step in A3</string>
+              </property>
+              <property name="statusTip">
+               <string>Step in A3</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="minimum">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>10.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.500000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_55"/>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_19">
+              <property name="toolTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="text">
+               <string>Monitor</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="scan_monitor_spinBox">
+              <property name="toolTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="statusTip">
+               <string>Monitor for scan</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100000000</number>
+              </property>
+              <property name="singleStep">
+               <number>1000</number>
+              </property>
+              <property name="value">
+               <number>100000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="scan_plot_checkBox">
+            <property name="toolTip">
+             <string>Plot individual scan points</string>
+            </property>
+            <property name="statusTip">
+             <string>Plot individual scan points</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Plot Scan Points</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Suggested Scan Command (Watch 2t limits!)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="scanCommand_textEdit">
+        <property name="toolTip">
+         <string>Suggested script</string>
+        </property>
+        <property name="statusTip">
+         <string>Suggested script</string>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;dr 2t -36.00&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;dr ei 5.00&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;dr 2t -36.00&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;sc a3 90.00 da3 1.00 np 181 mn 100000&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;dr 2t -40.00&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;sc a3 90.00 da3 1.00 np 181 mn 100000&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="tool_generate_button">
+        <property name="toolTip">
+         <string>Generate overview plots</string>
+        </property>
+        <property name="statusTip">
+         <string>Generate overview plots</string>
+        </property>
+        <property name="text">
+         <string>Generate</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>cell_a_spinBox</tabstop>
+  <tabstop>cell_b_spinBox</tabstop>
+  <tabstop>cell_c_spinBox</tabstop>
+  <tabstop>cell_alpha_spinBox</tabstop>
+  <tabstop>cell_beta_spinBox</tabstop>
+  <tabstop>cell_gamma_spinBox</tabstop>
+  <tabstop>alignment1_ei_spinBox</tabstop>
+  <tabstop>alignment1_h_spinBox</tabstop>
+  <tabstop>alignment1_k_spinBox</tabstop>
+  <tabstop>alignment1_l_spinBox</tabstop>
+  <tabstop>alignment1_a3_spinBox</tabstop>
+  <tabstop>alignment1_a4_spinBox</tabstop>
+  <tabstop>alignment2_ei_spinBox</tabstop>
+  <tabstop>alignment2_h_spinBox</tabstop>
+  <tabstop>alignment2_k_spinBox</tabstop>
+  <tabstop>alignment2_l_spinBox</tabstop>
+  <tabstop>alignment2_a3_spinBox</tabstop>
+  <tabstop>alignment2_a4_spinBox</tabstop>
+  <tabstop>scan_a3Start_spinBox</tabstop>
+  <tabstop>scan_a3Stop_spinBox</tabstop>
+  <tabstop>scan_da3_doubleSpinBox</tabstop>
+  <tabstop>scan_ei_spinBox</tabstop>
+  <tabstop>scan_a4_lineEdit</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,38 @@
+[workspace]
+authors = ["Jakob Lass <jakob.lass@psi.ch>"]
+channels = ["conda-forge"]
+name = "MJOLNIR-GUI"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+test = "pytest"
+
+[dependencies]
+pytest = ">=8,<10"
+pip = ">=25.2,<27"
+h5py = ">=3.8,<4"
+regex = ">=2025,<2027"
+pandas = ">=2,<4"
+future = ">=1,<2"
+sympy = ">=1.14,<2"
+scipy = ">=1.10,<2"
+matplotlib = ">=3.7,<4"
+pyqtgraph = ">=0.13,<1"
+pyperclip = ">=1.9.0,<2"
+
+[feature.py39-qt5.dependencies]
+python = "3.9.*"
+pip = "*"
+numpy = ">=1.26,<2"
+pyqt = ">=5,<6"
+
+[feature.py312-qt6.dependencies]
+python = "3.12.*"
+pip = "*"
+numpy = ">=2,<3"
+pyqt6 = ">=6,<7"
+
+[environments]
+py39-qt5 = ["py39-qt5"]
+py312-qt6 = ["py312-qt6"]

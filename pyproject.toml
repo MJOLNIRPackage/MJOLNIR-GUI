@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MJOLNIRGui"
+version = "1.1.0"
+description = "Graphical user interface for the MJOLNIR software."
+readme = "README.md"
+requires-python = ">=3.9"
+
+authors = [
+    {name = "MJOLNIRPackage", email = "mjolnirpackage@gmail.com"},
+]
+
+license = {text = "MPL-2.0"}
+
+dependencies = [
+    
+    "pyperclip",
+    "MJOLNIR>=1.4.0",
+]
+
+[project.optional-dependencies]
+qt5 = [
+    "PyQt5>=5.15,<6",
+]
+qt6 = [
+    "PyQt6>=6.7.1,<6.8",
+]
+
+[project.scripts]
+MJOLNIRGui = "MJOLNIRGui.main:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+MJOLNIRGui = [
+    "**/*.ui",
+    "**/*.png",
+    "**/*.ico",
+]

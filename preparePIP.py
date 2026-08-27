@@ -34,9 +34,8 @@ if not os.path.exists(targetDir):
     os.system("mkdir {}".format(targetDir))
 
 # If the build folder exists also delete the main folder
-if os.path.exists(os.path.join(targetDir,'build')):
-    shutil.rmtree(os.path.join(targetDir,'build'))
-    shutil.rmtree(os.path.join(targetDir,'main'))
+if os.path.exists(targetDir):
+    shutil.rmtree(targetDir)
 
 # Do not include the installer or sign folders
 removeList = ['installer','sign']
