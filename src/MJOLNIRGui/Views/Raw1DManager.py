@@ -93,8 +93,8 @@ def updateRaw1DCutLabels(self,dfs=None):
     instrumentCalibrationEf,instrumentCalibrationA4,_ = df.instrumentCalibrations[calibrationIndex]
     
     
-    instrumentCalibrationEf.shape = (detectors,EPrDetector,4)
-    instrumentCalibrationA4.shape = (detectors,EPrDetector)
+    instrumentCalibrationEf = instrumentCalibrationEf.reshape(detectors,EPrDetector,4)
+    instrumentCalibrationA4 = instrumentCalibrationA4.reshape(detectors,EPrDetector)
 
     analyzerValue = self.ui.Raw1D_Analyzer_spinBox.value()
     detectorValue = self.ui.Raw1D_Detector_spinBox.value() #
