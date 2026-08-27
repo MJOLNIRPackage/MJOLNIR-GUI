@@ -16,26 +16,32 @@ authors = [
 license = {text = "MPL-2.0"}
 
 dependencies = [
-    "MJOLNIR>=1.3.5",
+    
     "pyperclip",
 ]
 
 [project.optional-dependencies]
 qt5 = [
     "PyQt5>=5.15,<6",
+    "MJOLNIR[qt5]>=1.4.0",
 ]
 qt6 = [
-    "PyQt6>=6,<7",
+    "PyQt6>=6.7.1,<6.8",
+    "MJOLNIR[qt6]>=1.4.0",
 ]
 
 [project.scripts]
 MJOLNIRGui = "MJOLNIRGui.main:main"
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 MJOLNIRGui = [
-    "Views/*.ui",
-    "resources/**/*",
+    "**/*.ui",
+    "**/*.png",
+    "**/*.ico",
 ]
