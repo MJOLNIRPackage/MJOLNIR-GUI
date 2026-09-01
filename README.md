@@ -1,75 +1,92 @@
 # MJOLNIR-GUI
-This is a graphical interface for the MJOLNIR: https://github.com/MJOLNIRPackage/MJOLNIR/, which deals with multiplexing inelastic neutron spectrometers. MJOLNIRGui is meant to introduce the scripting software in a user-friendly way and to give access to data-overview methods either during an experiment or when inspecting data files. Further information can be found at https://www.psi.ch/en/sinq/camea/data-treatment.
 
-## Citing this package
-If you use this software for data treatment, please do cite it using its doi and the article found at https://www.psi.ch/en/sinq/camea/data-treatment.
+**MJOLNIR-GUI** is a graphical user interface for [MJOLNIR](https://github.com/MJOLNIRPackage/MJOLNIR), a Python package for data treatment and analysis of multiplexing inelastic neutron spectrometers.
 
+The GUI is designed to make the functionality of MJOLNIR accessible in a user-friendly environment, both for users who are new to scripting and for experienced users who want a convenient way to inspect and process data.
 
-# Install
+MJOLNIR-GUI provides tools for:
 
-There are in total four ways of installing this interface to MJOLNIR
+* Converting and inspecting experimental data
+* Quickly obtaining an overview of measured datasets
+* Visualising data during an experiment
+* Inspecting and analysing previously collected data
+* Accessing selected MJOLNIR data-treatment functionality without writing Python scripts
 
-## Using installers
+Further information about MJOLNIR and data treatment for multiplexing neutron spectrometers can be found on the [CAMEA data-treatment page](https://www.psi.ch/en/sinq/camea/data-treatment).
 
-Installers for the app is currently supported on Windows and Ubuntu. For both, installation files are available at https://www.psi.ch/en/sinq/camea/data-treatment. To install, double click the .exe file in windows, or run the .deb file through the system package manager on Ubuntu.
+## Installation
 
+The recommended way to install MJOLNIR-GUI is using `pip` in a dedicated Python environment. This can be created using tools such as [Miniforge](https://github.com/conda-forge/miniforge), `venv`, or another preferred environment manager.
 
-## Anaconda and Pip
+Installing MJOLNIR-GUI automatically installs the required [MJOLNIR](https://github.com/MJOLNIRPackage/MJOLNIR) package.
 
-The app can be install in an Anaconda environment on all platforms. In order to do this, first the anaconda environment is to be set up
+MJOLNIR-GUI supports both **Qt5** and **Qt6**. Because the Python Qt bindings are mutually exclusive, the desired Qt version must be selected when installing the package.
 
-```bash
-    conda create --name MJOLNIRGui python=3.6 geos numpy scipy shapely
-```
-
-For windows, it is important that the geos and shapely modules are installed through conda instead of pip. Next, the app is installed by
-
-```bash
-    conda activate MJOLNIRGui
-    pip install MJOLNIRGui
-```
-
-This installs the needed packages and creates a command line script to run the app. To run, be sure to be in the right environment and call
+### Qt5
 
 ```bash
-    MJOLNIRGui
+pip install "MJOLNIRGui[qt5]"
 ```
 
-## Through git
-
-As an alternative to the two above methods, it is possible to clone the git repository og MJOLNIRGui and run it locally. This is done by creating a folder in which to clone and invoke the clone command
+### Qt6
 
 ```bash
-    git clone https://github.com/MJOLNIRPackage/MJOLNIR-GUI.git
-    cd MJOLNIR-GUI
+pip install "MJOLNIRGui[qt6]"
 ```
 
-As was the case for the anaconda and pip method, on Windows the geos and shapely modules need to be installed through anaconda. Further needed packages are fbs PyQt5 PyInstaller==3.4 setuptools<45.0.0, MJOLNIR. With all of these installed navigate to the root directory of the git repository (containing setup.py, src, ...) and call
+After a successful installation, start the GUI from the command line with:
 
 ```bash
-    fbs run
+MJOLNIRGui
 ```
 
-## Ubunto through the apt-get
+## Requirements
 
-You can also add the MJOLNIRGui to be automatically update through the software updater. This is done by
+MJOLNIR-GUI requires:
+
+* Python **3.9 or newer**
+* Either **Qt5** or **Qt6**
+* MJOLNIR (installed automatically as a dependency)
+
+The required Qt version must be selected during installation using either the `qt5` or `qt6` optional dependency.
+
+## Installation from Git
+
+MJOLNIR-GUI can also be installed directly from the Git repository. This is useful for development, testing new features, or accessing the latest version before it is released through PyPI.
+
+First, clone the repository:
 
 ```bash
-    sudo apt-get install apt-transport-https
-    wget -qO - https://fbs.sh/MJOLNIRPackage/MJOLNIRGui/public-key.gpg | sudo apt-key add -
-    echo 'deb [arch=amd64] https://fbs.sh/MJOLNIRPackage/MJOLNIRGui/deb stable main' | sudo tee /etc/apt/sources.list.d/mjolnirgui.list
-    sudo apt-get update
-    sudo apt-get install mjolnirgui
+git clone https://github.com/MJOLNIRPackage/MJOLNIR-GUI.git
+cd MJOLNIR-GUI
 ```
 
-If you already have installed the app, a forced  update can be triggered via:
+The latest version can then be installed using `pip`. For example, for Qt6:
 
 ```bash
-    sudo apt-get update -o Dir::Etc::sourcelist="/etc/apt/sources.list.d/mjolnirgui.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
-    sudo apt-get install --only-upgrade mjolnirgui
+pip install ".[qt6]"
 ```
 
-Lastly, your can also install without automatic updates by downloading:
+or, for Qt5:
 
-https://fbs.sh/MJOLNIRPackage/MJOLNIRGui/MJOLNIRGui.deb
+```bash
+pip install ".[qt5]"
+```
 
+After installation, start the GUI with:
+
+```bash
+MJOLNIRGui
+```
+
+## Citing MJOLNIR-GUI
+
+If you use MJOLNIR-GUI for data treatment or analysis in a publication, please cite the MJOLNIR-GUI software and the associated publication.
+
+Citation information, the DOI, and the relevant publication can be found on the [CAMEA data-treatment page](https://www.psi.ch/en/sinq/camea/data-treatment).
+
+## Links
+
+* [MJOLNIR on GitHub](https://github.com/MJOLNIRPackage/MJOLNIR)
+* [MJOLNIR-GUI on GitHub](https://github.com/MJOLNIRPackage/MJOLNIR-GUI)
+* [CAMEA data treatment](https://www.psi.ch/en/sinq/camea/data-treatment)
